@@ -17,30 +17,25 @@
 </head>
 <body class="bg-gray-50 font-sans overflow-hidden text-buna">
 
-    <!-- Loading View -->
     <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300">
         <i class="ph-fill ph-spinner-gap animate-spin text-5xl text-botOrange mb-4"></i>
         <p class="text-gray-500 font-medium">Loading...</p>
     </div>
 
-    <!-- Registration / Edit View -->
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
         <div class="max-w-md mx-auto p-6 py-10">
             <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center transition-all">Step 1: Basics</h2>
             
-            <!-- Progress Bar -->
             <div class="w-full bg-gray-200 h-2 rounded-full mb-8 overflow-hidden">
                 <div id="progress-bar" class="bg-botOrange h-full w-1/3 transition-all duration-300"></div>
             </div>
 
-            <!-- Page 1: Basics -->
             <div id="page-1" class="space-y-4 transition-all">
                 <div class="mb-6 flex flex-col items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl h-32 w-32 mx-auto cursor-pointer hover:bg-gray-200 transition">
                     <i class="ph ph-camera text-3xl text-gray-500 mb-1"></i>
                     <span class="text-xs text-gray-500">Upload Photo</span>
                 </div>
                 
-                <!-- Nickname (Optional) -->
                 <input id="reg-name" type="text" placeholder="Nickname (Optional)" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
                 
                 <div class="flex gap-2">
@@ -82,7 +77,6 @@
                 <button onclick="validateAndNext(1)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md">Next</button>
             </div>
 
-            <!-- Page 2: Details & Lifestyle -->
             <div id="page-2" class="hidden space-y-4 transition-all">
                 <input id="reg-height" type="text" placeholder="Height (e.g. 1.70m)" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                 
@@ -134,7 +128,6 @@
                 </div>
             </div>
 
-            <!-- Page 3: Bio -->
             <div id="page-3" class="hidden space-y-4 transition-all">
                 <textarea id="reg-bio" placeholder="Tell us about yourself... (Hobbies, what you're looking for)" class="w-full p-4 border rounded-xl bg-gray-50 h-32 focus:outline-none focus:border-botOrange resize-none"></textarea>
                 
@@ -149,9 +142,7 @@
         </div>
     </div>
 
-    <!-- Swipe View -->
     <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-20 px-4 flex-col bg-gray-100">
-        <!-- New Header with Edit Button -->
         <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-4 mt-2">
             <h2 class="font-bold text-2xl text-buna">Discover</h2>
             <button onclick="openEditProfile()" class="text-botOrange text-sm font-bold flex items-center gap-1.5 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-gray-50 transition">
@@ -159,7 +150,7 @@
             </button>
         </div>
 
-        <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
+        <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full min-h-[60vh] bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
             <p class="text-gray-400 font-medium">No more profiles to show.</p>
         </div>
     </div>
@@ -173,6 +164,10 @@
         let selectedPhotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
         
         let isEditing = false;
+        
+        // Appended Global State for Swiping
+        let profiles = [];
+        let currentCardIndex = 0;
 
         function showAlert(message) {
             if (tg.showAlert) {
@@ -194,6 +189,11 @@
                     document.getElementById('view-registration').classList.remove('hidden');
                 } else {
                     document.getElementById('view-swipe').classList.remove('hidden');
+                    // In a real app, you would fetch profiles here. Mocking for demonstration:
+                    profiles = [
+                        { telegram_id: '123', name: 'Sample User', age: 24, bio: 'Ready to mingle!', photo_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80' }
+                    ];
+                    renderCards();
                 }
             } catch (err) {
                 console.error(err);
@@ -203,6 +203,67 @@
                     <p class="text-gray-500 text-sm mt-2">Please try again later.</p>`;
             }
         }
+
+        // ---------- SWIPING LOGIC INTEGRATION ---------- //
+        
+        function renderCards() {
+            const container = document.getElementById('card-container');
+            
+            if (currentCardIndex >= profiles.length || profiles.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 font-medium">No more profiles to show.</p>`;
+                return;
+            }
+
+            const profile = profiles[currentCardIndex];
+            
+            container.innerHTML = `
+                <div class="w-full h-full flex flex-col">
+                    <div class="flex-1 bg-gray-200 bg-cover bg-center" style="background-image: url('${profile.photo_url}')"></div>
+                    <div class="p-4 bg-white flex-shrink-0">
+                        <h3 class="text-xl font-bold">${profile.name}, ${profile.age}</h3>
+                        <p class="text-gray-500 text-sm mt-1">${profile.bio}</p>
+                    </div>
+                    
+                    <div class="mt-auto w-full flex justify-around pt-6 pb-6 bg-white">
+                        <button onclick="handleSwipe(false)" class="w-14 h-14 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform">
+                            <i class="ph-bold ph-x text-2xl"></i>
+                        </button>
+                        <button onclick="handleSwipe(true)" class="w-14 h-14 bg-gradient-to-tr from-botOrange to-orange-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-95 transition-transform">
+                            <i class="ph-fill ph-heart text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function handleSwipe(isLike) {
+            const swiperId = cleanTelegramId;
+            const swipedId = profiles[currentCardIndex].telegram_id; 
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/swipe`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ swiper_id: swiperId, swiped_id: swipedId, is_like: isLike })
+                });
+                
+                const data = await response.json();
+                if (data.match) {
+                    showAlert("It's a Match! ❤️");
+                }
+            } catch (e) {
+                console.error("Swipe failed:", e);
+            }
+            
+            nextCard();
+        }
+
+        function nextCard() {
+            currentCardIndex++;
+            renderCards();
+        }
+
+        // ---------- END SWIPING LOGIC INTEGRATION ---------- //
 
         function toggleOtherLocation() {
             const select = document.getElementById('reg-location');
@@ -228,7 +289,6 @@
                     location = document.getElementById('reg-location-other').value.trim();
                 }
 
-                // Name is no longer checked here because it is Optional
                 if (!gender || !age || !interest || !intention || !location) {
                     return showAlert("Please fill out all required basic fields.");
                 }
@@ -259,7 +319,6 @@
             
             document.getElementById('page-' + step).classList.remove('hidden');
             
-            // Dynamic titles based on whether they are creating or editing
             const titles = isEditing 
                 ? ["Edit Profile: Basics", "Edit Profile: Details", "Edit Profile: Bio"] 
                 : ["Step 1: Basics", "Step 2: Details", "Step 3: Bio"];
@@ -275,79 +334,5 @@
             document.getElementById('view-swipe').classList.add('hidden');
             document.getElementById('view-registration').classList.remove('hidden');
             
-            // Reset UI for Editing
             goToPage(1); 
-            document.getElementById('submit-btn').innerHTML = `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>`;
-        }
-
-        async function submitRegistration() {
-            const bio = document.getElementById('reg-bio').value.trim();
-            if(!bio) return showAlert("Please write a short bio to help others get to know you!");
-
-            let finalLocation = document.getElementById('reg-location').value;
-            if (finalLocation === 'Other') {
-                finalLocation = document.getElementById('reg-location-other').value.trim();
-            }
-
-            // Fallback for optional name
-            let finalName = document.getElementById('reg-name').value.trim();
-            if (!finalName) {
-                finalName = tg.initDataUnsafe?.user?.first_name || "Anonymous";
-            }
-
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Saving...`;
-            submitBtn.disabled = true;
-
-            const payload = {
-                telegram_id: cleanTelegramId,
-                name: finalName, // Uses typed Nickname, or Telegram First Name
-                age: parseInt(document.getElementById('reg-age').value),
-                gender: document.getElementById('reg-gender').value,
-                interested_in: document.getElementById('reg-interest').value,
-                location: finalLocation, 
-                height: document.getElementById('reg-height').value,
-                religion: document.getElementById('reg-religion').value,
-                education: document.getElementById('reg-education').value,
-                occupation: document.getElementById('reg-occupation').value,
-                bio: bio,
-                photo_url: selectedPhotoUrl,
-                intention: document.getElementById('reg-intention').value,
-                kids: document.getElementById('reg-kids').value,
-                drinking: document.getElementById('reg-drinking').value,
-                smoking: document.getElementById('reg-smoking').value
-            };
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.detail || "Server Error");
-                }
-                
-                // Done. Reset states and return to swipe view.
-                isEditing = false;
-                document.getElementById('view-registration').classList.add('hidden');
-                document.getElementById('view-swipe').classList.remove('hidden');
-                
-                // Reset button UI for future edits
-                submitBtn.innerHTML = `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
-                submitBtn.disabled = false;
-                
-                if(tg.showAlert) tg.showAlert("Profile successfully saved!");
-            } catch (err) {
-                showAlert("Failed to save profile: " + err.message);
-                submitBtn.innerHTML = isEditing ? `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>` : `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
-                submitBtn.disabled = false;
-            }
-        }
-
-        initApp();
-    </script>
-</body>
-</html>
+            document.getElementById('submit-btn').innerHTML = `<span>Update Profile</span><i class="
