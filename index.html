@@ -2,213 +2,131 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration - Habesha Date</title>
-    
-    <!-- Telegram Web App SDK (Required for Telegram integration) -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- Tailwind CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Habesha Date</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script>
-        (function() {
-            const checkTailwind = setInterval(() => {
-                if (window.tailwind) {
-                    window.tailwind.config = { 
-                        theme: { 
-                            extend: { 
-                                colors: { 
-                                    botOrange: '#FF952B', 
-                                    buna: '#2C1E16' 
-                                } 
-                            } 
-                        } 
-                    };
-                    clearInterval(checkTailwind);
-                }
-            }, 50);
-        })();
+        tailwind.config = { theme: { extend: { colors: { botOrange: '#FF952B', buna: '#2C1E16' } } } }
     </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div id="reg-container" class="max-w-md mx-auto bg-white min-h-screen shadow-lg p-6">
-        <h2 id="reg-title" class="text-2xl font-bold text-buna mb-6 text-center">Step 1: The Basics</h2>
+<body class="bg-gray-50 font-sans overflow-hidden">
 
-        <!-- Progress Bar -->
-        <div class="w-full bg-gray-200 h-2 rounded-full mb-8 overflow-hidden">
-            <div id="progress-bar" class="bg-botOrange h-full w-1/3 transition-all duration-300"></div>
-        </div>
+    <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6">
+        <i class="ph-fill ph-spinner-gap animate-spin text-4xl text-botOrange mb-4"></i>
+        <p class="text-gray-500 font-medium">Loading...</p>
+    </div>
 
-        <!-- Page 1: Basics -->
-        <div id="page-1" class="space-y-4">
-            <input id="reg-name" type="text" placeholder="Full Name" class="w-full p-3 border rounded-xl" required>
-            <div class="flex gap-2">
-                <select id="reg-gender" class="w-1/2 p-3 border rounded-xl">
-                    <option value="">Gender</option>
-                    <option value="Man">Man</option>
-                    <option value="Woman">Woman</option>
-                </select>
-                <input id="reg-age" type="number" placeholder="Age" min="18" class="w-1/2 p-3 border rounded-xl" required>
-            </div>
-            <select id="reg-interest" class="w-full p-3 border rounded-xl">
-                <option value="">Interested In</option>
-                <option value="Women">Women</option>
-                <option value="Men">Men</option>
-                <option value="Everyone">Everyone</option>
-            </select>
-            <div class="space-y-3">
-                <select id="reg-location" class="w-full p-3 border rounded-xl" onchange="toggleInput('reg-location', 'reg-location-other')">
-                    <option value="">Living City</option>
-                    <option value="Addis Ababa">Addis Ababa</option>
-                    <option value="Bahir Dar">Bahir Dar</option>
-                    <option value="Hawassa">Hawassa</option>
-                    <option value="Diaspora">Diaspora</option>
-                    <option value="Other">Other</option>
-                </select>
-                <input id="reg-location-other" type="text" placeholder="Type your city..." class="w-full p-3 border rounded-xl hidden">
-            </div>
-            <button onclick="nextPage(2)" class="w-full p-3 bg-botOrange text-white rounded-xl font-bold mt-4">Next: Lifestyle</button>
-        </div>
-
-        <!-- Page 2: Lifestyle & Background -->
-        <div id="page-2" class="hidden space-y-4">
-            <input id="reg-height" type="text" placeholder="Height (e.g. 1.70m)" class="w-full p-3 border rounded-xl">
-            
-            <div class="space-y-3">
-                <select id="reg-religion" class="w-full p-3 border rounded-xl" onchange="toggleInput('reg-religion', 'reg-religion-other')">
-                    <option value="">Religion</option>
-                    <option value="Orthodox">Orthodox</option>
-                    <option value="Muslim">Muslim</option>
-                    <option value="Protestant">Protestant</option>
-                    <option value="Catholic">Catholic</option>
-                    <option value="Other">Other</option>
-                </select>
-                <input id="reg-religion-other" type="text" placeholder="Specify religion..." class="w-full p-3 border rounded-xl hidden">
+    <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar">
+        <div class="max-w-md mx-auto p-6 py-10 pb-24">
+            <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center">Step 1: Basics</h2>
+            <div class="w-full bg-gray-200 h-2 rounded-full mb-8 overflow-hidden">
+                <div id="progress-bar" class="bg-botOrange h-full w-1/3 transition-all duration-300"></div>
             </div>
 
-            <select id="reg-education" class="w-full p-3 border rounded-xl">
-                <option value="">Education Level</option>
-                <option value="None">None</option>
-                <option value="High School">High School</option>
-                <option value="Bachelor's">Bachelor's</option>
-                <option value="Master's">Master's</option>
-            </select>
-
-            <input id="reg-occupation" type="text" placeholder="Occupation" class="w-full p-3 border rounded-xl">
-            <div class="flex gap-2">
-                <select id="reg-drinking" class="w-1/2 p-3 border rounded-xl">
-                    <option value="">Drinking</option>
-                    <option value="Never">Never</option>
-                    <option value="Socially">Socially</option>
-                </select>
-                <select id="reg-smoking" class="w-1/2 p-3 border rounded-xl">
-                    <option value="">Smoking</option>
-                    <option value="Never">Never</option>
-                    <option value="Socially">Socially</option>
-                </select>
+            <div id="page-1" class="space-y-4">
+                <div class="mb-6" id="photo-selector"></div>
+                <input id="reg-name" type="text" placeholder="Full Name" class="w-full p-4 border rounded-xl bg-gray-50">
+                <div class="flex gap-2">
+                    <select id="reg-gender" class="w-1/2 p-4 border rounded-xl bg-gray-50"><option value="">Gender</option><option>Man</option><option>Woman</option></select>
+                    <input id="reg-age" type="number" placeholder="Age (18+)" min="18" class="w-1/2 p-4 border rounded-xl bg-gray-50">
+                </div>
+                <select id="reg-interest" class="w-full p-4 border rounded-xl bg-gray-50"><option value="">Interested In</option><option>Women</option><option>Men</option><option>Everyone</option></select>
+                <select id="reg-location" class="w-full p-4 border rounded-xl bg-gray-50"><option value="">Living City</option><option>Addis Ababa</option><option>Bahir Dar</option><option>Hawassa</option><option>Adama</option><option>Diaspora</option></select>
+                <button onclick="nextPage(2)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold">Next</button>
             </div>
-            <select id="reg-kids" class="w-full p-3 border rounded-xl">
-                <option value="">Family Plans</option>
-                <option value="Want kids">Want kids</option>
-                <option value="Don't want kids">Don't want kids</option>
-            </select>
-            <button onclick="nextPage(3)" class="w-full p-3 bg-botOrange text-white rounded-xl font-bold mt-4">Next: Bio</button>
-        </div>
 
-        <!-- Page 3: About You -->
-        <div id="page-3" class="hidden space-y-4">
-            <textarea id="reg-bio" placeholder="Tell us about yourself..." class="w-full p-3 border rounded-xl h-32"></textarea>
-            <button id="submit-btn" onclick="submitData()" class="w-full p-3 bg-green-600 text-white rounded-xl font-bold mt-4">Complete Registration</button>
+            <div id="page-2" class="hidden space-y-4">
+                <input id="reg-height" type="text" placeholder="Height (e.g. 1.70m)" class="w-full p-4 border rounded-xl bg-gray-50">
+                <select id="reg-religion" class="w-full p-4 border rounded-xl bg-gray-50"><option value="">Religion</option><option>Orthodox</option><option>Muslim</option><option>Protestant</option><option>Catholic</option></select>
+                <select id="reg-education" class="w-full p-4 border rounded-xl bg-gray-50"><option value="">Education</option><option>High School</option><option>Bachelor's</option><option>Master's</option></select>
+                <input id="reg-occupation" type="text" placeholder="Occupation" class="w-full p-4 border rounded-xl bg-gray-50">
+                <button onclick="nextPage(3)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold">Next</button>
+            </div>
+
+            <div id="page-3" class="hidden space-y-4">
+                <textarea id="reg-bio" placeholder="Tell us about yourself..." class="w-full p-4 border rounded-xl bg-gray-50 h-32"></textarea>
+                <button onclick="submitRegistration()" class="w-full p-4 bg-green-600 text-white rounded-xl font-bold">Complete Registration</button>
+            </div>
         </div>
     </div>
 
+    <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-20 px-4 flex-col">
+        <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full"></div>
+    </div>
+
     <script>
-        const API_BASE_URL = "YOUR_RENDER_URL_HERE"; 
         const tg = window.Telegram.WebApp;
         tg.expand();
+        const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
+        const cleanTelegramId = String(tg.initDataUnsafe?.user?.id || Math.random()).trim();
+        let selectedPhotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
 
-        function toggleInput(selectId, inputId) {
-            const select = document.getElementById(selectId);
-            const input = document.getElementById(inputId);
-            if (select.value === 'Other') {
-                input.classList.remove('hidden');
-            } else {
-                input.classList.add('hidden');
-                input.value = '';
+        // Initialize App
+        async function initApp() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
+                const data = await response.json();
+                document.getElementById('view-loading').classList.add('hidden');
+                if (!data.exists) {
+                    document.getElementById('reg-name').value = tg.initDataUnsafe?.user?.first_name || "";
+                    document.getElementById('view-registration').classList.remove('hidden');
+                } else {
+                    document.getElementById('view-swipe').classList.remove('hidden');
+                }
+            } catch (err) {
+                document.getElementById('view-loading').innerHTML = `<p class="text-red-500">Backend Offline</p>`;
             }
         }
 
         function nextPage(step) {
-            if (step === 2) {
-                if (!document.getElementById('reg-name').value || !document.getElementById('reg-age').value) {
-                    alert("Please fill in basic details!");
-                    return;
-                }
-            }
+            if(step === 2 && document.getElementById('reg-age').value < 18) return alert("Must be 18+");
             document.getElementById('page-1').classList.add('hidden');
             document.getElementById('page-2').classList.add('hidden');
             document.getElementById('page-3').classList.add('hidden');
             document.getElementById('page-' + step).classList.remove('hidden');
-            document.getElementById('progress-bar').style.width = (step * 33.3) + '%';
+            document.getElementById('progress-bar').style.width = (step * 33) + '%';
         }
 
-        async function submitData() {
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.innerText = "Creating Profile...";
-            submitBtn.disabled = true;
-
-            const telegramId = tg.initDataUnsafe?.user?.id?.toString() || ("test_" + Math.floor(Math.random() * 100000));
-
-            let location = document.getElementById('reg-location').value;
-            if (location === 'Other') location = document.getElementById('reg-location-other').value;
-            
-            let religion = document.getElementById('reg-religion').value;
-            if (religion === 'Other') religion = document.getElementById('reg-religion-other').value;
-
-            const extras = [
-                location ? `📍 ${location}` : '',
-                document.getElementById('reg-height').value ? `📏 ${document.getElementById('reg-height').value}` : '',
-                religion ? `🙏 ${religion}` : '',
-                document.getElementById('reg-education').value ? `🎓 ${document.getElementById('reg-education').value}` : '',
-                document.getElementById('reg-occupation').value ? `💼 ${document.getElementById('reg-occupation').value}` : ''
-            ].filter(Boolean).join(" | ");
-
+        async function submitRegistration() {
             const payload = {
-                telegram_id: telegramId,
+                telegram_id: cleanTelegramId,
                 name: document.getElementById('reg-name').value,
-                gender: document.getElementById('reg-gender').value,
                 age: parseInt(document.getElementById('reg-age').value),
-                bio: (document.getElementById('reg-bio').value || "") + (extras ? "\n\n" + extras : ""),
-                interested_in: document.getElementById('reg-interest').value
+                gender: document.getElementById('reg-gender').value,
+                interested_in: document.getElementById('reg-interest').value,
+                location: document.getElementById('reg-location').value,
+                height: document.getElementById('reg-height').value,
+                religion: document.getElementById('reg-religion').value,
+                education: document.getElementById('reg-education').value,
+                occupation: document.getElementById('reg-occupation').value,
+                bio: document.getElementById('reg-bio').value,
+                photo_url: selectedPhotoUrl
             };
 
-            console.log("Submitting payload:", payload);
-
             try {
-                const response = await fetch(`${API_BASE_URL}/api/register`, {
+                const response = await fetch(`${BACKEND_URL}/api/register`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
-                const responseText = await response.text();
-                console.log("API Response:", responseText);
-
-                if (response.ok) {
-                    alert("Registration successful!");
-                    tg.close();
-                } else {
-                    alert("Registration failed: " + responseText);
-                    submitBtn.innerText = "Complete Registration";
-                    submitBtn.disabled = false;
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || "Server Error");
                 }
+                document.getElementById('view-registration').classList.add('hidden');
+                document.getElementById('view-swipe').classList.remove('hidden');
             } catch (err) {
-                console.error("Fetch Error:", err);
-                alert("Network error: " + err.message);
-                submitBtn.innerText = "Complete Registration";
-                submitBtn.disabled = false;
+                alert("Registration failed: " + err.message);
             }
         }
+
+        initApp();
     </script>
 </body>
 </html>
