@@ -17,6 +17,15 @@
 </head>
 <body class="bg-gray-50 font-sans overflow-hidden text-buna">
 
+    <!-- Custom Alert Box (To avoid native alerts) -->
+    <div id="custom-alert" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 px-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
+            <h3 class="text-xl font-bold mb-2">Notice</h3>
+            <p id="custom-alert-msg" class="text-gray-600 mb-6"></p>
+            <button onclick="closeAlert()" class="w-full p-3 bg-botOrange text-white rounded-xl font-bold">OK</button>
+        </div>
+    </div>
+
     <!-- Loading View -->
     <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300">
         <i class="ph-fill ph-spinner-gap animate-spin text-5xl text-botOrange mb-4"></i>
@@ -40,7 +49,6 @@
                     <span class="text-xs text-gray-500">Upload Photo</span>
                 </div>
                 
-                <!-- Nickname (Optional) -->
                 <input id="reg-name" type="text" placeholder="Nickname (Optional)" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
                 
                 <div class="flex gap-2">
@@ -150,7 +158,7 @@
     </div>
 
     <!-- Swipe View -->
-    <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-20 px-4 flex-col bg-gray-100">
+    <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-100 overflow-hidden">
         <!-- Header with Edit Button -->
         <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-4 mt-2">
             <h2 class="font-bold text-2xl text-buna">Discover</h2>
@@ -159,9 +167,29 @@
             </button>
         </div>
 
-        <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full min-h-[60vh] bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
+        <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full min-h-[60vh] max-h-[75vh] bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
             <p class="text-gray-400 font-medium">No more profiles to show.</p>
         </div>
+    </div>
+
+    <!-- Matches View -->
+    <div id="view-matches" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-50 overflow-y-auto">
+        <h2 class="font-bold text-3xl text-buna mb-6 mt-4 px-2">Your Matches <span class="text-botOrange">❤️</span></h2>
+        <div id="matches-container" class="w-full max-w-sm mx-auto space-y-4">
+            <p class="text-gray-400 text-center mt-10">Loading matches...</p>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('swipe')" id="tab-swipe" class="flex flex-col items-center text-botOrange transition-colors">
+            <i class="ph-bold ph-cards text-2xl mb-1"></i>
+            <span class="text-xs font-bold">Discover</span>
+        </button>
+        <button onclick="switchTab('matches')" id="tab-matches" class="flex flex-col items-center text-gray-400 hover:text-botOrange transition-colors">
+            <i class="ph-bold ph-chats-circle text-2xl mb-1"></i>
+            <span class="text-xs font-bold">Matches</span>
+        </button>
     </div>
 
     <script>
@@ -174,16 +202,22 @@
         
         let isEditing = false;
         
-        // Appended Global State for Swiping
+        // Global State for Swiping
         let profiles = [];
         let currentCardIndex = 0;
 
+        // Fallback alert wrapper to comply with strict non-native alert rules
         function showAlert(message) {
             if (tg.showAlert) {
                 tg.showAlert(message);
             } else {
-                alert(message);
+                document.getElementById('custom-alert-msg').innerText = message;
+                document.getElementById('custom-alert').classList.remove('hidden');
             }
+        }
+
+        function closeAlert() {
+            document.getElementById('custom-alert').classList.add('hidden');
         }
 
         async function initApp() {
@@ -198,11 +232,10 @@
                     document.getElementById('view-registration').classList.remove('hidden');
                 } else {
                     document.getElementById('view-swipe').classList.remove('hidden');
-                    // In a real app, you would fetch profiles here. Mocking for demonstration:
-                    profiles = [
-                        { telegram_id: '123', name: 'Sample User', age: 24, bio: 'Ready to mingle!', photo_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80' }
-                    ];
-                    renderCards();
+                    document.getElementById('bottom-nav').classList.remove('hidden'); // Show nav
+                    
+                    // Fetch real profiles from backend
+                    await loadDiscoverProfiles();
                 }
             } catch (err) {
                 console.error(err);
@@ -213,28 +246,46 @@
             }
         }
 
-        // ---------- SWIPING LOGIC INTEGRATION ---------- //
-        
+        async function loadDiscoverProfiles() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/get-potential-matches/${cleanTelegramId}`);
+                const data = await res.json();
+                profiles = data.matches || [];
+                renderCards();
+            } catch (e) {
+                console.error("Failed to load profiles", e);
+                profiles = [];
+                renderCards();
+            }
+        }
+
         function renderCards() {
             const container = document.getElementById('card-container');
             
             if (currentCardIndex >= profiles.length || profiles.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 font-medium">No more profiles to show.</p>`;
+                container.innerHTML = `
+                    <div class="text-center p-6">
+                        <i class="ph-duotone ph-sparkle text-6xl text-gray-300 mb-2"></i>
+                        <p class="text-gray-400 font-medium">You've seen everyone in your area.</p>
+                        <p class="text-gray-400 text-sm mt-2">Check back later for more profiles!</p>
+                    </div>`;
                 return;
             }
 
             const profile = profiles[currentCardIndex];
             
+            // Fallback image if user has none
+            const photoToUse = profile.photo_url || "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80";
+
             container.innerHTML = `
                 <div class="w-full h-full flex flex-col">
-                    <div class="flex-1 bg-gray-200 bg-cover bg-center" style="background-image: url('${profile.photo_url}')"></div>
+                    <div class="flex-1 bg-gray-200 bg-cover bg-center" style="background-image: url('${photoToUse}')"></div>
                     <div class="p-4 bg-white flex-shrink-0">
                         <h3 class="text-xl font-bold">${profile.name}, ${profile.age}</h3>
-                        <p class="text-gray-500 text-sm mt-1">${profile.bio}</p>
+                        <p class="text-gray-500 text-sm mt-1">${profile.bio || 'Ready to mingle!'}</p>
                     </div>
                     
-                    <!-- Updated Buttons injected here -->
-                    <div class="mt-auto w-full flex justify-around pt-6 pb-6 bg-white">
+                    <div class="mt-auto w-full flex justify-around pt-6 pb-6 bg-white border-t border-gray-50">
                         <button onclick="handleSwipe(false)" class="w-14 h-14 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform">
                             <i class="ph-bold ph-x text-2xl"></i>
                         </button>
@@ -273,7 +324,58 @@
             renderCards();
         }
 
-        // ---------- END SWIPING LOGIC INTEGRATION ---------- //
+        function switchTab(tab) {
+            document.getElementById('view-swipe').classList.add('hidden');
+            document.getElementById('view-matches').classList.add('hidden');
+            
+            document.getElementById('tab-swipe').classList.replace('text-botOrange', 'text-gray-400');
+            document.getElementById('tab-matches').classList.replace('text-botOrange', 'text-gray-400');
+            
+            if (tab === 'swipe') {
+                document.getElementById('view-swipe').classList.remove('hidden');
+                document.getElementById('tab-swipe').classList.replace('text-gray-400', 'text-botOrange');
+            } else if (tab === 'matches') {
+                document.getElementById('view-matches').classList.remove('hidden');
+                document.getElementById('tab-matches').classList.replace('text-gray-400', 'text-botOrange');
+                loadMatchesList();
+            }
+        }
+
+        async function loadMatchesList() {
+            const container = document.getElementById('matches-container');
+            container.innerHTML = `<div class="flex justify-center mt-10"><i class="ph ph-spinner animate-spin text-3xl text-botOrange"></i></div>`;
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/matches-list/${cleanTelegramId}`);
+                const data = await response.json();
+                
+                if (!data.matches || data.matches.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center mt-10">
+                            <i class="ph-duotone ph-ghost text-6xl text-gray-300 mb-2"></i>
+                            <p class="text-gray-500 font-medium">No matches yet. Keep swiping!</p>
+                        </div>`;
+                    return;
+                }
+
+                container.innerHTML = data.matches.map(match => `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition active:scale-95">
+                        <div class="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0 bg-cover bg-center" style="background-image: url('${match.photo_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"}')"></div>
+                        <div class="flex-1 overflow-hidden">
+                            <h4 class="font-bold text-lg text-buna truncate">${match.name}</h4>
+                            <p class="text-sm text-gray-500 truncate">${match.bio || "Say hi!"}</p>
+                        </div>
+                        <div class="w-10 h-10 bg-orange-50 text-botOrange rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="ph-fill ph-chat-teardrop-text text-xl"></i>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<p class="text-red-500 text-center mt-10">Failed to load matches.</p>`;
+            }
+        }
 
         function toggleOtherLocation() {
             const select = document.getElementById('reg-location');
@@ -342,6 +444,8 @@
         function openEditProfile() {
             isEditing = true;
             document.getElementById('view-swipe').classList.add('hidden');
+            document.getElementById('view-matches').classList.add('hidden');
+            document.getElementById('bottom-nav').classList.add('hidden'); // Hide nav during edit
             document.getElementById('view-registration').classList.remove('hidden');
             
             goToPage(1); 
@@ -399,12 +503,18 @@
                 
                 isEditing = false;
                 document.getElementById('view-registration').classList.add('hidden');
+                
+                // Show Swipe view and Nav by default
                 document.getElementById('view-swipe').classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+                
+                // Reload profiles to ensure latest data
+                await loadDiscoverProfiles();
                 
                 submitBtn.innerHTML = `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
                 submitBtn.disabled = false;
                 
-                if(tg.showAlert) tg.showAlert("Profile successfully saved!");
+                showAlert("Profile successfully saved!");
             } catch (err) {
                 showAlert("Failed to save profile: " + err.message);
                 submitBtn.innerHTML = isEditing ? `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>` : `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
@@ -412,6 +522,7 @@
             }
         }
 
+        // Kick off the app
         initApp();
     </script>
 </body>
