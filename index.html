@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Habesha Date</title>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Tailwind CSS for beautiful, fast styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        buna: '#2B2B2B',       /* Darker text for readability */
+                        botOrange: '#FF952B',  /* Matches your bot's avatar */
+                        sand: '#F9F9F9'        /* Cleaner background to match Telegram */
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: var(--tg-theme-bg-color, #F9F9F9);
+            color: var(--tg-theme-text-color, #2B2B2B);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+        .app-container {
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .btn-primary {
+            background-color: var(--tg-theme-button-color, #FF952B);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container flex flex-col items-center justify-center min-h-screen text-center">
+        
+        <!-- Header to match your bot profile -->
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-buna mb-1">Habesha Date</h1>
+            <h2 class="text-2xl font-bold text-botOrange mb-3">ሀበሻ ቀጠሮ❤️</h2>
+            <p class="text-sm text-gray-500 max-w-xs mx-auto leading-relaxed">
+                የህይወት አጋርዎን በቀላሉ ያግኙ! አስተማማኝ እና ትክክለኛ የኢትዮጵያውያን የፍቅር ጓደኛ ማገናኛ ቦት።
+            </p>
+        </div>
+        
+        <p class="text-botOrange font-semibold mb-6 animate-pulse" id="welcome-message">Loading your profile...</p>
+
+        <!-- Profile Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm mb-6 border-t-4 border-botOrange">
+            <div class="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden border-2 border-botOrange shadow-inner">
+                <img id="user-photo" src="https://ui-avatars.com/api/?name=User&background=FF952B&color=fff&size=200" alt="Profile" class="w-full h-full object-cover">
+            </div>
+            <h2 class="text-xl font-bold text-buna" id="user-name">Welcome!</h2>
+            <p class="text-sm text-gray-500 mt-2">Ready to find your match?</p>
+        </div>
+
+        <!-- Action Button -->
+        <button id="start-btn" class="btn-primary w-full max-w-sm py-4 rounded-xl font-bold text-lg shadow-lg transition-transform active:scale-95 hidden">
+            Start Swiping
+        </button>
+
+        <p id="status-log" class="text-xs text-gray-400 mt-8"></p>
+    </div>
+
+    <script>
+        // 1. Initialize Telegram Mini App
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Make the app take up the full screen
+        tg.ready();
+
+        const statusLog = document.getElementById('status-log');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const userNameText = document.getElementById('user-name');
+        const startBtn = document.getElementById('start-btn');
+        
+        // YOUR RENDER URL GOES HERE (Make sure it has no slash at the end)
+        const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
+
+        // 2. Extract User Data from Telegram
+        const user = tg.initDataUnsafe?.user;
+
+        if (user) {
+            // Update UI with Telegram data
+            const firstName = user.first_name || 'User';
+            userNameText.innerText = firstName + (user.last_name ? ' ' + user.last_name : '');
+            
+            // Generate an avatar matching your brand colors if they don't have a Telegram photo
+            const photoUrl = user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=FF952B&color=fff&size=200`;
+            document.getElementById('user-photo').src = photoUrl;
+
+            welcomeMessage.innerText = "Connecting to database...";
+            
+            // 3. Send data to your Render Backend
+            fetch(`${BACKEND_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    telegram_id: user.id.toString(),
+                    name: user.first_name
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                welcomeMessage.innerText = "Profile securely loaded!";
+                startBtn.classList.remove('hidden');
+                statusLog.innerText = data.message;
+            })
+            .catch(error => {
+                welcomeMessage.innerText = "Connection error.";
+                statusLog.innerText = "Error: " + error.message;
+            });
+            
+        } else {
+            welcomeMessage.innerText = "Please open this inside Telegram.";
+        }
+
+        // Close app when done
+        startBtn.addEventListener('click', () => {
+            tg.showAlert("Coming soon: Swiping interface!");
+        });
+    </script>
+</body>
+</html>
