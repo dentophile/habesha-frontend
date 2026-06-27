@@ -1,54 +1,59 @@
-<!-- ... existing code ... -->
-        <!-- VIEW 2: SWIPE INTERFACE -->
-        <div id="view-swipe" class="w-full h-screen flex flex-col items-center">
-            <!-- ... Swipe UI code ... -->
-            <!-- ADD THIS TAB BAR AT THE BOTTOM -->
-            <div class="fixed bottom-0 w-full bg-white border-t p-4 flex justify-around">
-                <button onclick="showView('swipe')" class="text-botOrange font-bold">Swipe</button>
-                <button onclick="showView('matches')" class="text-gray-400">Matches</button>
-            </div>
-        </div>
+<!-- ... (Keep your existing card-stack and everything else) ... -->
 
-        <!-- VIEW 3: MATCHES / CHAT LIST -->
-        <div id="view-matches" class="hidden w-full h-screen p-4">
-            <h2 class="text-xl font-bold mb-4">Matches</h2>
-            <div id="matches-list" class="space-y-4"></div>
+    <!-- NAVIGATION BAR -->
+    <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 py-3 flex justify-around items-center z-50">
+        <button onclick="showView('view-swipe')" class="flex flex-col items-center text-botOrange">
+            <i class="ph-fill ph-fire text-2xl"></i>
+            <span class="text-[10px] font-bold">Swipe</span>
+        </button>
+        <button onclick="showView('view-matches')" class="flex flex-col items-center text-gray-400">
+            <i class="ph-fill ph-chats-circle text-2xl"></i>
+            <span class="text-[10px] font-bold">Matches</span>
+        </button>
+    </div>
+
+    <!-- MATCHES VIEW (HIDDEN BY DEFAULT) -->
+    <div id="view-matches" class="hidden w-full h-full pt-16 px-4">
+        <h2 class="text-2xl font-bold text-buna mb-4">Your Matches</h2>
+        <div id="matches-list" class="space-y-4">
+            <!-- Matches will be injected here -->
+            <p class="text-gray-500 italic">No matches yet. Keep swiping! ❤️</p>
         </div>
-        
-        <!-- VIEW 4: CHAT DETAIL -->
-        <div id="view-chat" class="hidden w-full h-screen flex flex-col">
-            <div class="p-4 border-b font-bold" id="chat-header">Chat</div>
-            <div id="chat-messages" class="flex-1 overflow-y-auto p-4"></div>
-            <div class="p-4 flex gap-2">
-                <input id="msg-input" class="flex-1 border p-2 rounded" placeholder="Type message...">
-                <button onclick="sendMessage()" class="bg-botOrange text-white px-4 py-2 rounded">Send</button>
-            </div>
-        </div>
+    </div>
 
     <script>
-        // ... (existing logic)
+        // ... (Keep your existing logic) ...
 
-        function showView(view) {
+        function showView(viewId) {
             document.getElementById('view-swipe').classList.add('hidden');
             document.getElementById('view-matches').classList.add('hidden');
-            document.getElementById('view-chat').classList.add('hidden');
-            document.getElementById('view-' + view).classList.remove('hidden');
-            
-            if(view === 'matches') loadMatches();
+            document.getElementById(viewId).classList.remove('hidden');
+
+            if (viewId === 'view-matches') {
+                fetchMatchesList();
+            }
         }
 
-        async function loadMatches() {
-            // Call the new /api/matches-list endpoint
-            const res = await fetch(`${BACKEND_URL}/api/matches-list/${userTelegramData.id}`);
-            const data = await res.json();
+        async function fetchMatchesList() {
             const list = document.getElementById('matches-list');
-            list.innerHTML = data.matches.map(m => `
-                <div onclick="openChat('${m.id}', '${m.name}')" class="p-4 bg-white rounded shadow flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-botOrange text-white flex items-center justify-center">${m.name[0]}</div>
-                    <p class="font-bold">${m.name}</p>
-                </div>
-            `).join('');
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/get_matches/${userTelegramData.id}`);
+                const data = await response.json();
+                
+                if (data.matches && data.matches.length > 0) {
+                    list.innerHTML = data.matches.map(m => `
+                        <div class="flex items-center p-3 bg-white rounded-xl shadow-sm border border-gray-100">
+                            <img src="${m.image}" class="w-14 h-14 rounded-full object-cover mr-4">
+                            <div>
+                                <h3 class="font-bold text-buna">${m.name}</h3>
+                                <p class="text-xs text-botOrange">Tap to chat</p>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error("Error loading matches", e);
+            }
         }
     </script>
 </body>
-<!-- ... existing code ... -->
