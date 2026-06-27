@@ -17,19 +17,23 @@
 </head>
 <body class="bg-gray-50 font-sans overflow-hidden text-buna">
 
+    <!-- Loading View -->
     <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300">
         <i class="ph-fill ph-spinner-gap animate-spin text-5xl text-botOrange mb-4"></i>
         <p class="text-gray-500 font-medium">Loading...</p>
     </div>
 
+    <!-- Registration View -->
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
         <div class="max-w-md mx-auto p-6 py-10">
             <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center transition-all">Step 1: Basics</h2>
             
+            <!-- Progress Bar -->
             <div class="w-full bg-gray-200 h-2 rounded-full mb-8 overflow-hidden">
                 <div id="progress-bar" class="bg-botOrange h-full w-1/3 transition-all duration-300"></div>
             </div>
 
+            <!-- Page 1: Basics -->
             <div id="page-1" class="space-y-4 transition-all">
                 <div class="mb-6 flex flex-col items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl h-32 w-32 mx-auto cursor-pointer hover:bg-gray-200 transition">
                     <i class="ph ph-camera text-3xl text-gray-500 mb-1"></i>
@@ -53,7 +57,17 @@
                     <option value="Men">Men</option>
                     <option value="Everyone">Everyone</option>
                 </select>
+
+                <!-- New: Intention -->
+                <select id="reg-intention" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                    <option value="">Looking For</option>
+                    <option value="Marriage">Marriage</option>
+                    <option value="Serious Relationship">Serious Relationship</option>
+                    <option value="Casual Dating">Casual Dating</option>
+                    <option value="Friendship">Friendship</option>
+                </select>
                 
+                <!-- Location Select -->
                 <select id="reg-location" onchange="toggleOtherLocation()" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                     <option value="">Living City</option>
                     <option value="Addis Ababa">Addis Ababa</option>
@@ -64,11 +78,13 @@
                     <option value="Other">Other</option>
                 </select>
                 
+                <!-- Hidden Input for 'Other' Location -->
                 <input id="reg-location-other" type="text" placeholder="Please type your city" class="hidden w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
                 
                 <button onclick="validateAndNext(1)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md">Next</button>
             </div>
 
+            <!-- Page 2: Details & Lifestyle -->
             <div id="page-2" class="hidden space-y-4 transition-all">
                 <input id="reg-height" type="text" placeholder="Height (e.g. 1.70m)" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                 
@@ -90,6 +106,31 @@
                 </select>
                 
                 <input id="reg-occupation" type="text" placeholder="Occupation" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+
+                <!-- New: Kids -->
+                <select id="reg-kids" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                    <option value="">Kids</option>
+                    <option value="Don't have kids">Don't have kids</option>
+                    <option value="Have kids">Have kids</option>
+                    <option value="Want someday">Want someday</option>
+                    <option value="Don't want kids">Don't want kids</option>
+                </select>
+
+                <!-- New: Drinking & Smoking -->
+                <div class="flex gap-2">
+                    <select id="reg-drinking" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                        <option value="">Drinking</option>
+                        <option value="No">No</option>
+                        <option value="Socially">Socially</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                    <select id="reg-smoking" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                        <option value="">Smoking</option>
+                        <option value="No">No</option>
+                        <option value="Occasionally">Occasionally</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </div>
                 
                 <div class="flex gap-2">
                     <button onclick="goToPage(1)" class="w-1/3 p-4 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">Back</button>
@@ -97,6 +138,7 @@
                 </div>
             </div>
 
+            <!-- Page 3: Bio -->
             <div id="page-3" class="hidden space-y-4 transition-all">
                 <textarea id="reg-bio" placeholder="Tell us about yourself... (Hobbies, what you're looking for)" class="w-full p-4 border rounded-xl bg-gray-50 h-32 focus:outline-none focus:border-botOrange resize-none"></textarea>
                 
@@ -111,6 +153,7 @@
         </div>
     </div>
 
+    <!-- Swipe View -->
     <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-20 px-4 flex-col bg-gray-100">
         <h2 class="text-center font-bold text-xl text-buna mb-4">Discover</h2>
         <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full bg-white rounded-2xl shadow-xl overflow-hidden">
@@ -156,7 +199,6 @@
             }
         }
 
-        // New function to handle the "Other" city toggle
         function toggleOtherLocation() {
             const select = document.getElementById('reg-location');
             const otherInput = document.getElementById('reg-location-other');
@@ -165,7 +207,7 @@
                 otherInput.classList.remove('hidden');
             } else {
                 otherInput.classList.add('hidden');
-                otherInput.value = ''; // Clear it out if they switch away
+                otherInput.value = '';
             }
         }
 
@@ -175,14 +217,14 @@
                 const gender = document.getElementById('reg-gender').value;
                 const age = document.getElementById('reg-age').value;
                 const interest = document.getElementById('reg-interest').value;
+                const intention = document.getElementById('reg-intention').value;
                 
-                // Determine final location value
                 let location = document.getElementById('reg-location').value;
                 if (location === 'Other') {
                     location = document.getElementById('reg-location-other').value.trim();
                 }
 
-                if (!name || !gender || !age || !interest || !location) {
+                if (!name || !gender || !age || !interest || !intention || !location) {
                     return showAlert("Please fill out all basic information fields.");
                 }
                 if (age < 18) {
@@ -194,9 +236,12 @@
                 const height = document.getElementById('reg-height').value.trim();
                 const religion = document.getElementById('reg-religion').value;
                 const education = document.getElementById('reg-education').value;
+                const kids = document.getElementById('reg-kids').value;
+                const drinking = document.getElementById('reg-drinking').value;
+                const smoking = document.getElementById('reg-smoking').value;
                 
-                if (!height || !religion || !education) {
-                    return showAlert("Please fill out height, religion, and education.");
+                if (!height || !religion || !education || !kids || !drinking || !smoking) {
+                    return showAlert("Please fill out all detail and lifestyle fields.");
                 }
                 goToPage(3);
             }
@@ -220,7 +265,6 @@
             const bio = document.getElementById('reg-bio').value.trim();
             if(!bio) return showAlert("Please write a short bio to help others get to know you!");
 
-            // Determine final location value for payload
             let finalLocation = document.getElementById('reg-location').value;
             if (finalLocation === 'Other') {
                 finalLocation = document.getElementById('reg-location-other').value.trim();
@@ -230,20 +274,24 @@
             submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Saving...`;
             submitBtn.disabled = true;
 
-            // Updated Payload
             const payload = {
                 telegram_id: cleanTelegramId,
-                name: document.getElementById('reg-name').value.trim(),
+                name: document.getElementById('reg-name').value,
                 age: parseInt(document.getElementById('reg-age').value),
                 gender: document.getElementById('reg-gender').value,
                 interested_in: document.getElementById('reg-interest').value,
-                location: finalLocation,
-                height: document.getElementById('reg-height').value.trim(),
+                location: finalLocation, // Uses the dynamic logic you requested
+                height: document.getElementById('reg-height').value,
                 religion: document.getElementById('reg-religion').value,
                 education: document.getElementById('reg-education').value,
-                occupation: document.getElementById('reg-occupation').value.trim(),
-                bio: bio,
-                photo_url: selectedPhotoUrl
+                occupation: document.getElementById('reg-occupation').value,
+                bio: document.getElementById('reg-bio').value,
+                photo_url: selectedPhotoUrl,
+                // Newly added fields
+                intention: document.getElementById('reg-intention').value,
+                kids: document.getElementById('reg-kids').value,
+                drinking: document.getElementById('reg-drinking').value,
+                smoking: document.getElementById('reg-smoking').value
             };
 
             try {
