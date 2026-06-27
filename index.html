@@ -175,8 +175,39 @@
     <!-- Matches View -->
     <div id="view-matches" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-50 overflow-y-auto">
         <h2 class="font-bold text-3xl text-buna mb-6 mt-4 px-2">Your Matches <span class="text-botOrange">❤️</span></h2>
-        <div id="matches-container" class="w-full max-w-sm mx-auto space-y-4">
+        <div id="matches-container" class="w-full max-w-sm mx-auto space-y-4 pb-10">
             <p class="text-gray-400 text-center mt-10">Loading matches...</p>
+        </div>
+    </div>
+
+    <!-- Chat View -->
+    <div id="view-chat" class="hidden w-full h-screen bg-gray-50 flex-col z-[60] fixed top-0 left-0 overflow-hidden">
+        <!-- Chat Header -->
+        <div class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 shadow-sm shrink-0">
+            <button onclick="closeChat()" class="text-gray-500 p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition">
+                <i class="ph-bold ph-arrow-left text-2xl"></i>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-cover bg-center bg-gray-200" id="chat-header-photo"></div>
+            <div class="flex-1">
+                <h3 class="font-bold text-buna truncate" id="chat-header-name">Name</h3>
+                <p class="text-xs text-green-500 font-medium">Matched!</p>
+            </div>
+            <button class="text-gray-400 hover:text-botOrange p-2">
+                <i class="ph-bold ph-dots-three-vertical text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
+            <!-- Messages will be injected here -->
+        </div>
+
+        <!-- Chat Input Area -->
+        <div class="bg-white border-t border-gray-200 p-3 flex gap-2 items-center shrink-0">
+            <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKeyPress(event)" class="flex-1 bg-gray-100 border-transparent focus:bg-white focus:border-botOrange focus:ring-1 focus:ring-botOrange rounded-full px-4 py-3 outline-none transition">
+            <button onclick="sendMessage()" class="w-12 h-12 bg-botOrange text-white rounded-full flex items-center justify-center hover:bg-orange-500 active:scale-95 transition shadow-sm shrink-0">
+                <i class="ph-fill ph-paper-plane-right text-xl"></i>
+            </button>
         </div>
     </div>
 
@@ -201,12 +232,11 @@
         let selectedPhotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
         
         let isEditing = false;
-        
-        // Global State for Swiping
         let profiles = [];
         let currentCardIndex = 0;
+        let activeChatId = null;
 
-        // Fallback alert wrapper to comply with strict non-native alert rules
+        // Fallback alert wrapper
         function showAlert(message) {
             if (tg.showAlert) {
                 tg.showAlert(message);
@@ -232,9 +262,8 @@
                     document.getElementById('view-registration').classList.remove('hidden');
                 } else {
                     document.getElementById('view-swipe').classList.remove('hidden');
-                    document.getElementById('bottom-nav').classList.remove('hidden'); // Show nav
+                    document.getElementById('bottom-nav').classList.remove('hidden'); 
                     
-                    // Fetch real profiles from backend
                     await loadDiscoverProfiles();
                 }
             } catch (err) {
@@ -273,15 +302,13 @@
             }
 
             const profile = profiles[currentCardIndex];
-            
-            // Fallback image if user has none
             const photoToUse = profile.photo_url || "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80";
 
             container.innerHTML = `
                 <div class="w-full h-full flex flex-col">
                     <div class="flex-1 bg-gray-200 bg-cover bg-center" style="background-image: url('${photoToUse}')"></div>
                     <div class="p-4 bg-white flex-shrink-0">
-                        <h3 class="text-xl font-bold">${profile.name}, ${profile.age}</h3>
+                        <h3 class="text-xl font-bold">${profile.name}, ${profile.age || '?'}</h3>
                         <p class="text-gray-500 text-sm mt-1">${profile.bio || 'Ready to mingle!'}</p>
                     </div>
                     
@@ -359,7 +386,7 @@
                 }
 
                 container.innerHTML = data.matches.map(match => `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition active:scale-95">
+                    <div onclick="openChat('${match.telegram_id}', '${match.name.replace(/'/g, "\\'")}', '${match.photo_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"}')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition active:scale-95">
                         <div class="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0 bg-cover bg-center" style="background-image: url('${match.photo_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"}')"></div>
                         <div class="flex-1 overflow-hidden">
                             <h4 class="font-bold text-lg text-buna truncate">${match.name}</h4>
@@ -376,6 +403,70 @@
                 container.innerHTML = `<p class="text-red-500 text-center mt-10">Failed to load matches.</p>`;
             }
         }
+
+        // --- Chat Functions ---
+
+        function openChat(matchId, matchName, matchPhoto) {
+            activeChatId = matchId;
+            
+            // Set Header info
+            document.getElementById('chat-header-name').innerText = matchName;
+            document.getElementById('chat-header-photo').style.backgroundImage = `url('${matchPhoto}')`;
+            
+            // Show Chat View
+            document.getElementById('view-chat').classList.replace('hidden', 'flex');
+            
+            // Clear or load mock messages
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = `
+                <div class="text-center text-xs text-gray-400 my-4">Today</div>
+                <div class="flex justify-start">
+                    <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%]">
+                        You matched with ${matchName}! Break the ice.
+                    </div>
+                </div>
+            `;
+            
+            // TODO in future step: Fetch message history from backend here
+        }
+
+        function closeChat() {
+            activeChatId = null;
+            document.getElementById('view-chat').classList.replace('flex', 'hidden');
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const messageText = input.value.trim();
+            if (!messageText) return;
+            
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            // Add user message directly to UI
+            messagesContainer.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words">
+                        ${messageText}
+                    </div>
+                </div>
+            `;
+            
+            // Auto-scroll to latest message
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Clear input field
+            input.value = '';
+            
+            // TODO in future step: Send this message to backend via fetch to save it
+        }
+
+        // --- Registration & Edit Functions ---
 
         function toggleOtherLocation() {
             const select = document.getElementById('reg-location');
@@ -445,7 +536,7 @@
             isEditing = true;
             document.getElementById('view-swipe').classList.add('hidden');
             document.getElementById('view-matches').classList.add('hidden');
-            document.getElementById('bottom-nav').classList.add('hidden'); // Hide nav during edit
+            document.getElementById('bottom-nav').classList.add('hidden'); 
             document.getElementById('view-registration').classList.remove('hidden');
             
             goToPage(1); 
@@ -504,11 +595,9 @@
                 isEditing = false;
                 document.getElementById('view-registration').classList.add('hidden');
                 
-                // Show Swipe view and Nav by default
                 document.getElementById('view-swipe').classList.remove('hidden');
                 document.getElementById('bottom-nav').classList.remove('hidden');
                 
-                // Reload profiles to ensure latest data
                 await loadDiscoverProfiles();
                 
                 submitBtn.innerHTML = `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
