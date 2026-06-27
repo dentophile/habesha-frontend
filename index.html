@@ -88,7 +88,7 @@
             </div>
             <p class="text-sm text-gray-500 mb-6">Let's build a profile that stands out.</p>
             
-            <form id="profile-form" class="w-full space-y-5">
+            <form id="profile-form" class="w-full space-y-5" novalidate>
                 
                 <!-- Basic Info -->
                 <div class="grid grid-cols-2 gap-4">
@@ -147,8 +147,10 @@
                         <option value="diaspora_us">Diaspora (USA/Canada)</option>
                         <option value="diaspora_eu">Diaspora (Europe)</option>
                         <option value="diaspora_other">Diaspora (Other)</option>
-                        <option value="other_ethiopia">Other City in Ethiopia</option>
+                        <option value="other_custom">Other (Please specify)</option>
                     </select>
+                    <!-- Custom Location Input (Hidden by default) -->
+                    <input type="text" id="input-location-custom" placeholder="Type your city here..." class="hidden w-full mt-3 p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow animate-fade-in-up">
                 </div>
 
                 <!-- Religion (Important in Ethiopian context) -->
@@ -202,6 +204,8 @@
         const saveProfileBtn = document.getElementById('save-profile-btn');
         const bioInput = document.getElementById('input-bio');
         const bioCounter = document.getElementById('bio-counter');
+        const locationSelect = document.getElementById('input-location');
+        const customLocationInput = document.getElementById('input-location-custom');
 
         // Bio character counter
         bioInput.addEventListener('input', function() {
@@ -252,9 +256,49 @@
             tg.BackButton.hide();
         });
 
+        // Handle Custom Location Toggle
+        locationSelect.addEventListener('change', function() {
+            if (this.value === 'other_custom') {
+                customLocationInput.classList.remove('hidden');
+            } else {
+                customLocationInput.classList.add('hidden');
+                customLocationInput.value = ''; // Clear the input when hidden
+            }
+        });
+
         // Handle Form Submission
         profileForm.addEventListener('submit', (e) => {
             e.preventDefault(); // Prevent page reload
+
+            // 1. Gather required fields for validation
+            const age = document.getElementById('input-age').value;
+            const gender = document.getElementById('input-gender').value;
+            const interested_in = document.getElementById('input-interested-in').value;
+            const intent = document.getElementById('input-intent').value;
+            let location = document.getElementById('input-location').value;
+            const customLocation = document.getElementById('input-location-custom').value;
+            const bio = document.getElementById('input-bio').value;
+
+            // 2. Handle custom location logic
+            if (location === 'other_custom') {
+                if (!customLocation.trim()) {
+                    tg.showAlert("እባክዎ ከተማዎን ያስገቡ (Please type your city).");
+                    return;
+                }
+                location = customLocation.trim(); // Override location with the typed text
+            }
+
+            // 3. Custom Validation using Telegram's native alert
+            if (!gender || !interested_in || !age || !intent || !location || !bio) {
+                tg.showAlert("እባክዎ ሁሉንም አስፈላጊ መረጃዎች ይሙሉ (Please fill in all required fields marked with *).");
+                return;
+            }
+
+            // 4. Age validation
+            if (parseInt(age) < 18) {
+                tg.showAlert("ዕድሜዎ 18 እና ከዚያ በላይ መሆን አለበት (You must be at least 18 years old).");
+                return;
+            }
 
             const btnTextSpan = saveProfileBtn.querySelector('span');
             btnTextSpan.innerText = "Saving profile...";
@@ -270,7 +314,7 @@
                 gender: document.getElementById('input-gender').value,
                 interested_in: document.getElementById('input-interested-in').value,
                 intent: document.getElementById('input-intent').value,
-                location: document.getElementById('input-location').value,
+                location: location, // Uses the newly resolved location variable
                 religion: document.getElementById('input-religion').value,
                 bio: document.getElementById('input-bio').value
             };
