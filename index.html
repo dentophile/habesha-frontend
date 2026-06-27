@@ -2,287 +2,96 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Habesha Date</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration - Habesha Date</title>
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script>
-        tailwind.config = { theme: { extend: { colors: { botOrange: '#FF952B', buna: '#2C1E16' } } } }
+        // Defensive fix: Wait for tailwind to be defined before setting config
+        (function() {
+            const checkTailwind = setInterval(() => {
+                if (window.tailwind) {
+                    window.tailwind.config = { 
+                        theme: { 
+                            extend: { 
+                                colors: { 
+                                    botOrange: '#FF952B', 
+                                    buna: '#2C1E16' 
+                                } 
+                            } 
+                        } 
+                    };
+                    clearInterval(checkTailwind);
+                }
+            }, 50);
+        })();
     </script>
 </head>
-<body class="bg-gray-50 font-sans overflow-hidden">
+<body class="bg-gray-50 min-h-screen">
+    <div id="reg-container" class="max-w-md mx-auto bg-white min-h-screen shadow-lg p-6">
+        <h2 id="reg-title" class="text-2xl font-bold text-buna mb-6 text-center">Step 1: The Basics</h2>
 
-    <!-- Loading Screen -->
-    <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6">
-        <i class="ph-fill ph-spinner-gap animate-spin text-4xl text-botOrange mb-4"></i>
-        <p id="loading-text" class="text-gray-500 font-medium text-center">Reading Telegram Profile...</p>
-        <p id="debug-text" class="text-xs text-gray-400 mt-2 font-mono"></p>
-    </div>
-
-    <!-- Registration View -->
-    <div id="view-registration" class="hidden w-full h-screen p-6 bg-white flex flex-col justify-center max-w-md mx-auto">
-        <h2 class="text-3xl font-bold text-buna mb-2 text-center">Welcome! 👋</h2>
-        <p class="text-gray-500 text-center mb-8">Let's set up your profile.</p>
-        
-        <input id="reg-name" type="text" placeholder="Your Name" class="w-full p-4 mb-4 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
-        
-        <div class="flex gap-4 mb-4">
-            <select id="reg-gender" class="w-1/2 p-4 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
-                <option value="" disabled selected>I am a...</option>
-                <option value="male">Man</option>
-                <option value="female">Woman</option>
-            </select>
-            
-            <input id="reg-age" type="number" placeholder="Age" class="w-1/2 p-4 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 h-2 rounded-full mb-8 overflow-hidden">
+            <div id="progress-bar" class="bg-botOrange h-full w-1/3 transition-all duration-300"></div>
         </div>
 
-        <select id="reg-interest" class="w-full p-4 mb-4 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
-            <option value="" disabled selected>Interested in...</option>
-            <option value="female">Women</option>
-            <option value="male">Men</option>
-            <option value="both">Everyone</option>
-        </select>
-
-        <textarea id="reg-bio" placeholder="A short bio about you..." rows="3" class="w-full p-4 mb-6 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange"></textarea>
-        
-        <button onclick="submitRegistration()" class="w-full p-4 bg-botOrange text-white font-bold rounded-xl shadow-lg shadow-orange-200 active:scale-95 transition-transform">
-            Join Habesha Date
-        </button>
-    </div>
-
-    <!-- Swipe View -->
-    <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-20 px-4 flex-col">
-        <h2 class="text-2xl font-bold text-botOrange text-center mb-4">Find Matches</h2>
-        <div id="card-container" class="relative w-full flex-grow max-w-sm mx-auto flex items-center justify-center">
-            <p class="text-center text-gray-500">Loading profiles...</p>
+        <!-- Page 1: Basics -->
+        <div id="page-1" class="space-y-4">
+            <input id="reg-name" type="text" placeholder="Full Name" class="w-full p-3 border rounded-xl">
+            <div class="flex gap-2">
+                <select id="reg-gender" class="w-1/2 p-3 border rounded-xl"><option value="">Gender</option><option>Man</option><option>Woman</option></select>
+                <input id="reg-age" type="number" placeholder="Age" min="18" class="w-1/2 p-3 border rounded-xl">
+            </div>
+            <select id="reg-interest" class="w-full p-3 border rounded-xl"><option value="">Interested In</option><option>Women</option><option>Men</option><option>Everyone</option></select>
+            <select id="reg-location" class="w-full p-3 border rounded-xl"><option value="">Living City</option><option>Addis Ababa</option><option>Bahir Dar</option><option>Hawassa</option><option>Diaspora</option></select>
+            <button onclick="nextPage(2)" class="w-full p-3 bg-botOrange text-white rounded-xl font-bold mt-4">Next: Lifestyle</button>
         </div>
-    </div>
 
-    <!-- Matches View -->
-    <div id="view-matches" class="hidden w-full h-screen pt-16 px-4">
-        <h2 class="text-2xl font-bold text-buna mb-4">Your Matches</h2>
-        <div id="matches-list" class="space-y-4">
-            <p class="text-gray-500 italic">No matches yet. Keep swiping! ❤️</p>
+        <!-- Page 2: Lifestyle & Background -->
+        <div id="page-2" class="hidden space-y-4">
+            <input id="reg-height" type="text" placeholder="Height (e.g. 1.70m)" class="w-full p-3 border rounded-xl">
+            <select id="reg-religion" class="w-full p-3 border rounded-xl"><option value="">Religion</option><option>Orthodox</option><option>Muslim</option><option>Protestant</option><option>Catholic</option></select>
+            <select id="reg-education" class="w-full p-3 border rounded-xl"><option value="">Education Level</option><option>High School</option><option>Bachelor's</option><option>Master's</option></select>
+            <input id="reg-occupation" type="text" placeholder="Occupation" class="w-full p-3 border rounded-xl">
+            <div class="flex gap-2">
+                <select id="reg-drinking" class="w-1/2 p-3 border rounded-xl"><option value="">Drinking</option><option>Never</option><option>Socially</option></select>
+                <select id="reg-smoking" class="w-1/2 p-3 border rounded-xl"><option value="">Smoking</option><option>Never</option><option>Socially</option></select>
+            </div>
+            <select id="reg-kids" class="w-full p-3 border rounded-xl"><option value="">Family Plans</option><option>Want kids</option><option>Don't want kids</option></select>
+            <button onclick="nextPage(3)" class="w-full p-3 bg-botOrange text-white rounded-xl font-bold mt-4">Next: Bio</button>
         </div>
-    </div>
 
-    <!-- Navigation -->
-    <div id="nav-bar" class="hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 py-3 flex justify-around items-center z-50">
-        <button onclick="showView('view-swipe')" class="flex flex-col items-center text-botOrange">
-            <i class="ph-fill ph-fire text-2xl"></i>
-            <span class="text-[10px] font-bold">Swipe</span>
-        </button>
-        <button onclick="showView('view-matches')" class="flex flex-col items-center text-gray-400">
-            <i class="ph-fill ph-chats-circle text-2xl"></i>
-            <span class="text-[10px] font-bold">Matches</span>
-        </button>
+        <!-- Page 3: About You -->
+        <div id="page-3" class="hidden space-y-4">
+            <textarea id="reg-bio" placeholder="Tell us about yourself..." class="w-full p-3 border rounded-xl h-32"></textarea>
+            <button onclick="submitData()" class="w-full p-3 bg-green-600 text-white rounded-xl font-bold mt-4">Complete Registration</button>
+        </div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
-        
-        let userTelegramData = tg.initDataUnsafe?.user;
-        
-        if (!userTelegramData || Object.keys(userTelegramData).length === 0) {
-            userTelegramData = { 
-                id: Math.floor(Math.random() * 1000000000).toString(), 
-                first_name: "Browser Tester" 
-            }; 
-        }
-
-        // Ensure ID is a clean string
-        const cleanTelegramId = String(userTelegramData.id).trim();
-
-        let profiles = [];
-        let currentCardIndex = 0;
-
-        async function initApp() {
-            try {
-                // Show the ID on screen so we know exactly what is being sent
-                document.getElementById('debug-text').innerText = `ID: ${cleanTelegramId}`;
-
-                const timestamp = new Date().getTime();
-                const checkUrl = `${BACKEND_URL}/api/check-user/${cleanTelegramId}?t=${timestamp}`;
-                
-                const response = await fetch(checkUrl);
-                
-                if (!response.ok) {
-                    // This extracts the specific backend Python error instead of just saying "500"
-                    let errorDetails = `Status: ${response.status}`;
-                    try {
-                        const errorJson = await response.json();
-                        if (errorJson.detail) {
-                            errorDetails += ` | ${errorJson.detail}`;
-                        }
-                    } catch (e) {
-                        const errorText = await response.text();
-                        if (errorText) errorDetails += ` | ${errorText}`;
-                    }
-                    throw new Error(errorDetails);
+        function nextPage(step) {
+            // Age validation check
+            if(step === 2) {
+                const age = document.getElementById('reg-age').value;
+                if(!age || age < 18) { 
+                    alert("You must be 18+ to use this app!"); 
+                    return; 
                 }
-
-                const data = await response.json();
-                
-                document.getElementById('debug-text').innerText += ` | Exists: ${data.exists}`;
-
-                setTimeout(() => {
-                    document.getElementById('view-loading').classList.add('hidden');
-                    
-                    if (data.exists === false) {
-                        if (userTelegramData.first_name) {
-                            document.getElementById('reg-name').value = userTelegramData.first_name;
-                        }
-                        document.getElementById('view-registration').classList.remove('hidden');
-                    } else {
-                        showView('view-swipe');
-                    }
-                }, 1000);
-
-            } catch (err) {
-                document.getElementById('view-loading').innerHTML = `
-                    <div class="text-center bg-red-50 p-4 rounded-xl border border-red-200">
-                        <i class="ph-fill ph-warning-circle text-4xl text-red-500 mb-2"></i>
-                        <p class="text-red-700 font-bold mb-1">Backend Connection Failed</p>
-                        <p class="text-xs text-red-500 break-all">${err.message}</p>
-                    </div>
-                `;
             }
-        }
-
-        async function submitRegistration() {
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "Registering...";
-            btn.disabled = true;
-
-            const ageVal = parseInt(document.getElementById('reg-age').value);
-
-            const payload = {
-                telegram_id: cleanTelegramId,
-                name: document.getElementById('reg-name').value,
-                gender: document.getElementById('reg-gender').value,
-                age: isNaN(ageVal) ? 18 : ageVal, 
-                interested_in: document.getElementById('reg-interest').value,
-                bio: document.getElementById('reg-bio').value
-            };
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    document.getElementById('view-registration').classList.add('hidden');
-                    showView('view-swipe');
-                } else {
-                    const errorText = await response.text();
-                    alert("Registration failed: " + errorText);
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                }
-            } catch (err) {
-                alert("Network error: " + err.message);
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        function showView(viewId) {
-            document.getElementById('view-swipe').classList.add('hidden');
-            document.getElementById('view-matches').classList.add('hidden');
-            document.getElementById('view-registration').classList.add('hidden');
-            document.getElementById(viewId).classList.remove('hidden');
             
-            document.getElementById('nav-bar').classList.remove('hidden');
-            document.getElementById('nav-bar').classList.add('flex');
-
-            if (viewId === 'view-matches') fetchMatchesList();
-            else fetchMatches();
+            document.getElementById('page-1').classList.add('hidden');
+            document.getElementById('page-2').classList.add('hidden');
+            document.getElementById('page-3').classList.add('hidden');
+            document.getElementById('page-' + step).classList.remove('hidden');
+            document.getElementById('progress-bar').style.width = (step * 33) + '%';
+            document.getElementById('reg-title').innerText = "Step " + step + ": Details";
         }
 
-        function renderCards() {
-            const container = document.getElementById('card-container');
-            if (profiles.length === 0 || currentCardIndex >= profiles.length) {
-                container.innerHTML = '<p class="text-center text-gray-500 mt-10">No profiles found nearby.</p>';
-                return;
-            }
-            const profile = profiles[currentCardIndex];
-            container.innerHTML = `
-                <div class="w-full max-h-[70vh] bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center border border-gray-100">
-                    <div class="w-32 h-32 bg-gray-200 rounded-full mb-4 flex items-center justify-center text-gray-400 mt-4">
-                        <i class="ph-fill ph-user text-6xl"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-buna">${profile.name || 'Unknown'}, ${profile.age || '?'}</h3>
-                    <p class="text-botOrange font-medium mt-1">${profile.gender || 'Location hidden'}</p>
-                    <p class="text-gray-600 mt-4 text-center px-4">${profile.bio || 'No bio available.'}</p>
-                    
-                    <div class="mt-auto pt-8 w-full flex justify-around pb-4">
-                        <button onclick="nextCard()" class="w-16 h-16 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform">
-                            <i class="ph-bold ph-x text-3xl"></i>
-                        </button>
-                        <button onclick="nextCard()" class="w-16 h-16 bg-gradient-to-tr from-botOrange to-orange-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-95 transition-transform">
-                            <i class="ph-fill ph-heart text-3xl"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
+        function submitData() {
+            // Here you gather all values and call your API
+            alert("Registration logic triggered!");
         }
-
-        function nextCard() {
-            currentCardIndex++;
-            renderCards();
-        }
-
-        async function fetchMatches() {
-            const container = document.getElementById('card-container');
-            container.innerHTML = '<i class="ph-fill ph-spinner-gap animate-spin text-4xl text-botOrange"></i>';
-            
-            try {
-                const timestamp = new Date().getTime();
-                const response = await fetch(`${BACKEND_URL}/api/get-potential-matches/${cleanTelegramId}?t=${timestamp}`);
-                
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.detail || "Server error");
-                }
-
-                const data = await response.json();
-                
-                profiles = data.matches || [];
-                currentCardIndex = 0;
-                renderCards();
-            } catch (err) {
-                container.innerHTML = `<p class="text-center text-red-500 text-sm mt-10">Error loading profiles:<br>${err.message}</p>`;
-            }
-        }
-
-        async function fetchMatchesList() {
-            const list = document.getElementById('matches-list');
-            list.innerHTML = '<p class="text-center text-gray-500">Loading...</p>';
-            try {
-                const timestamp = new Date().getTime();
-                const response = await fetch(`${BACKEND_URL}/api/matches-list/${cleanTelegramId}?t=${timestamp}`);
-                
-                if(!response.ok) throw new Error("Failed to load");
-
-                const data = await response.json();
-                if (data.matches?.length) {
-                    list.innerHTML = data.matches.map(m => `<div class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 font-medium">${m.name}</div>`).join('');
-                } else {
-                    list.innerHTML = '<p class="text-gray-500 italic text-center mt-10">No matches yet.</p>';
-                }
-            } catch (e) {
-                list.innerHTML = `<p class="text-red-500 italic text-center mt-10">${e.message}</p>`;
-            }
-        }
-
-        // Start the app!
-        initApp();
     </script>
 </body>
 </html>
