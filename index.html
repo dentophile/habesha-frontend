@@ -174,6 +174,7 @@
         
         let isEditing = false;
         
+        // Appended Global State for Swiping
         let profiles = [];
         let currentCardIndex = 0;
 
@@ -197,6 +198,7 @@
                     document.getElementById('view-registration').classList.remove('hidden');
                 } else {
                     document.getElementById('view-swipe').classList.remove('hidden');
+                    // In a real app, you would fetch profiles here. Mocking for demonstration:
                     profiles = [
                         { telegram_id: '123', name: 'Sample User', age: 24, bio: 'Ready to mingle!', photo_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80' }
                     ];
@@ -211,13 +213,18 @@
             }
         }
 
+        // ---------- SWIPING LOGIC INTEGRATION ---------- //
+        
         function renderCards() {
             const container = document.getElementById('card-container');
+            
             if (currentCardIndex >= profiles.length || profiles.length === 0) {
                 container.innerHTML = `<p class="text-gray-400 font-medium">No more profiles to show.</p>`;
                 return;
             }
+
             const profile = profiles[currentCardIndex];
+            
             container.innerHTML = `
                 <div class="w-full h-full flex flex-col">
                     <div class="flex-1 bg-gray-200 bg-cover bg-center" style="background-image: url('${profile.photo_url}')"></div>
@@ -225,6 +232,8 @@
                         <h3 class="text-xl font-bold">${profile.name}, ${profile.age}</h3>
                         <p class="text-gray-500 text-sm mt-1">${profile.bio}</p>
                     </div>
+                    
+                    <!-- Updated Buttons injected here -->
                     <div class="mt-auto w-full flex justify-around pt-6 pb-6 bg-white">
                         <button onclick="handleSwipe(false)" class="w-14 h-14 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform">
                             <i class="ph-bold ph-x text-2xl"></i>
@@ -240,12 +249,14 @@
         async function handleSwipe(isLike) {
             const swiperId = cleanTelegramId;
             const swipedId = profiles[currentCardIndex].telegram_id; 
+
             try {
                 const response = await fetch(`${BACKEND_URL}/api/swipe`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ swiper_id: swiperId, swiped_id: swipedId, is_like: isLike })
                 });
+                
                 const data = await response.json();
                 if (data.match) {
                     showAlert("It's a Match! ❤️");
@@ -253,6 +264,7 @@
             } catch (e) {
                 console.error("Swipe failed:", e);
             }
+            
             nextCard();
         }
 
@@ -261,9 +273,12 @@
             renderCards();
         }
 
+        // ---------- END SWIPING LOGIC INTEGRATION ---------- //
+
         function toggleOtherLocation() {
             const select = document.getElementById('reg-location');
             const otherInput = document.getElementById('reg-location-other');
+            
             if (select.value === 'Other') {
                 otherInput.classList.remove('hidden');
             } else {
@@ -278,19 +293,31 @@
                 const age = document.getElementById('reg-age').value;
                 const interest = document.getElementById('reg-interest').value;
                 const intention = document.getElementById('reg-intention').value;
+                
                 let location = document.getElementById('reg-location').value;
-                if (location === 'Other') location = document.getElementById('reg-location-other').value.trim();
-                if (!gender || !age || !interest || !intention || !location) return showAlert("Please fill out all required basic fields.");
-                if (age < 18) return showAlert("You must be at least 18 years old to use Habesha Date.");
+                if (location === 'Other') {
+                    location = document.getElementById('reg-location-other').value.trim();
+                }
+
+                if (!gender || !age || !interest || !intention || !location) {
+                    return showAlert("Please fill out all required basic fields.");
+                }
+                if (age < 18) {
+                    return showAlert("You must be at least 18 years old to use Habesha Date.");
+                }
                 goToPage(2);
-            } else if (currentStep === 2) {
+            } 
+            else if (currentStep === 2) {
                 const height = document.getElementById('reg-height').value.trim();
                 const religion = document.getElementById('reg-religion').value;
                 const education = document.getElementById('reg-education').value;
                 const kids = document.getElementById('reg-kids').value;
                 const drinking = document.getElementById('reg-drinking').value;
                 const smoking = document.getElementById('reg-smoking').value;
-                if (!height || !religion || !education || !kids || !drinking || !smoking) return showAlert("Please fill out all detail and lifestyle fields.");
+                
+                if (!height || !religion || !education || !kids || !drinking || !smoking) {
+                    return showAlert("Please fill out all detail and lifestyle fields.");
+                }
                 goToPage(3);
             }
         }
@@ -299,9 +326,15 @@
             document.getElementById('page-1').classList.add('hidden');
             document.getElementById('page-2').classList.add('hidden');
             document.getElementById('page-3').classList.add('hidden');
+            
             document.getElementById('page-' + step).classList.remove('hidden');
-            const titles = isEditing ? ["Edit Profile: Basics", "Edit Profile: Details", "Edit Profile: Bio"] : ["Step 1: Basics", "Step 2: Details", "Step 3: Bio"];
+            
+            const titles = isEditing 
+                ? ["Edit Profile: Basics", "Edit Profile: Details", "Edit Profile: Bio"] 
+                : ["Step 1: Basics", "Step 2: Details", "Step 3: Bio"];
+                
             const progress = ["33.3%", "66.6%", "100%"];
+            
             document.getElementById('reg-title').innerText = titles[step - 1];
             document.getElementById('progress-bar').style.width = progress[step - 1];
         }
@@ -310,6 +343,7 @@
             isEditing = true;
             document.getElementById('view-swipe').classList.add('hidden');
             document.getElementById('view-registration').classList.remove('hidden');
+            
             goToPage(1); 
             document.getElementById('submit-btn').innerHTML = `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>`;
         }
@@ -317,9 +351,16 @@
         async function submitRegistration() {
             const bio = document.getElementById('reg-bio').value.trim();
             if(!bio) return showAlert("Please write a short bio to help others get to know you!");
+
             let finalLocation = document.getElementById('reg-location').value;
-            if (finalLocation === 'Other') finalLocation = document.getElementById('reg-location-other').value.trim();
-            let finalName = document.getElementById('reg-name').value.trim() || tg.initDataUnsafe?.user?.first_name || "Anonymous";
+            if (finalLocation === 'Other') {
+                finalLocation = document.getElementById('reg-location-other').value.trim();
+            }
+
+            let finalName = document.getElementById('reg-name').value.trim();
+            if (!finalName) {
+                finalName = tg.initDataUnsafe?.user?.first_name || "Anonymous";
+            }
 
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Saving...`;
@@ -344,24 +385,25 @@
                 smoking: document.getElementById('reg-smoking').value
             };
 
-            const endpoint = isEditing ? `${BACKEND_URL}/api/update-profile` : `${BACKEND_URL}/api/register`;
-            const reqMethod = isEditing ? 'PUT' : 'POST';
-
             try {
-                const response = await fetch(endpoint, {
-                    method: reqMethod,
+                const response = await fetch(`${BACKEND_URL}/api/register`, {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                
                 if (!response.ok) {
                     const err = await response.json();
                     throw new Error(err.detail || "Server Error");
                 }
+                
                 isEditing = false;
                 document.getElementById('view-registration').classList.add('hidden');
                 document.getElementById('view-swipe').classList.remove('hidden');
+                
                 submitBtn.innerHTML = `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
                 submitBtn.disabled = false;
+                
                 if(tg.showAlert) tg.showAlert("Profile successfully saved!");
             } catch (err) {
                 showAlert("Failed to save profile: " + err.message);
@@ -369,6 +411,7 @@
                 submitBtn.disabled = false;
             }
         }
+
         initApp();
     </script>
 </body>
