@@ -229,8 +229,8 @@
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
         const cleanTelegramId = String(tg.initDataUnsafe?.user?.id || Math.random()).trim();
         
-        // Start with default photo, but it will be overwritten by user selection
         let selectedPhotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+        let selectedPhotoFile = null; // Store actual File object
         
         let isEditing = false;
         let profiles = [];
@@ -543,23 +543,26 @@
 
         // --- Registration & Edit Functions ---
 
-        // NEW: Handle photo selection and convert to Base64
+        // Handle photo selection and store file for actual upload
         function handlePhotoSelect(event) {
             const file = event.target.files[0];
             if (file) {
+                // Save the actual file object to send to the backend later
+                selectedPhotoFile = file;
+
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const preview = document.getElementById('photo-preview');
                     const icon = document.getElementById('photo-icon');
                     const text = document.getElementById('photo-text');
                     
-                    // Show the selected image as background
+                    // Show the selected image as background (Local preview)
                     preview.style.backgroundImage = `url(${e.target.result})`;
                     preview.classList.remove('border-dashed');
                     icon.classList.add('hidden');
                     text.classList.add('hidden');
                     
-                    // Set the variable that will be sent to the backend
+                    // Temporarily hold base64 in case we don't upload a new one during edits
                     selectedPhotoUrl = e.target.result;
                 }
                 reader.readAsDataURL(file);
@@ -656,29 +659,55 @@
             }
 
             const submitBtn = document.getElementById('submit-btn');
-            submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Saving...`;
+            submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Processing...`;
             submitBtn.disabled = true;
 
-            const payload = {
-                telegram_id: cleanTelegramId,
-                name: finalName,
-                age: parseInt(document.getElementById('reg-age').value),
-                gender: document.getElementById('reg-gender').value,
-                interested_in: document.getElementById('reg-interest').value,
-                location: finalLocation, 
-                height: document.getElementById('reg-height').value,
-                religion: document.getElementById('reg-religion').value,
-                education: document.getElementById('reg-education').value,
-                occupation: document.getElementById('reg-occupation').value,
-                bio: bio,
-                photo_url: selectedPhotoUrl,
-                intention: document.getElementById('reg-intention').value,
-                kids: document.getElementById('reg-kids').value,
-                drinking: document.getElementById('reg-drinking').value,
-                smoking: document.getElementById('reg-smoking').value
-            };
-
             try {
+                let finalPhotoUrl = selectedPhotoUrl;
+
+                // 1. Upload photo to backend if a new file was selected
+                if (selectedPhotoFile) {
+                    submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Uploading Photo...`;
+                    
+                    const formData = new FormData();
+                    formData.append('file', selectedPhotoFile);
+                    formData.append('telegram_id', cleanTelegramId);
+
+                    const uploadRes = await fetch(`${BACKEND_URL}/api/upload-photo`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!uploadRes.ok) {
+                        throw new Error("Failed to upload photo to storage.");
+                    }
+                    
+                    const uploadData = await uploadRes.json();
+                    finalPhotoUrl = uploadData.photo_url; // Use the returned public Supabase URL
+                }
+
+                // 2. Save profile data
+                submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Saving Profile...`;
+
+                const payload = {
+                    telegram_id: cleanTelegramId,
+                    name: finalName,
+                    age: parseInt(document.getElementById('reg-age').value),
+                    gender: document.getElementById('reg-gender').value,
+                    interested_in: document.getElementById('reg-interest').value,
+                    location: finalLocation, 
+                    height: document.getElementById('reg-height').value,
+                    religion: document.getElementById('reg-religion').value,
+                    education: document.getElementById('reg-education').value,
+                    occupation: document.getElementById('reg-occupation').value,
+                    bio: bio,
+                    photo_url: finalPhotoUrl, // Passed as safe URL, not base64
+                    intention: document.getElementById('reg-intention').value,
+                    kids: document.getElementById('reg-kids').value,
+                    drinking: document.getElementById('reg-drinking').value,
+                    smoking: document.getElementById('reg-smoking').value
+                };
+
                 const response = await fetch(`${BACKEND_URL}/api/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -701,9 +730,9 @@
                 submitBtn.innerHTML = `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
                 submitBtn.disabled = false;
                 
-                showAlert("Profile successfully saved!");
+                if(tg.showAlert) tg.showAlert("Profile successfully saved!");
             } catch (err) {
-                showAlert("Failed to save profile: " + err.message);
+                showAlert("Error: " + err.message);
                 submitBtn.innerHTML = isEditing ? `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>` : `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
                 submitBtn.disabled = false;
             }
