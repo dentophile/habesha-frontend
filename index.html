@@ -14,9 +14,10 @@
 <body class="bg-gray-50 font-sans overflow-hidden">
 
     <!-- Loading Screen -->
-    <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center">
+    <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6">
         <i class="ph-fill ph-spinner-gap animate-spin text-4xl text-botOrange mb-4"></i>
-        <p class="text-gray-500 font-medium">Loading your profile...</p>
+        <p id="loading-text" class="text-gray-500 font-medium text-center">Reading Telegram Profile...</p>
+        <p id="debug-text" class="text-xs text-gray-400 mt-2 font-mono"></p>
     </div>
 
     <!-- Registration View -->
@@ -85,44 +86,69 @@
         
         let userTelegramData = tg.initDataUnsafe?.user;
         
-        // --- DEBUG: FORCE REGISTRATION MODE ---
-        // Uncomment the line below to pretend you are a brand new user every time (even inside Telegram).
-        // userTelegramData = { id: Math.floor(Math.random() * 1000000000).toString(), first_name: "Test User" };
-        
-        // Fallback for regular web browser testing (creates a random ID so registration always shows)
         if (!userTelegramData || Object.keys(userTelegramData).length === 0) {
-            console.warn("No Telegram user found, using random test ID to trigger registration.");
             userTelegramData = { 
                 id: Math.floor(Math.random() * 1000000000).toString(), 
                 first_name: "Browser Tester" 
             }; 
         }
 
+        // Ensure ID is a clean string
+        const cleanTelegramId = String(userTelegramData.id).trim();
+
         let profiles = [];
         let currentCardIndex = 0;
 
         async function initApp() {
             try {
-                console.log("Checking user ID:", userTelegramData.id);
-                const response = await fetch(`${BACKEND_URL}/api/check-user/${userTelegramData.id}`);
-                const data = await response.json();
-                console.log("Check user response:", data);
+                // Show the ID on screen so we know exactly what is being sent
+                document.getElementById('debug-text').innerText = `ID: ${cleanTelegramId}`;
+
+                const timestamp = new Date().getTime();
+                const checkUrl = `${BACKEND_URL}/api/check-user/${cleanTelegramId}?t=${timestamp}`;
                 
-                document.getElementById('view-loading').classList.add('hidden');
+                const response = await fetch(checkUrl);
                 
-                if (data.exists === false) {
-                    // Show Registration
-                    if (userTelegramData.first_name) {
-                        document.getElementById('reg-name').value = userTelegramData.first_name;
+                if (!response.ok) {
+                    // This extracts the specific backend Python error instead of just saying "500"
+                    let errorDetails = `Status: ${response.status}`;
+                    try {
+                        const errorJson = await response.json();
+                        if (errorJson.detail) {
+                            errorDetails += ` | ${errorJson.detail}`;
+                        }
+                    } catch (e) {
+                        const errorText = await response.text();
+                        if (errorText) errorDetails += ` | ${errorText}`;
                     }
-                    document.getElementById('view-registration').classList.remove('hidden');
-                } else {
-                    // Show Main App
-                    showView('view-swipe');
+                    throw new Error(errorDetails);
                 }
+
+                const data = await response.json();
+                
+                document.getElementById('debug-text').innerText += ` | Exists: ${data.exists}`;
+
+                setTimeout(() => {
+                    document.getElementById('view-loading').classList.add('hidden');
+                    
+                    if (data.exists === false) {
+                        if (userTelegramData.first_name) {
+                            document.getElementById('reg-name').value = userTelegramData.first_name;
+                        }
+                        document.getElementById('view-registration').classList.remove('hidden');
+                    } else {
+                        showView('view-swipe');
+                    }
+                }, 1000);
+
             } catch (err) {
-                console.error("Initialization error:", err);
-                document.getElementById('view-loading').innerHTML = `<p class="text-red-500">Cannot connect to server. Try again later.</p>`;
+                document.getElementById('view-loading').innerHTML = `
+                    <div class="text-center bg-red-50 p-4 rounded-xl border border-red-200">
+                        <i class="ph-fill ph-warning-circle text-4xl text-red-500 mb-2"></i>
+                        <p class="text-red-700 font-bold mb-1">Backend Connection Failed</p>
+                        <p class="text-xs text-red-500 break-all">${err.message}</p>
+                    </div>
+                `;
             }
         }
 
@@ -135,16 +161,15 @@
             const ageVal = parseInt(document.getElementById('reg-age').value);
 
             const payload = {
-                telegram_id: userTelegramData.id.toString(),
+                telegram_id: cleanTelegramId,
                 name: document.getElementById('reg-name').value,
                 gender: document.getElementById('reg-gender').value,
-                age: isNaN(ageVal) ? 18 : ageVal, // Default to 18 if they left it blank to prevent 422 error
+                age: isNaN(ageVal) ? 18 : ageVal, 
                 interested_in: document.getElementById('reg-interest').value,
                 bio: document.getElementById('reg-bio').value
             };
 
             try {
-                console.log("Submitting registration:", payload);
                 const response = await fetch(`${BACKEND_URL}/api/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -155,12 +180,13 @@
                     document.getElementById('view-registration').classList.add('hidden');
                     showView('view-swipe');
                 } else {
-                    alert("Registration failed. Please fill all fields.");
+                    const errorText = await response.text();
+                    alert("Registration failed: " + errorText);
                     btn.innerText = originalText;
                     btn.disabled = false;
                 }
             } catch (err) {
-                alert("Network error.");
+                alert("Network error: " + err.message);
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
@@ -192,7 +218,7 @@
                         <i class="ph-fill ph-user text-6xl"></i>
                     </div>
                     <h3 class="text-3xl font-bold text-buna">${profile.name || 'Unknown'}, ${profile.age || '?'}</h3>
-                    <p class="text-botOrange font-medium mt-1">${profile.location || 'Addis Ababa'}</p>
+                    <p class="text-botOrange font-medium mt-1">${profile.gender || 'Location hidden'}</p>
                     <p class="text-gray-600 mt-4 text-center px-4">${profile.bio || 'No bio available.'}</p>
                     
                     <div class="mt-auto pt-8 w-full flex justify-around pb-4">
@@ -217,23 +243,33 @@
             container.innerHTML = '<i class="ph-fill ph-spinner-gap animate-spin text-4xl text-botOrange"></i>';
             
             try {
-                // Fetching potential matches, excluding the current user
-                const response = await fetch(`${BACKEND_URL}/api/get-potential-matches/${userTelegramData.id}`);
+                const timestamp = new Date().getTime();
+                const response = await fetch(`${BACKEND_URL}/api/get-potential-matches/${cleanTelegramId}?t=${timestamp}`);
+                
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || "Server error");
+                }
+
                 const data = await response.json();
                 
                 profiles = data.matches || [];
                 currentCardIndex = 0;
                 renderCards();
             } catch (err) {
-                console.error("Fetch Error:", err);
-                container.innerHTML = '<p class="text-center text-red-500">Error loading profiles.</p>';
+                container.innerHTML = `<p class="text-center text-red-500 text-sm mt-10">Error loading profiles:<br>${err.message}</p>`;
             }
         }
 
         async function fetchMatchesList() {
             const list = document.getElementById('matches-list');
+            list.innerHTML = '<p class="text-center text-gray-500">Loading...</p>';
             try {
-                const response = await fetch(`${BACKEND_URL}/api/matches-list/${userTelegramData.id}`);
+                const timestamp = new Date().getTime();
+                const response = await fetch(`${BACKEND_URL}/api/matches-list/${cleanTelegramId}?t=${timestamp}`);
+                
+                if(!response.ok) throw new Error("Failed to load");
+
                 const data = await response.json();
                 if (data.matches?.length) {
                     list.innerHTML = data.matches.map(m => `<div class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 font-medium">${m.name}</div>`).join('');
@@ -241,7 +277,7 @@
                     list.innerHTML = '<p class="text-gray-500 italic text-center mt-10">No matches yet.</p>';
                 }
             } catch (e) {
-                console.error("Error loading matches", e);
+                list.innerHTML = `<p class="text-red-500 italic text-center mt-10">${e.message}</p>`;
             }
         }
 
