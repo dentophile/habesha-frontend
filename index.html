@@ -84,9 +84,18 @@
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
         
         let userTelegramData = tg.initDataUnsafe?.user;
-        if (!userTelegramData) {
-            console.warn("No Telegram user found, using test ID");
-            userTelegramData = { id: '111111111', first_name: "Local Tester" }; 
+        
+        // --- DEBUG: FORCE REGISTRATION MODE ---
+        // Uncomment the line below to pretend you are a brand new user every time (even inside Telegram).
+        // userTelegramData = { id: Math.floor(Math.random() * 1000000000).toString(), first_name: "Test User" };
+        
+        // Fallback for regular web browser testing (creates a random ID so registration always shows)
+        if (!userTelegramData || Object.keys(userTelegramData).length === 0) {
+            console.warn("No Telegram user found, using random test ID to trigger registration.");
+            userTelegramData = { 
+                id: Math.floor(Math.random() * 1000000000).toString(), 
+                first_name: "Browser Tester" 
+            }; 
         }
 
         let profiles = [];
@@ -94,8 +103,10 @@
 
         async function initApp() {
             try {
+                console.log("Checking user ID:", userTelegramData.id);
                 const response = await fetch(`${BACKEND_URL}/api/check-user/${userTelegramData.id}`);
                 const data = await response.json();
+                console.log("Check user response:", data);
                 
                 document.getElementById('view-loading').classList.add('hidden');
                 
@@ -133,6 +144,7 @@
             };
 
             try {
+                console.log("Submitting registration:", payload);
                 const response = await fetch(`${BACKEND_URL}/api/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
