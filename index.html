@@ -135,12 +135,7 @@
         const profileStatus = document.getElementById('profile-status');
         const cardContainer = document.getElementById('card-container');
 
-        // Mock Profiles (So you can see how it looks before users join!)
-        const profiles = [
-            { id: 1, name: "Helen", age: 24, location: "Addis Ababa", profession: "Architect", bio: "Looking for a serious connection. I love weekend getaways to Kuriftu.", image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=500&h=700&fit=crop" },
-            { id: 2, name: "Beti", age: 26, location: "Bole", profession: "Banker", bio: "Macchiato dates and deep conversations are my favorite.", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&h=700&fit=crop" },
-            { id: 3, name: "Saron", age: 23, location: "Hawassa", profession: "Software Engineer", bio: "Tech geek by day, food lover by night.", image: "https://images.unsplash.com/photo-1541216970279-affbf182e0d3?w=500&h=700&fit=crop" }
-        ];
+        let profiles = [];
         let currentCardIndex = 0;
 
         // 3. User Initialization
@@ -160,13 +155,33 @@
         }
 
         // 4. Navigation to Swipe Screen
-        startBtn.addEventListener('click', () => {
+        startBtn.addEventListener('click', async () => {
             viewWelcome.classList.add('hidden');
             viewSwipe.classList.remove('hidden');
-            renderCards();
+            
+            // Show loading state
+            cardContainer.innerHTML = '<div class="flex items-center justify-center h-full"><p class="text-botOrange font-bold animate-pulse text-lg">Finding matches...</p></div>';
+            
+            await fetchMatches();
         });
 
         // 5. Swipe Logic
+        async function fetchMatches() {
+            if (!userTelegramData) return;
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/matches/${userTelegramData.id}`);
+                const data = await response.json();
+                
+                profiles = data.matches || [];
+                currentCardIndex = 0;
+                renderCards();
+            } catch (error) {
+                console.error("Error fetching matches:", error);
+                cardContainer.innerHTML = '<p class="text-red-500 mt-10">Error loading profiles.</p>';
+            }
+        }
+
         function renderCards() {
             cardContainer.innerHTML = ''; // Clear container
             
@@ -207,6 +222,8 @@
             if (currentCardIndex >= profiles.length) return;
             
             const currentCard = document.getElementById(`card-${currentCardIndex}`);
+            const swipedProfile = profiles[currentCardIndex];
+            const isLike = (direction === 'right');
             
             // Add animation class based on direction
             if (direction === 'left') {
@@ -214,20 +231,33 @@
                 tg.HapticFeedback.impactOccurred('light');
             } else {
                 currentCard.classList.add('swipe-right');
-                tg.HapticFeedback.impactOccurred('medium'); // Stronger vibrate for a 'like'
+                tg.HapticFeedback.impactOccurred('medium'); 
+            }
+
+            // Send swipe to backend quietly
+            if (userTelegramData) {
+                fetch(`${BACKEND_URL}/api/swipe`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userTelegramData.id.toString(),
+                        swiped_telegram_id: swipedProfile.telegram_id.toString(),
+                        is_like: isLike
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.is_match) {
+                        tg.showAlert(`🎉 It's a Match! You and ${swipedProfile.name} liked each other!`);
+                    }
+                })
+                .catch(err => console.error(err));
             }
 
             // Wait for animation to finish, then show next card
             setTimeout(() => {
                 currentCardIndex++;
                 renderCards();
-                
-                if(direction === 'right') {
-                    // Temporary alert for testing
-                    if(Math.random() > 0.5) {
-                        tg.showAlert("🎉 It's a Match! You and " + profiles[currentCardIndex-1].name + " liked each other.");
-                    }
-                }
             }, 300); // 300ms matches the CSS transition time
         }
 
