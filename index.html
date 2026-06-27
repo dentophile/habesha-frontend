@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Habesha Date</title>
-    
-    <!-- Telegram Web App SDK -->
+    <title>Habesha Date( ሀበሻ ቀጠሮ❤️)</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- Tailwind CSS for beautiful, fast styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
                     colors: {
-                        buna: '#2B2B2B',       /* Darker text for readability */
-                        botOrange: '#FF952B',  /* Matches your bot's avatar */
-                        sand: '#F9F9F9'        /* Cleaner background to match Telegram */
+                        botOrange: '#FF952B',
+                        botOrangeLight: '#FFB366',
+                        buna: '#3C2A21',
                     }
                 }
             }
@@ -25,111 +25,263 @@
     </script>
     <style>
         body {
-            background-color: var(--tg-theme-bg-color, #F9F9F9);
-            color: var(--tg-theme-text-color, #2B2B2B);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: #F9FAFB;
+            color: #1F2937;
             overflow-x: hidden;
-        }
-        .app-container {
-            padding: 20px;
-            max-width: 500px;
-            margin: 0 auto;
+            overscroll-behavior: none;
         }
         .btn-primary {
-            background-color: var(--tg-theme-button-color, #FF952B);
-            color: var(--tg-theme-button-text-color, #ffffff);
+            background-color: #FF952B;
+            color: white;
+        }
+        .btn-primary:active {
+            background-color: #E68627;
+        }
+        .input-focus:focus {
+            outline: none;
+            border-color: #FF952B;
+            box-shadow: 0 0 0 3px rgba(255, 149, 43, 0.2);
         }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen">
 
-    <div class="app-container flex flex-col items-center justify-center min-h-screen text-center">
+    <div class="app-container w-full max-w-md p-4 pb-20">
         
-        <!-- Header to match your bot profile -->
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-buna mb-1">Habesha Date</h1>
-            <h2 class="text-2xl font-bold text-botOrange mb-3">ሀበሻ ቀጠሮ❤️</h2>
-            <p class="text-sm text-gray-500 max-w-xs mx-auto leading-relaxed">
+        <!-- VIEW 1: WELCOME SCREEN -->
+        <div id="view-welcome" class="w-full flex flex-col items-center text-center transition-all duration-300">
+            <!-- Header matching bot profile -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Habesha Date</h1>
+                <h2 class="text-2xl font-bold text-botOrange mt-1">ሀበሻ ቀጠሮ❤️</h2>
+            </div>
+            
+            <p class="text-sm text-gray-600 mb-8 max-w-xs leading-relaxed">
                 የህይወት አጋርዎን በቀላሉ ያግኙ! አስተማማኝ እና ትክክለኛ የኢትዮጵያውያን የፍቅር ጓደኛ ማገናኛ ቦት።
             </p>
-        </div>
-        
-        <p class="text-botOrange font-semibold mb-6 animate-pulse" id="welcome-message">Loading your profile...</p>
 
-        <!-- Profile Card -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm mb-6 border-t-4 border-botOrange">
-            <div class="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden border-2 border-botOrange shadow-inner">
-                <img id="user-photo" src="https://ui-avatars.com/api/?name=User&background=FF952B&color=fff&size=200" alt="Profile" class="w-full h-full object-cover">
+            <p id="welcome-message" class="text-botOrange font-semibold mb-6 animate-pulse">Connecting to Telegram...</p>
+
+            <!-- User Avatar Card -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 w-full mb-8 flex flex-col items-center">
+                <div id="user-avatar" class="w-24 h-24 rounded-full bg-botOrange text-white flex items-center justify-center text-3xl font-bold mb-4 shadow-inner">
+                    ?
+                </div>
+                <h3 id="user-name" class="text-xl font-bold text-gray-900">User</h3>
+                <p class="text-sm text-gray-500 mt-1">Ready to find your match?</p>
             </div>
-            <h2 class="text-xl font-bold text-buna" id="user-name">Welcome!</h2>
-            <p class="text-sm text-gray-500 mt-2">Ready to find your match?</p>
+
+            <!-- Action Button -->
+            <button id="start-btn" class="btn-primary w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-transform active:scale-95 hidden">
+                Start Swiping
+            </button>
+
+            <p class="text-xs text-gray-400 mt-8">@ethiopia_date_bot</p>
         </div>
 
-        <!-- Action Button -->
-        <button id="start-btn" class="btn-primary w-full max-w-sm py-4 rounded-xl font-bold text-lg shadow-lg transition-transform active:scale-95 hidden">
-            Start Swiping
-        </button>
+        <!-- VIEW 2: PROFILE SETUP SCREEN -->
+        <div id="view-setup" class="hidden w-full flex flex-col items-start text-left bg-white rounded-2xl shadow-xl p-6 border-t-4 border-botOrange animate-fade-in-up">
+            <div class="flex items-center justify-between w-full mb-2">
+                <h2 class="text-2xl font-bold text-gray-900">Your Profile</h2>
+                <span class="text-xs font-semibold bg-botOrangeLight text-white px-2 py-1 rounded-full">Step 1 of 1</span>
+            </div>
+            <p class="text-sm text-gray-500 mb-6">Let's build a profile that stands out.</p>
+            
+            <form id="profile-form" class="w-full space-y-5">
+                
+                <!-- Basic Info -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">I am a... <span class="text-red-500">*</span></label>
+                        <select id="input-gender" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
+                            <option value="">Select</option>
+                            <option value="male">Male (ወንድ)</option>
+                            <option value="female">Female (ሴት)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Looking for... <span class="text-red-500">*</span></label>
+                        <select id="input-interested-in" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
+                            <option value="">Select</option>
+                            <option value="female">Female (ሴት)</option>
+                            <option value="male">Male (ወንድ)</option>
+                            <option value="both">Both (ሁለቱንም)</option>
+                        </select>
+                    </div>
+                </div>
 
-        <p id="status-log" class="text-xs text-gray-400 mt-8"></p>
+                <!-- Age & Profession -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Age <span class="text-red-500">*</span></label>
+                        <input type="number" id="input-age" min="18" max="99" required placeholder="18+" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Profession</label>
+                        <input type="text" id="input-profession" placeholder="E.g. Engineer, Student" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
+                    </div>
+                </div>
+
+                <!-- Intent / Relationship Goal -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Relationship Goal <span class="text-red-500">*</span></label>
+                    <select id="input-intent" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
+                        <option value="">What are you looking for?</option>
+                        <option value="marriage">Marriage / Serious (ትዳር / ቁም ነገር)</option>
+                        <option value="dating">Dating (የፍቅር ጓደኝነት)</option>
+                        <option value="friendship">Friendship (ጓደኝነት)</option>
+                    </select>
+                </div>
+
+                <!-- Location / City -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">City / Location <span class="text-red-500">*</span></label>
+                    <select id="input-location" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
+                        <option value="">Where do you live?</option>
+                        <option value="addis_ababa">Addis Ababa</option>
+                        <option value="hawassa">Hawassa</option>
+                        <option value="bahir_dar">Bahir Dar</option>
+                        <option value="adama">Adama</option>
+                        <option value="dire_dawa">Dire Dawa</option>
+                        <option value="diaspora_us">Diaspora (USA/Canada)</option>
+                        <option value="diaspora_eu">Diaspora (Europe)</option>
+                        <option value="diaspora_other">Diaspora (Other)</option>
+                        <option value="other_ethiopia">Other City in Ethiopia</option>
+                    </select>
+                </div>
+
+                <!-- Religion (Important in Ethiopian context) -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Religion (Optional)</label>
+                    <select id="input-religion" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
+                        <option value="">Select (Optional)</option>
+                        <option value="orthodox">Orthodox Christian</option>
+                        <option value="protestant">Protestant</option>
+                        <option value="muslim">Muslim</option>
+                        <option value="catholic">Catholic</option>
+                        <option value="other">Other / Prefer not to say</option>
+                    </select>
+                </div>
+
+                <!-- Bio -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1 flex justify-between">
+                        <span>About Me <span class="text-red-500">*</span></span>
+                        <span id="bio-counter" class="text-xs text-gray-400 font-normal">0/150</span>
+                    </label>
+                    <textarea id="input-bio" rows="3" maxlength="150" required placeholder="E.g., I love Buna, long walks in Addis, and good conversations. What's the last thing that made you smile?" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm resize-none transition-shadow"></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Ask a question in your bio to get better matches!</p>
+                </div>
+
+                <button type="submit" id="save-profile-btn" class="btn-primary w-full py-4 mt-6 rounded-xl font-bold text-lg shadow-lg transition-transform active:scale-95 flex justify-center items-center">
+                    <span>Save & Start Swiping</span>
+                </button>
+            </form>
+        </div>
+
     </div>
 
     <script>
-        // 1. Initialize Telegram Mini App
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Make the app take up the full screen
-        tg.ready();
+        tg.expand(); // Make it full screen
 
-        const statusLog = document.getElementById('status-log');
-        const welcomeMessage = document.getElementById('welcome-message');
-        const userNameText = document.getElementById('user-name');
-        const startBtn = document.getElementById('start-btn');
-        
-        // YOUR RENDER URL GOES HERE (Make sure it has no slash at the end)
+        // YOUR RENDER BACKEND URL GOES HERE
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
 
-        // 2. Extract User Data from Telegram
-        const user = tg.initDataUnsafe?.user;
+        // Elements
+        const welcomeMessage = document.getElementById('welcome-message');
+        const startBtn = document.getElementById('start-btn');
+        const userNameEl = document.getElementById('user-name');
+        const userAvatarEl = document.getElementById('user-avatar');
+        
+        const viewWelcome = document.getElementById('view-welcome');
+        const viewSetup = document.getElementById('view-setup');
+        
+        const profileForm = document.getElementById('profile-form');
+        const saveProfileBtn = document.getElementById('save-profile-btn');
+        const bioInput = document.getElementById('input-bio');
+        const bioCounter = document.getElementById('bio-counter');
 
-        if (user) {
-            // Update UI with Telegram data
-            const firstName = user.first_name || 'User';
-            userNameText.innerText = firstName + (user.last_name ? ' ' + user.last_name : '');
-            
-            // Generate an avatar matching your brand colors if they don't have a Telegram photo
-            const photoUrl = user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=FF952B&color=fff&size=200`;
-            document.getElementById('user-photo').src = photoUrl;
+        // Bio character counter
+        bioInput.addEventListener('input', function() {
+            bioCounter.innerText = `${this.value.length}/150`;
+            if(this.value.length >= 140) {
+                bioCounter.classList.add('text-botOrange');
+            } else {
+                bioCounter.classList.remove('text-botOrange');
+            }
+        });
 
-            welcomeMessage.innerText = "Connecting to database...";
+        // Initialize App
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
             
-            // 3. Send data to your Render Backend
-            fetch(`${BACKEND_URL}/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    telegram_id: user.id.toString(),
-                    name: user.first_name
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                welcomeMessage.innerText = "Profile securely loaded!";
-                startBtn.classList.remove('hidden');
-                statusLog.innerText = data.message;
-            })
-            .catch(error => {
-                welcomeMessage.innerText = "Connection error.";
-                statusLog.innerText = "Error: " + error.message;
-            });
+            // Set User Details
+            userNameEl.innerText = user.first_name + (user.last_name ? ' ' + user.last_name[0] + '.' : '');
+            userAvatarEl.innerText = user.first_name.charAt(0).toUpperCase() + (user.last_name ? user.last_name.charAt(0).toUpperCase() : '');
             
+            // Provide feedback that data was received
+            welcomeMessage.innerText = "Profile securely loaded!";
+            welcomeMessage.classList.remove('animate-pulse');
+            
+            // Show the start button
+            startBtn.classList.remove('hidden');
+
+            // Set theme color to match the app
+            tg.setHeaderColor('#F9FAFB');
+            tg.setBackgroundColor('#F9FAFB');
+
         } else {
             welcomeMessage.innerText = "Please open this inside Telegram.";
+            welcomeMessage.classList.replace('text-botOrange', 'text-red-500');
         }
 
-        // Close app when done
+        // Navigation: Welcome -> Setup
         startBtn.addEventListener('click', () => {
-            tg.showAlert("Coming soon: Swiping interface!");
+            viewWelcome.classList.add('hidden');
+            viewSetup.classList.remove('hidden');
+            // Inform Telegram to show the back button
+            tg.BackButton.show();
+        });
+
+        // Handle Telegram Back Button
+        tg.BackButton.onClick(() => {
+            viewSetup.classList.add('hidden');
+            viewWelcome.classList.remove('hidden');
+            tg.BackButton.hide();
+        });
+
+        // Handle Form Submission
+        profileForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent page reload
+
+            const btnTextSpan = saveProfileBtn.querySelector('span');
+            btnTextSpan.innerText = "Saving profile...";
+            saveProfileBtn.disabled = true;
+            saveProfileBtn.classList.add('opacity-75');
+
+            // Collect data
+            const profileData = {
+                telegram_id: tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : 'demo_123',
+                name: userNameEl.innerText,
+                age: document.getElementById('input-age').value,
+                profession: document.getElementById('input-profession').value,
+                gender: document.getElementById('input-gender').value,
+                interested_in: document.getElementById('input-interested-in').value,
+                intent: document.getElementById('input-intent').value,
+                location: document.getElementById('input-location').value,
+                religion: document.getElementById('input-religion').value,
+                bio: document.getElementById('input-bio').value
+            };
+
+            // Simulate network request (Will connect to FastAPI in next step)
+            setTimeout(() => {
+                tg.HapticFeedback.notificationOccurred('success');
+                console.log("Collected Data:", profileData);
+                saveProfileBtn.disabled = false;
+                saveProfileBtn.classList.remove('opacity-75');
+            }, 1000);
         });
     </script>
 </body>
