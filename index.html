@@ -44,7 +44,16 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
-        const userTelegramData = tg.initDataUnsafe?.user;
+        
+        // Use Telegram user if available, otherwise use your hardcoded ID for testing
+        let userTelegramData = tg.initDataUnsafe?.user;
+        if (!userTelegramData) {
+            console.warn("No Telegram user found, using test ID");
+            userTelegramData = { id: '723718730' }; 
+        }
+
+        let profiles = [];
+        let currentCardIndex = 0;
 
         function showView(viewId) {
             document.getElementById('view-swipe').classList.add('hidden');
@@ -54,36 +63,50 @@
             else fetchMatches();
         }
 
-        async function fetchMatches() {
-            if (!userTelegramData) return;
+        function renderCards() {
             const container = document.getElementById('card-container');
+            if (profiles.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 mt-10">No profiles found.</p>';
+                return;
+            }
+            const profile = profiles[currentCardIndex];
+            container.innerHTML = `
+                <div class="w-full h-full bg-white rounded-3xl shadow-lg p-6 flex flex-col items-center">
+                    <div class="w-24 h-24 bg-gray-200 rounded-full mb-4"></div>
+                    <h3 class="text-2xl font-bold text-buna">${profile.name || 'Unknown'}</h3>
+                    <p class="text-gray-600 mt-2">${profile.bio || 'No bio available.'}</p>
+                </div>
+            `;
+        }
+
+        async function fetchMatches() {
+            const container = document.getElementById('card-container');
+            container.innerHTML = '<p class="text-center">Loading profiles...</p>';
             
             try {
-                // FIXED: Now fetching POTENTIAL matches
+                console.log("Fetching for ID:", userTelegramData.id);
                 const response = await fetch(`${BACKEND_URL}/api/get-potential-matches/${userTelegramData.id}`);
                 const data = await response.json();
+                console.log("API Response:", data);
                 
                 profiles = data.matches || [];
                 currentCardIndex = 0;
-                
-                if (profiles.length === 0) {
-                    container.innerHTML = '<p class="text-center text-gray-500 mt-10">No profiles nearby. Check back later!</p>';
-                } else {
-                    renderCards();
-                }
+                renderCards();
             } catch (err) {
+                console.error("Fetch Error:", err);
                 container.innerHTML = "Error loading. Check console.";
             }
         }
 
         async function fetchMatchesList() {
             const list = document.getElementById('matches-list');
-            if (!userTelegramData) return;
             try {
                 const response = await fetch(`${BACKEND_URL}/api/matches-list/${userTelegramData.id}`);
                 const data = await response.json();
                 if (data.matches?.length) {
                     list.innerHTML = data.matches.map(m => `<div class="p-3 bg-white rounded-xl shadow-sm">${m.name}</div>`).join('');
+                } else {
+                    list.innerHTML = '<p class="text-gray-500 italic">No matches yet.</p>';
                 }
             } catch (e) {
                 console.error("Error loading matches", e);
