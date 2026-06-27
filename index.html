@@ -1,4 +1,17 @@
-<!-- ... (Keep your existing card-stack and everything else) ... -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habesha Date</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        .btn-primary { background: linear-gradient(135deg, #FF952B 0%, #FF7F00 100%); color: white; }
+    </style>
+</head>
+<body class="bg-gray-50">
 
     <!-- NAVIGATION BAR -->
     <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 py-3 flex justify-around items-center z-50">
@@ -12,48 +25,60 @@
         </button>
     </div>
 
-    <!-- MATCHES VIEW (HIDDEN BY DEFAULT) -->
-    <div id="view-matches" class="hidden w-full h-full pt-16 px-4">
-        <h2 class="text-2xl font-bold text-buna mb-4">Your Matches</h2>
-        <div id="matches-list" class="space-y-4">
-            <!-- Matches will be injected here -->
-            <p class="text-gray-500 italic">No matches yet. Keep swiping! ❤️</p>
+    <!-- MAIN APP CONTAINER -->
+    <div class="app-container pt-8 px-4 pb-24">
+        
+        <!-- VIEW SWIPE -->
+        <div id="view-swipe">
+            <h2 class="text-2xl font-bold text-center text-orange-500 mb-6">Find Matches</h2>
+            <div id="card-container" class="h-[60vh] flex items-center justify-center">
+                <p class="text-gray-500 animate-pulse">Loading profiles...</p>
+            </div>
+        </div>
+
+        <!-- VIEW MATCHES -->
+        <div id="view-matches" class="hidden">
+            <h2 class="text-2xl font-bold text-center mb-6">Your Matches</h2>
+            <div id="matches-list" class="space-y-4">
+                <p class="text-gray-500 text-center italic">No matches yet. Keep swiping! ❤️</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // ... (Keep your existing logic) ...
+        const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        const user = tg.initDataUnsafe.user;
 
         function showView(viewId) {
             document.getElementById('view-swipe').classList.add('hidden');
             document.getElementById('view-matches').classList.add('hidden');
             document.getElementById(viewId).classList.remove('hidden');
-
-            if (viewId === 'view-matches') {
-                fetchMatchesList();
-            }
+            if (viewId === 'view-matches') fetchMatchesList();
         }
 
         async function fetchMatchesList() {
             const list = document.getElementById('matches-list');
             try {
-                const response = await fetch(`${BACKEND_URL}/api/get_matches/${userTelegramData.id}`);
+                const response = await fetch(`${BACKEND_URL}/api/matches-list/${user.id}`);
                 const data = await response.json();
-                
                 if (data.matches && data.matches.length > 0) {
                     list.innerHTML = data.matches.map(m => `
-                        <div class="flex items-center p-3 bg-white rounded-xl shadow-sm border border-gray-100">
-                            <img src="${m.image}" class="w-14 h-14 rounded-full object-cover mr-4">
+                        <div class="flex items-center p-4 bg-white rounded-xl shadow-sm border border-gray-100">
+                            <div class="w-14 h-14 bg-orange-200 rounded-full flex items-center justify-center font-bold text-orange-700 mr-4">${m.name[0]}</div>
                             <div>
-                                <h3 class="font-bold text-buna">${m.name}</h3>
-                                <p class="text-xs text-botOrange">Tap to chat</p>
+                                <h3 class="font-bold">${m.name}</h3>
+                                <p class="text-xs text-orange-500">Tap to chat</p>
                             </div>
                         </div>
                     `).join('');
                 }
-            } catch (e) {
-                console.error("Error loading matches", e);
-            }
+            } catch (e) { console.error(e); }
         }
+        
+        // Initial load
+        showView('view-swipe');
     </script>
 </body>
+</html>
