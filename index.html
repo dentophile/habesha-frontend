@@ -17,7 +17,7 @@
 </head>
 <body class="bg-gray-50 font-sans overflow-hidden text-buna">
 
-    <!-- Custom Alert Box (To avoid native alerts) -->
+    <!-- Custom Alert Box -->
     <div id="custom-alert" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 px-4">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
             <h3 class="text-xl font-bold mb-2">Notice</h3>
@@ -37,12 +37,10 @@
         <div class="max-w-md mx-auto p-6 py-10">
             <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center transition-all">Step 1: Basics</h2>
             
-            <!-- Progress Bar -->
             <div class="w-full bg-gray-200 h-2 rounded-full mb-8 overflow-hidden">
                 <div id="progress-bar" class="bg-botOrange h-full w-1/3 transition-all duration-300"></div>
             </div>
 
-            <!-- Page 1: Basics -->
             <div id="page-1" class="space-y-4 transition-all">
                 <div class="mb-6 flex flex-col items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl h-32 w-32 mx-auto cursor-pointer hover:bg-gray-200 transition">
                     <i class="ph ph-camera text-3xl text-gray-500 mb-1"></i>
@@ -90,7 +88,6 @@
                 <button onclick="validateAndNext(1)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md">Next</button>
             </div>
 
-            <!-- Page 2: Details & Lifestyle -->
             <div id="page-2" class="hidden space-y-4 transition-all">
                 <input id="reg-height" type="text" placeholder="Height (e.g. 1.70m)" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                 
@@ -142,7 +139,6 @@
                 </div>
             </div>
 
-            <!-- Page 3: Bio -->
             <div id="page-3" class="hidden space-y-4 transition-all">
                 <textarea id="reg-bio" placeholder="Tell us about yourself... (Hobbies, what you're looking for)" class="w-full p-4 border rounded-xl bg-gray-50 h-32 focus:outline-none focus:border-botOrange resize-none"></textarea>
                 
@@ -159,7 +155,6 @@
 
     <!-- Swipe View -->
     <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-100 overflow-hidden">
-        <!-- Header with Edit Button -->
         <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-4 mt-2">
             <h2 class="font-bold text-2xl text-buna">Discover</h2>
             <button onclick="openEditProfile()" class="text-botOrange text-sm font-bold flex items-center gap-1.5 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-gray-50 transition">
@@ -182,7 +177,6 @@
 
     <!-- Chat View -->
     <div id="view-chat" class="hidden w-full h-screen bg-gray-50 flex-col z-[60] fixed top-0 left-0 overflow-hidden">
-        <!-- Chat Header -->
         <div class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 shadow-sm shrink-0">
             <button onclick="closeChat()" class="text-gray-500 p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition">
                 <i class="ph-bold ph-arrow-left text-2xl"></i>
@@ -192,17 +186,12 @@
                 <h3 class="font-bold text-buna truncate" id="chat-header-name">Name</h3>
                 <p class="text-xs text-green-500 font-medium">Matched!</p>
             </div>
-            <button class="text-gray-400 hover:text-botOrange p-2">
-                <i class="ph-bold ph-dots-three-vertical text-2xl"></i>
-            </button>
         </div>
 
-        <!-- Chat Messages Container -->
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col scroll-smooth">
             <!-- Messages will be injected here -->
         </div>
 
-        <!-- Chat Input Area -->
         <div class="bg-white border-t border-gray-200 p-3 flex gap-2 items-center shrink-0">
             <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKeyPress(event)" class="flex-1 bg-gray-100 border-transparent focus:bg-white focus:border-botOrange focus:ring-1 focus:ring-botOrange rounded-full px-4 py-3 outline-none transition">
             <button onclick="sendMessage()" class="w-12 h-12 bg-botOrange text-white rounded-full flex items-center justify-center hover:bg-orange-500 active:scale-95 transition shadow-sm shrink-0">
@@ -234,9 +223,11 @@
         let isEditing = false;
         let profiles = [];
         let currentCardIndex = 0;
+        
+        // Chat variables
         let activeChatId = null;
+        let chatPollInterval = null;
 
-        // Fallback alert wrapper
         function showAlert(message) {
             if (tg.showAlert) {
                 tg.showAlert(message);
@@ -263,7 +254,6 @@
                 } else {
                     document.getElementById('view-swipe').classList.remove('hidden');
                     document.getElementById('bottom-nav').classList.remove('hidden'); 
-                    
                     await loadDiscoverProfiles();
                 }
             } catch (err) {
@@ -406,32 +396,93 @@
 
         // --- Chat Functions ---
 
-        function openChat(matchId, matchName, matchPhoto) {
+        async function openChat(matchId, matchName, matchPhoto) {
             activeChatId = matchId;
             
-            // Set Header info
             document.getElementById('chat-header-name').innerText = matchName;
             document.getElementById('chat-header-photo').style.backgroundImage = `url('${matchPhoto}')`;
             
-            // Show Chat View
             document.getElementById('view-chat').classList.replace('hidden', 'flex');
             
-            // Clear or load mock messages
             const messagesContainer = document.getElementById('chat-messages');
-            messagesContainer.innerHTML = `
-                <div class="text-center text-xs text-gray-400 my-4">Today</div>
-                <div class="flex justify-start">
-                    <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%]">
-                        You matched with ${matchName}! Break the ice.
-                    </div>
-                </div>
-            `;
+            messagesContainer.innerHTML = `<div class="flex justify-center mt-4"><i class="ph ph-spinner animate-spin text-botOrange text-3xl"></i></div>`;
             
-            // TODO in future step: Fetch message history from backend here
+            await loadChatHistory(matchId, matchName);
+
+            // Poll for new messages every 3 seconds
+            chatPollInterval = setInterval(() => {
+                if (activeChatId === matchId) {
+                    loadChatHistory(matchId, matchName, true);
+                }
+            }, 3000);
+        }
+
+        async function loadChatHistory(matchId, matchName, isPolling = false) {
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/get-messages/${cleanTelegramId}/${matchId}`);
+                const data = await response.json();
+                
+                if (!data.messages || data.messages.length === 0) {
+                    if (!isPolling) {
+                        messagesContainer.innerHTML = `
+                            <div class="text-center text-xs text-gray-400 my-4">Today</div>
+                            <div class="flex justify-start">
+                                <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%]">
+                                    You matched with ${matchName}! Break the ice.
+                                </div>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                // Prevents jumping scroll behavior if user is scrolling up to read old messages
+                const isAtBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 100;
+
+                messagesContainer.innerHTML = data.messages.map(msg => {
+                    const isMe = msg.sender_id === cleanTelegramId;
+                    // Safely grab message text based on your database schema
+                    const contentText = msg.content || msg.message || ""; 
+                    
+                    if (isMe) {
+                        return `
+                            <div class="flex justify-end">
+                                <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words">
+                                    ${contentText}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="flex justify-start">
+                                <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%] break-words">
+                                    ${contentText}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }).join('');
+
+                if (isAtBottom || !isPolling) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+                
+            } catch (err) {
+                console.error("Failed to fetch chat history", err);
+                if (!isPolling) {
+                    messagesContainer.innerHTML = `<p class="text-center text-red-500 mt-4">Failed to load messages.</p>`;
+                }
+            }
         }
 
         function closeChat() {
             activeChatId = null;
+            if (chatPollInterval) {
+                clearInterval(chatPollInterval);
+                chatPollInterval = null;
+            }
             document.getElementById('view-chat').classList.replace('flex', 'hidden');
         }
 
@@ -441,29 +492,41 @@
             }
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('chat-input');
             const messageText = input.value.trim();
-            if (!messageText) return;
+            if (!messageText || !activeChatId) return;
             
             const messagesContainer = document.getElementById('chat-messages');
             
-            // Add user message directly to UI
+            // Optimistic Update: instantly show message to the user locally before DB response
             messagesContainer.innerHTML += `
-                <div class="flex justify-end">
+                <div class="flex justify-end opacity-70">
                     <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words">
                         ${messageText}
                     </div>
                 </div>
             `;
-            
-            // Auto-scroll to latest message
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            
-            // Clear input field
             input.value = '';
             
-            // TODO in future step: Send this message to backend via fetch to save it
+            try {
+                await fetch(`${BACKEND_URL}/api/send-message`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        sender_id: cleanTelegramId, 
+                        receiver_id: activeChatId, 
+                        message: messageText 
+                    })
+                });
+                
+                // Immediately pull updated chat history to replace our optimistic UI message
+                loadChatHistory(activeChatId, document.getElementById('chat-header-name').innerText, true);
+            } catch (err) {
+                console.error("Send error:", err);
+                showAlert("Failed to send message. Please check your connection.");
+            }
         }
 
         // --- Registration & Edit Functions ---
@@ -611,7 +674,6 @@
             }
         }
 
-        // Kick off the app
         initApp();
     </script>
 </body>
