@@ -15,64 +15,132 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-gray-50 font-sans overflow-hidden">
+<body class="bg-gray-50 font-sans overflow-hidden text-buna">
 
-    <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6">
-        <i class="ph-fill ph-spinner-gap animate-spin text-4xl text-botOrange mb-4"></i>
+    <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300">
+        <i class="ph-fill ph-spinner-gap animate-spin text-5xl text-botOrange mb-4"></i>
         <p class="text-gray-500 font-medium">Loading...</p>
     </div>
 
-    <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar">
-        <div class="max-w-md mx-auto p-6 py-10 pb-24">
-            <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center">Step 1: Basics</h2>
+    <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
+        <div class="max-w-md mx-auto p-6 py-10">
+            <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center transition-all">Step 1: Basics</h2>
+            
             <div class="w-full bg-gray-200 h-2 rounded-full mb-8 overflow-hidden">
                 <div id="progress-bar" class="bg-botOrange h-full w-1/3 transition-all duration-300"></div>
             </div>
 
-            <div id="page-1" class="space-y-4">
-                <div class="mb-6" id="photo-selector"></div>
-                <input id="reg-name" type="text" placeholder="Full Name" class="w-full p-4 border rounded-xl bg-gray-50">
-                <div class="flex gap-2">
-                    <select id="reg-gender" class="w-1/2 p-4 border rounded-xl bg-gray-50"><option value="">Gender</option><option>Man</option><option>Woman</option></select>
-                    <input id="reg-age" type="number" placeholder="Age (18+)" min="18" class="w-1/2 p-4 border rounded-xl bg-gray-50">
+            <div id="page-1" class="space-y-4 transition-all">
+                <div class="mb-6 flex flex-col items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl h-32 w-32 mx-auto cursor-pointer hover:bg-gray-200 transition">
+                    <i class="ph ph-camera text-3xl text-gray-500 mb-1"></i>
+                    <span class="text-xs text-gray-500">Upload Photo</span>
                 </div>
-                <select id="reg-interest" class="w-full p-4 border rounded-xl bg-gray-50"><option value="">Interested In</option><option>Women</option><option>Men</option><option>Everyone</option></select>
-                <select id="reg-location" class="w-full p-4 border rounded-xl bg-gray-50"><option value="">Living City</option><option>Addis Ababa</option><option>Bahir Dar</option><option>Hawassa</option><option>Adama</option><option>Diaspora</option></select>
-                <button onclick="nextPage(2)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold">Next</button>
+                
+                <input id="reg-name" type="text" placeholder="Full Name" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
+                
+                <div class="flex gap-2">
+                    <select id="reg-gender" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                        <option value="">Gender</option>
+                        <option value="Man">Man</option>
+                        <option value="Woman">Woman</option>
+                    </select>
+                    <input id="reg-age" type="number" placeholder="Age (18+)" min="18" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                </div>
+                
+                <select id="reg-interest" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                    <option value="">Interested In</option>
+                    <option value="Women">Women</option>
+                    <option value="Men">Men</option>
+                    <option value="Everyone">Everyone</option>
+                </select>
+                
+                <select id="reg-location" onchange="toggleOtherLocation()" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                    <option value="">Living City</option>
+                    <option value="Addis Ababa">Addis Ababa</option>
+                    <option value="Bahir Dar">Bahir Dar</option>
+                    <option value="Hawassa">Hawassa</option>
+                    <option value="Adama">Adama</option>
+                    <option value="Diaspora">Diaspora</option>
+                    <option value="Other">Other</option>
+                </select>
+                
+                <input id="reg-location-other" type="text" placeholder="Please type your city" class="hidden w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
+                
+                <button onclick="validateAndNext(1)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md">Next</button>
             </div>
 
-            <div id="page-2" class="hidden space-y-4">
-                <input id="reg-height" type="text" placeholder="Height (e.g. 1.70m)" class="w-full p-4 border rounded-xl bg-gray-50">
-                <select id="reg-religion" class="w-full p-4 border rounded-xl bg-gray-50"><option value="">Religion</option><option>Orthodox</option><option>Muslim</option><option>Protestant</option><option>Catholic</option></select>
-                <select id="reg-education" class="w-full p-4 border rounded-xl bg-gray-50"><option value="">Education</option><option>High School</option><option>Bachelor's</option><option>Master's</option></select>
-                <input id="reg-occupation" type="text" placeholder="Occupation" class="w-full p-4 border rounded-xl bg-gray-50">
-                <button onclick="nextPage(3)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold">Next</button>
+            <div id="page-2" class="hidden space-y-4 transition-all">
+                <input id="reg-height" type="text" placeholder="Height (e.g. 1.70m)" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                
+                <select id="reg-religion" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                    <option value="">Religion</option>
+                    <option value="Orthodox">Orthodox</option>
+                    <option value="Muslim">Muslim</option>
+                    <option value="Protestant">Protestant</option>
+                    <option value="Catholic">Catholic</option>
+                    <option value="Other">Other</option>
+                </select>
+                
+                <select id="reg-education" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                    <option value="">Education</option>
+                    <option value="Uneducated">Uneducated</option>
+                    <option value="High School">High School</option>
+                    <option value="Bachelor's">Bachelor's</option>
+                    <option value="Master's">Master's</option>
+                </select>
+                
+                <input id="reg-occupation" type="text" placeholder="Occupation" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                
+                <div class="flex gap-2">
+                    <button onclick="goToPage(1)" class="w-1/3 p-4 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">Back</button>
+                    <button onclick="validateAndNext(2)" class="w-2/3 p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md">Next</button>
+                </div>
             </div>
 
-            <div id="page-3" class="hidden space-y-4">
-                <textarea id="reg-bio" placeholder="Tell us about yourself..." class="w-full p-4 border rounded-xl bg-gray-50 h-32"></textarea>
-                <button onclick="submitRegistration()" class="w-full p-4 bg-green-600 text-white rounded-xl font-bold">Complete Registration</button>
+            <div id="page-3" class="hidden space-y-4 transition-all">
+                <textarea id="reg-bio" placeholder="Tell us about yourself... (Hobbies, what you're looking for)" class="w-full p-4 border rounded-xl bg-gray-50 h-32 focus:outline-none focus:border-botOrange resize-none"></textarea>
+                
+                <div class="flex gap-2">
+                    <button onclick="goToPage(2)" class="w-1/3 p-4 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">Back</button>
+                    <button id="submit-btn" onclick="submitRegistration()" class="w-2/3 p-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition shadow-md flex justify-center items-center gap-2">
+                        <span>Complete</span>
+                        <i class="ph-bold ph-check-circle"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-20 px-4 flex-col">
-        <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full"></div>
+    <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-20 px-4 flex-col bg-gray-100">
+        <h2 class="text-center font-bold text-xl text-buna mb-4">Discover</h2>
+        <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full bg-white rounded-2xl shadow-xl overflow-hidden">
+            <p class="text-gray-400">No more profiles to show.</p>
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
         const cleanTelegramId = String(tg.initDataUnsafe?.user?.id || Math.random()).trim();
         let selectedPhotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
 
-        // Initialize App
+        function showAlert(message) {
+            if (tg.showAlert) {
+                tg.showAlert(message);
+            } else {
+                alert(message);
+            }
+        }
+
         async function initApp() {
             try {
                 const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
                 const data = await response.json();
+                
                 document.getElementById('view-loading').classList.add('hidden');
+                
                 if (!data.exists) {
                     document.getElementById('reg-name').value = tg.initDataUnsafe?.user?.first_name || "";
                     document.getElementById('view-registration').classList.remove('hidden');
@@ -80,32 +148,101 @@
                     document.getElementById('view-swipe').classList.remove('hidden');
                 }
             } catch (err) {
-                document.getElementById('view-loading').innerHTML = `<p class="text-red-500">Backend Offline</p>`;
+                console.error(err);
+                document.getElementById('view-loading').innerHTML = `
+                    <i class="ph-fill ph-warning-circle text-5xl text-red-500 mb-4"></i>
+                    <p class="text-red-500 font-bold">Failed to connect to server.</p>
+                    <p class="text-gray-500 text-sm mt-2">Please try again later.</p>`;
             }
         }
 
-        function nextPage(step) {
-            if(step === 2 && document.getElementById('reg-age').value < 18) return alert("Must be 18+");
+        // New function to handle the "Other" city toggle
+        function toggleOtherLocation() {
+            const select = document.getElementById('reg-location');
+            const otherInput = document.getElementById('reg-location-other');
+            
+            if (select.value === 'Other') {
+                otherInput.classList.remove('hidden');
+            } else {
+                otherInput.classList.add('hidden');
+                otherInput.value = ''; // Clear it out if they switch away
+            }
+        }
+
+        function validateAndNext(currentStep) {
+            if (currentStep === 1) {
+                const name = document.getElementById('reg-name').value.trim();
+                const gender = document.getElementById('reg-gender').value;
+                const age = document.getElementById('reg-age').value;
+                const interest = document.getElementById('reg-interest').value;
+                
+                // Determine final location value
+                let location = document.getElementById('reg-location').value;
+                if (location === 'Other') {
+                    location = document.getElementById('reg-location-other').value.trim();
+                }
+
+                if (!name || !gender || !age || !interest || !location) {
+                    return showAlert("Please fill out all basic information fields.");
+                }
+                if (age < 18) {
+                    return showAlert("You must be at least 18 years old to use Habesha Date.");
+                }
+                goToPage(2);
+            } 
+            else if (currentStep === 2) {
+                const height = document.getElementById('reg-height').value.trim();
+                const religion = document.getElementById('reg-religion').value;
+                const education = document.getElementById('reg-education').value;
+                
+                if (!height || !religion || !education) {
+                    return showAlert("Please fill out height, religion, and education.");
+                }
+                goToPage(3);
+            }
+        }
+
+        function goToPage(step) {
             document.getElementById('page-1').classList.add('hidden');
             document.getElementById('page-2').classList.add('hidden');
             document.getElementById('page-3').classList.add('hidden');
+            
             document.getElementById('page-' + step).classList.remove('hidden');
-            document.getElementById('progress-bar').style.width = (step * 33) + '%';
+            
+            const titles = ["Step 1: Basics", "Step 2: Details", "Step 3: Bio"];
+            const progress = ["33.3%", "66.6%", "100%"];
+            
+            document.getElementById('reg-title').innerText = titles[step - 1];
+            document.getElementById('progress-bar').style.width = progress[step - 1];
         }
 
         async function submitRegistration() {
+            const bio = document.getElementById('reg-bio').value.trim();
+            if(!bio) return showAlert("Please write a short bio to help others get to know you!");
+
+            // Determine final location value for payload
+            let finalLocation = document.getElementById('reg-location').value;
+            if (finalLocation === 'Other') {
+                finalLocation = document.getElementById('reg-location-other').value.trim();
+            }
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Saving...`;
+            submitBtn.disabled = true;
+
+            // Updated Payload
             const payload = {
                 telegram_id: cleanTelegramId,
-                name: document.getElementById('reg-name').value,
+                name: document.getElementById('reg-name').value.trim(),
                 age: parseInt(document.getElementById('reg-age').value),
                 gender: document.getElementById('reg-gender').value,
                 interested_in: document.getElementById('reg-interest').value,
-                location: document.getElementById('reg-location').value,
-                height: document.getElementById('reg-height').value,
+                location: finalLocation,
+                height: document.getElementById('reg-height').value.trim(),
                 religion: document.getElementById('reg-religion').value,
                 education: document.getElementById('reg-education').value,
-                occupation: document.getElementById('reg-occupation').value,
-                bio: document.getElementById('reg-bio').value,
+                occupation: document.getElementById('reg-occupation').value.trim(),
+                bio: bio,
                 photo_url: selectedPhotoUrl
             };
 
@@ -115,14 +252,18 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                
                 if (!response.ok) {
                     const err = await response.json();
                     throw new Error(err.detail || "Server Error");
                 }
+                
                 document.getElementById('view-registration').classList.add('hidden');
                 document.getElementById('view-swipe').classList.remove('hidden');
             } catch (err) {
-                alert("Registration failed: " + err.message);
+                showAlert("Registration failed: " + err.message);
+                submitBtn.innerHTML = `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
+                submitBtn.disabled = false;
             }
         }
 
