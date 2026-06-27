@@ -57,15 +57,22 @@
         async function fetchMatches() {
             if (!userTelegramData) return;
             const container = document.getElementById('card-container');
+            
             try {
-                // FIXED: Using /api/matches-list/ to match main.py
-                const response = await fetch(`${BACKEND_URL}/api/matches-list/${userTelegramData.id}`);
+                // FIXED: Now fetching POTENTIAL matches
+                const response = await fetch(`${BACKEND_URL}/api/get-potential-matches/${userTelegramData.id}`);
                 const data = await response.json();
-                console.log("Matches response:", data);
-                container.innerHTML = data.matches?.length ? "Profiles loaded!" : "No profiles nearby.";
+                
+                profiles = data.matches || [];
+                currentCardIndex = 0;
+                
+                if (profiles.length === 0) {
+                    container.innerHTML = '<p class="text-center text-gray-500 mt-10">No profiles nearby. Check back later!</p>';
+                } else {
+                    renderCards();
+                }
             } catch (err) {
                 container.innerHTML = "Error loading. Check console.";
-                console.error(err);
             }
         }
 
