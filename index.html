@@ -309,23 +309,41 @@
             const profileData = {
                 telegram_id: tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : 'demo_123',
                 name: userNameEl.innerText,
-                age: document.getElementById('input-age').value,
+                age: parseInt(document.getElementById('input-age').value),
                 profession: document.getElementById('input-profession').value,
                 gender: document.getElementById('input-gender').value,
                 interested_in: document.getElementById('input-interested-in').value,
                 intent: document.getElementById('input-intent').value,
-                location: location, // Uses the newly resolved location variable
+                location: location,
                 religion: document.getElementById('input-religion').value,
                 bio: document.getElementById('input-bio').value
             };
 
-            // Simulate network request (Will connect to FastAPI in next step)
-            setTimeout(() => {
+            // Send data securely to your Render Backend
+            fetch(`${BACKEND_URL}/api/profile`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(profileData)
+            })
+            .then(response => response.json())
+            .then(data => {
                 tg.HapticFeedback.notificationOccurred('success');
-                console.log("Collected Data:", profileData);
+                tg.showAlert("Profile saved successfully! 🎉 Next: We will build the Swiping cards!");
+                
+                // Reset button state
                 saveProfileBtn.disabled = false;
                 saveProfileBtn.classList.remove('opacity-75');
-            }, 1000);
+                btnTextSpan.innerText = "Save & Start Swiping";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                tg.showAlert("Oops! Failed to connect to the server. Please try again.");
+                saveProfileBtn.disabled = false;
+                saveProfileBtn.classList.remove('opacity-75');
+                btnTextSpan.innerText = "Save & Start Swiping";
+            });
         });
     </script>
 </body>
