@@ -42,9 +42,19 @@
             </div>
 
             <div id="page-1" class="space-y-4 transition-all">
-                <div class="mb-6 flex flex-col items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl h-32 w-32 mx-auto cursor-pointer hover:bg-gray-200 transition">
-                    <i class="ph ph-camera text-3xl text-gray-500 mb-1"></i>
-                    <span class="text-xs text-gray-500">Upload Photo</span>
+                
+                <!-- NEW: Interactive Photo Upload -->
+                <div class="mb-6 flex flex-col items-center justify-center mx-auto relative cursor-pointer group" onclick="document.getElementById('file-upload').click()">
+                    <div id="photo-preview" class="bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl h-32 w-32 flex flex-col items-center justify-center overflow-hidden bg-cover bg-center transition group-hover:bg-gray-200 shadow-sm relative">
+                        <i id="photo-icon" class="ph ph-camera text-3xl text-gray-500 mb-1"></i>
+                        <span id="photo-text" class="text-xs text-gray-500">Upload Photo</span>
+                        
+                        <!-- Overlay for changing photo -->
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-xl">
+                            <i class="ph-bold ph-pencil-simple text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <input id="file-upload" type="file" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)">
                 </div>
                 
                 <input id="reg-name" type="text" placeholder="Nickname (Optional)" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
@@ -218,6 +228,8 @@
         
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
         const cleanTelegramId = String(tg.initDataUnsafe?.user?.id || Math.random()).trim();
+        
+        // Start with default photo, but it will be overwritten by user selection
         let selectedPhotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
         
         let isEditing = false;
@@ -530,6 +542,29 @@
         }
 
         // --- Registration & Edit Functions ---
+
+        // NEW: Handle photo selection and convert to Base64
+        function handlePhotoSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('photo-preview');
+                    const icon = document.getElementById('photo-icon');
+                    const text = document.getElementById('photo-text');
+                    
+                    // Show the selected image as background
+                    preview.style.backgroundImage = `url(${e.target.result})`;
+                    preview.classList.remove('border-dashed');
+                    icon.classList.add('hidden');
+                    text.classList.add('hidden');
+                    
+                    // Set the variable that will be sent to the backend
+                    selectedPhotoUrl = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
 
         function toggleOtherLocation() {
             const select = document.getElementById('reg-location');
