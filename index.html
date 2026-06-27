@@ -182,21 +182,30 @@
                 interested_in: document.getElementById('reg-interest').value
             };
 
+            console.log("Submitting payload:", payload);
+
             try {
                 const response = await fetch(`${API_BASE_URL}/api/register`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
+                
+                const responseText = await response.text();
+                console.log("API Response:", responseText);
+
                 if (response.ok) {
                     alert("Registration successful!");
                     tg.close();
                 } else {
-                    alert("Error registering.");
+                    alert("Registration failed: " + responseText);
+                    submitBtn.innerText = "Complete Registration";
                     submitBtn.disabled = false;
                 }
             } catch (err) {
-                alert("Network error.");
+                console.error("Fetch Error:", err);
+                alert("Network error: " + err.message);
+                submitBtn.innerText = "Complete Registration";
                 submitBtn.disabled = false;
             }
         }
