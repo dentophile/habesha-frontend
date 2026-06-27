@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Habesha Date( ሀበሻ ቀጠሮ❤️)</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Habesha Date</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Add Phosphor Icons for elegant buttons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
                     colors: {
                         botOrange: '#FF952B',
                         botOrangeLight: '#FFB366',
-                        buna: '#3C2A21',
+                        buna: '#2C1E16',
+                        lightGray: '#F5F5F5'
                     }
                 }
             }
@@ -25,326 +24,220 @@
     </script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F9FAFB;
-            color: #1F2937;
-            overflow-x: hidden;
-            overscroll-behavior: none;
+            background-color: #F5F5F5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden; /* Prevent scrolling while swiping */
         }
         .btn-primary {
-            background-color: #FF952B;
+            background: linear-gradient(135deg, #FF952B 0%, #FF7F00 100%);
             color: white;
         }
-        .btn-primary:active {
-            background-color: #E68627;
+        .card-stack {
+            position: relative;
+            width: 100%;
+            height: 65vh;
+            max-width: 350px;
+            perspective: 1000px;
         }
-        .input-focus:focus {
-            outline: none;
-            border-color: #FF952B;
-            box-shadow: 0 0 0 3px rgba(255, 149, 43, 0.2);
+        .swipe-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
+        .swipe-card img {
+            width: 100%;
+            height: 70%;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 15px;
+            height: 30%;
+            background: white;
+        }
+        /* Animation classes */
+        .swipe-left { transform: translateX(-150%) rotate(-15deg); opacity: 0; }
+        .swipe-right { transform: translateX(150%) rotate(15deg); opacity: 0; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body>
 
-    <div class="app-container w-full max-w-md p-4 pb-20">
+    <div class="flex flex-col items-center justify-center min-h-screen text-center w-full px-4">
         
         <!-- VIEW 1: WELCOME SCREEN -->
-        <div id="view-welcome" class="w-full flex flex-col items-center text-center transition-all duration-300">
-            <!-- Header matching bot profile -->
+        <div id="view-welcome" class="w-full flex flex-col items-center transition-all duration-300">
             <div class="mb-6">
-                <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Habesha Date</h1>
-                <h2 class="text-2xl font-bold text-botOrange mt-1">ሀበሻ ቀጠሮ❤️</h2>
+                <h1 class="text-3xl font-bold text-buna">Habesha Date</h1>
+                <h2 class="text-xl font-bold text-botOrange mt-1">ሀበሻ ቀጠሮ ❤️</h2>
+                <p class="text-sm text-gray-500 mt-3 px-4">የህይወት አጋርዎን በቀላሉ ያግኙ! አስተማማኝ እና ትክክለኛ የኢትዮጵያውያን የፍቅር ጓደኛ ማገናኛ ቦት።</p>
+            </div>
+
+            <div class="w-24 h-24 rounded-full bg-botOrange flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4" id="user-avatar">
+                <span id="user-initial">?</span>
             </div>
             
-            <p class="text-sm text-gray-600 mb-8 max-w-xs leading-relaxed">
-                የህይወት አጋርዎን በቀላሉ ያግኙ! አስተማማኝ እና ትክክለኛ የኢትዮጵያውያን የፍቅር ጓደኛ ማገናኛ ቦት።
-            </p>
+            <h2 class="text-2xl font-bold text-buna" id="user-name">Loading...</h2>
+            <p class="text-botOrange font-medium mb-8" id="profile-status">Connecting to secure server...</p>
 
-            <p id="welcome-message" class="text-botOrange font-semibold mb-6 animate-pulse">Connecting to Telegram...</p>
-
-            <!-- User Avatar Card -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 w-full mb-8 flex flex-col items-center">
-                <div id="user-avatar" class="w-24 h-24 rounded-full bg-botOrange text-white flex items-center justify-center text-3xl font-bold mb-4 shadow-inner">
-                    ?
-                </div>
-                <h3 id="user-name" class="text-xl font-bold text-gray-900">User</h3>
-                <p class="text-sm text-gray-500 mt-1">Ready to find your match?</p>
-            </div>
-
-            <!-- Action Button -->
-            <button id="start-btn" class="btn-primary w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-transform active:scale-95 hidden">
+            <button id="start-btn" class="btn-primary w-full max-w-sm py-4 rounded-xl font-bold text-lg shadow-lg transition-transform active:scale-95 hidden">
                 Start Swiping
             </button>
-
-            <p class="text-xs text-gray-400 mt-8">@ethiopia_date_bot</p>
         </div>
 
-        <!-- VIEW 2: PROFILE SETUP SCREEN -->
-        <div id="view-setup" class="hidden w-full flex flex-col items-start text-left bg-white rounded-2xl shadow-xl p-6 border-t-4 border-botOrange animate-fade-in-up">
-            <div class="flex items-center justify-between w-full mb-2">
-                <h2 class="text-2xl font-bold text-gray-900">Your Profile</h2>
-                <span class="text-xs font-semibold bg-botOrangeLight text-white px-2 py-1 rounded-full">Step 1 of 1</span>
+        <!-- VIEW 2: SWIPE INTERFACE (NEW!) -->
+        <div id="view-swipe" class="hidden w-full flex flex-col items-center h-screen pt-4 pb-8">
+            <!-- Mini Header -->
+            <div class="flex justify-between items-center w-full max-w-sm px-2 mb-4">
+                <h2 class="text-xl font-bold text-botOrange">ሀበሻ ቀጠሮ</h2>
+                <i class="ph ph-sliders-horizontal text-2xl text-gray-500"></i>
             </div>
-            <p class="text-sm text-gray-500 mb-6">Let's build a profile that stands out.</p>
-            
-            <form id="profile-form" class="w-full space-y-5" novalidate>
-                
-                <!-- Basic Info -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">I am a... <span class="text-red-500">*</span></label>
-                        <select id="input-gender" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
-                            <option value="">Select</option>
-                            <option value="male">Male (ወንድ)</option>
-                            <option value="female">Female (ሴት)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Looking for... <span class="text-red-500">*</span></label>
-                        <select id="input-interested-in" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
-                            <option value="">Select</option>
-                            <option value="female">Female (ሴት)</option>
-                            <option value="male">Male (ወንድ)</option>
-                            <option value="both">Both (ሁለቱንም)</option>
-                        </select>
-                    </div>
-                </div>
 
-                <!-- Age & Profession -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Age <span class="text-red-500">*</span></label>
-                        <input type="number" id="input-age" min="18" max="99" required placeholder="18+" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Profession</label>
-                        <input type="text" id="input-profession" placeholder="E.g. Engineer, Student" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
-                    </div>
-                </div>
+            <!-- Card Stack -->
+            <div class="card-stack" id="card-container">
+                <!-- Cards will be injected here by JavaScript -->
+            </div>
 
-                <!-- Intent / Relationship Goal -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Relationship Goal <span class="text-red-500">*</span></label>
-                    <select id="input-intent" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
-                        <option value="">What are you looking for?</option>
-                        <option value="marriage">Marriage / Serious (ትዳር / ቁም ነገር)</option>
-                        <option value="dating">Dating (የፍቅር ጓደኝነት)</option>
-                        <option value="friendship">Friendship (ጓደኝነት)</option>
-                    </select>
-                </div>
-
-                <!-- Location / City -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">City / Location <span class="text-red-500">*</span></label>
-                    <select id="input-location" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
-                        <option value="">Where do you live?</option>
-                        <option value="addis_ababa">Addis Ababa</option>
-                        <option value="hawassa">Hawassa</option>
-                        <option value="bahir_dar">Bahir Dar</option>
-                        <option value="adama">Adama</option>
-                        <option value="dire_dawa">Dire Dawa</option>
-                        <option value="diaspora_us">Diaspora (USA/Canada)</option>
-                        <option value="diaspora_eu">Diaspora (Europe)</option>
-                        <option value="diaspora_other">Diaspora (Other)</option>
-                        <option value="other_custom">Other (Please specify)</option>
-                    </select>
-                    <!-- Custom Location Input (Hidden by default) -->
-                    <input type="text" id="input-location-custom" placeholder="Type your city here..." class="hidden w-full mt-3 p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow animate-fade-in-up">
-                </div>
-
-                <!-- Religion (Important in Ethiopian context) -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Religion (Optional)</label>
-                    <select id="input-religion" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm transition-shadow">
-                        <option value="">Select (Optional)</option>
-                        <option value="orthodox">Orthodox Christian</option>
-                        <option value="protestant">Protestant</option>
-                        <option value="muslim">Muslim</option>
-                        <option value="catholic">Catholic</option>
-                        <option value="other">Other / Prefer not to say</option>
-                    </select>
-                </div>
-
-                <!-- Bio -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1 flex justify-between">
-                        <span>About Me <span class="text-red-500">*</span></span>
-                        <span id="bio-counter" class="text-xs text-gray-400 font-normal">0/150</span>
-                    </label>
-                    <textarea id="input-bio" rows="3" maxlength="150" required placeholder="E.g., I love Buna, long walks in Addis, and good conversations. What's the last thing that made you smile?" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg input-focus text-sm resize-none transition-shadow"></textarea>
-                    <p class="text-xs text-gray-400 mt-1">Ask a question in your bio to get better matches!</p>
-                </div>
-
-                <button type="submit" id="save-profile-btn" class="btn-primary w-full py-4 mt-6 rounded-xl font-bold text-lg shadow-lg transition-transform active:scale-95 flex justify-center items-center">
-                    <span>Save & Start Swiping</span>
+            <!-- Action Buttons -->
+            <div class="flex justify-center items-center gap-6 mt-8 w-full max-w-sm">
+                <button id="btn-pass" class="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center text-red-500 transition-transform active:scale-90 border border-gray-100">
+                    <i class="ph ph-x text-3xl font-bold"></i>
                 </button>
-            </form>
+                <button id="btn-superlike" class="w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center text-blue-500 transition-transform active:scale-90 border border-gray-100">
+                    <i class="ph ph-star text-2xl font-bold"></i>
+                </button>
+                <button id="btn-like" class="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center text-green-500 transition-transform active:scale-90 border border-gray-100">
+                    <i class="ph ph-heart text-3xl font-bold"></i>
+                </button>
+            </div>
         </div>
 
     </div>
 
     <script>
+        // 1. Initialize Telegram Mini App
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Make it full screen
-
-        // YOUR RENDER BACKEND URL GOES HERE
-        const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
-
-        // Elements
-        const welcomeMessage = document.getElementById('welcome-message');
-        const startBtn = document.getElementById('start-btn');
-        const userNameEl = document.getElementById('user-name');
-        const userAvatarEl = document.getElementById('user-avatar');
+        tg.expand(); 
         
+        // 2. Constants & Variables
+        const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com"; 
+        let userTelegramData = null;
+
+        // View Elements
         const viewWelcome = document.getElementById('view-welcome');
-        const viewSetup = document.getElementById('view-setup');
-        
-        const profileForm = document.getElementById('profile-form');
-        const saveProfileBtn = document.getElementById('save-profile-btn');
-        const bioInput = document.getElementById('input-bio');
-        const bioCounter = document.getElementById('bio-counter');
-        const locationSelect = document.getElementById('input-location');
-        const customLocationInput = document.getElementById('input-location-custom');
+        const viewSwipe = document.getElementById('view-swipe');
+        const startBtn = document.getElementById('start-btn');
+        const profileStatus = document.getElementById('profile-status');
+        const cardContainer = document.getElementById('card-container');
 
-        // Bio character counter
-        bioInput.addEventListener('input', function() {
-            bioCounter.innerText = `${this.value.length}/150`;
-            if(this.value.length >= 140) {
-                bioCounter.classList.add('text-botOrange');
-            } else {
-                bioCounter.classList.remove('text-botOrange');
-            }
-        });
+        // Mock Profiles (So you can see how it looks before users join!)
+        const profiles = [
+            { id: 1, name: "Helen", age: 24, location: "Addis Ababa", profession: "Architect", bio: "Looking for a serious connection. I love weekend getaways to Kuriftu.", image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=500&h=700&fit=crop" },
+            { id: 2, name: "Beti", age: 26, location: "Bole", profession: "Banker", bio: "Macchiato dates and deep conversations are my favorite.", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&h=700&fit=crop" },
+            { id: 3, name: "Saron", age: 23, location: "Hawassa", profession: "Software Engineer", bio: "Tech geek by day, food lover by night.", image: "https://images.unsplash.com/photo-1541216970279-affbf182e0d3?w=500&h=700&fit=crop" }
+        ];
+        let currentCardIndex = 0;
 
-        // Initialize App
+        // 3. User Initialization
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
+            userTelegramData = tg.initDataUnsafe.user;
+            document.getElementById('user-name').innerText = userTelegramData.first_name + (userTelegramData.last_name ? ' ' + userTelegramData.last_name.charAt(0) + '.' : '');
+            document.getElementById('user-initial').innerText = userTelegramData.first_name.charAt(0);
             
-            // Set User Details
-            userNameEl.innerText = user.first_name + (user.last_name ? ' ' + user.last_name[0] + '.' : '');
-            userAvatarEl.innerText = user.first_name.charAt(0).toUpperCase() + (user.last_name ? user.last_name.charAt(0).toUpperCase() : '');
-            
-            // Provide feedback that data was received
-            welcomeMessage.innerText = "Profile securely loaded!";
-            welcomeMessage.classList.remove('animate-pulse');
-            
-            // Show the start button
+            profileStatus.innerText = "Profile securely loaded!";
+            profileStatus.classList.remove("text-botOrange");
+            profileStatus.classList.add("text-green-500");
             startBtn.classList.remove('hidden');
-
-            // Set theme color to match the app
-            tg.setHeaderColor('#F9FAFB');
-            tg.setBackgroundColor('#F9FAFB');
-
         } else {
-            welcomeMessage.innerText = "Please open this inside Telegram.";
-            welcomeMessage.classList.replace('text-botOrange', 'text-red-500');
+            document.getElementById('user-name').innerText = "Test Mode";
+            profileStatus.innerText = "Not in Telegram. Open via Bot!";
+            startBtn.classList.remove('hidden'); // Allow testing in browser
         }
 
-        // Navigation: Welcome -> Setup
+        // 4. Navigation to Swipe Screen
         startBtn.addEventListener('click', () => {
             viewWelcome.classList.add('hidden');
-            viewSetup.classList.remove('hidden');
-            // Inform Telegram to show the back button
-            tg.BackButton.show();
+            viewSwipe.classList.remove('hidden');
+            renderCards();
         });
 
-        // Handle Telegram Back Button
-        tg.BackButton.onClick(() => {
-            viewSetup.classList.add('hidden');
-            viewWelcome.classList.remove('hidden');
-            tg.BackButton.hide();
-        });
+        // 5. Swipe Logic
+        function renderCards() {
+            cardContainer.innerHTML = ''; // Clear container
+            
+            if (currentCardIndex >= profiles.length) {
+                cardContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full bg-white rounded-2xl shadow-sm border border-gray-100">
+                        <i class="ph ph-magnifying-glass text-5xl text-gray-300 mb-2"></i>
+                        <p class="text-gray-500 font-medium">No more profiles nearby.</p>
+                        <p class="text-sm text-gray-400 mt-1">Check back later!</p>
+                    </div>`;
+                return;
+            }
 
-        // Handle Custom Location Toggle
-        locationSelect.addEventListener('change', function() {
-            if (this.value === 'other_custom') {
-                customLocationInput.classList.remove('hidden');
+            // Render remaining profiles backwards so the first one is on top
+            for (let i = profiles.length - 1; i >= currentCardIndex; i--) {
+                const profile = profiles[i];
+                const zIndex = profiles.length - i;
+                const scale = i === currentCardIndex ? 1 : 0.95;
+                const topOffset = i === currentCardIndex ? 0 : 10; // Stack effect
+
+                const cardHTML = `
+                    <div class="swipe-card" id="card-${i}" style="z-index: ${zIndex}; transform: scale(${scale}) translateY(${topOffset}px);">
+                        <img src="${profile.image}" alt="${profile.name}">
+                        <div class="card-content text-left">
+                            <h2 class="text-2xl font-bold text-buna">${profile.name}, <span class="font-normal text-gray-600">${profile.age}</span></h2>
+                            <p class="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                                <i class="ph-fill ph-map-pin text-botOrange"></i> ${profile.location} • ${profile.profession}
+                            </p>
+                            <p class="text-sm text-gray-700 mt-2 line-clamp-2">${profile.bio}</p>
+                        </div>
+                    </div>
+                `;
+                cardContainer.insertAdjacentHTML('beforeend', cardHTML);
+            }
+        }
+
+        function handleSwipe(direction) {
+            if (currentCardIndex >= profiles.length) return;
+            
+            const currentCard = document.getElementById(`card-${currentCardIndex}`);
+            
+            // Add animation class based on direction
+            if (direction === 'left') {
+                currentCard.classList.add('swipe-left');
+                tg.HapticFeedback.impactOccurred('light');
             } else {
-                customLocationInput.classList.add('hidden');
-                customLocationInput.value = ''; // Clear the input when hidden
-            }
-        });
-
-        // Handle Form Submission
-        profileForm.addEventListener('submit', (e) => {
-            e.preventDefault(); // Prevent page reload
-
-            // 1. Gather required fields for validation
-            const age = document.getElementById('input-age').value;
-            const gender = document.getElementById('input-gender').value;
-            const interested_in = document.getElementById('input-interested-in').value;
-            const intent = document.getElementById('input-intent').value;
-            let location = document.getElementById('input-location').value;
-            const customLocation = document.getElementById('input-location-custom').value;
-            const bio = document.getElementById('input-bio').value;
-
-            // 2. Handle custom location logic
-            if (location === 'other_custom') {
-                if (!customLocation.trim()) {
-                    tg.showAlert("እባክዎ ከተማዎን ያስገቡ (Please type your city).");
-                    return;
-                }
-                location = customLocation.trim(); // Override location with the typed text
+                currentCard.classList.add('swipe-right');
+                tg.HapticFeedback.impactOccurred('medium'); // Stronger vibrate for a 'like'
             }
 
-            // 3. Custom Validation using Telegram's native alert
-            if (!gender || !interested_in || !age || !intent || !location || !bio) {
-                tg.showAlert("እባክዎ ሁሉንም አስፈላጊ መረጃዎች ይሙሉ (Please fill in all required fields marked with *).");
-                return;
-            }
-
-            // 4. Age validation
-            if (parseInt(age) < 18) {
-                tg.showAlert("ዕድሜዎ 18 እና ከዚያ በላይ መሆን አለበት (You must be at least 18 years old).");
-                return;
-            }
-
-            const btnTextSpan = saveProfileBtn.querySelector('span');
-            btnTextSpan.innerText = "Saving profile...";
-            saveProfileBtn.disabled = true;
-            saveProfileBtn.classList.add('opacity-75');
-
-            // Collect data
-            const profileData = {
-                telegram_id: tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : 'demo_123',
-                name: userNameEl.innerText,
-                age: parseInt(document.getElementById('input-age').value),
-                profession: document.getElementById('input-profession').value,
-                gender: document.getElementById('input-gender').value,
-                interested_in: document.getElementById('input-interested-in').value,
-                intent: document.getElementById('input-intent').value,
-                location: location,
-                religion: document.getElementById('input-religion').value,
-                bio: document.getElementById('input-bio').value
-            };
-
-            // Send data securely to your Render Backend
-            fetch(`${BACKEND_URL}/api/profile`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(profileData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                tg.HapticFeedback.notificationOccurred('success');
-                tg.showAlert("Profile saved successfully! 🎉 Next: We will build the Swiping cards!");
+            // Wait for animation to finish, then show next card
+            setTimeout(() => {
+                currentCardIndex++;
+                renderCards();
                 
-                // Reset button state
-                saveProfileBtn.disabled = false;
-                saveProfileBtn.classList.remove('opacity-75');
-                btnTextSpan.innerText = "Save & Start Swiping";
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                tg.showAlert("Oops! Failed to connect to the server. Please try again.");
-                saveProfileBtn.disabled = false;
-                saveProfileBtn.classList.remove('opacity-75');
-                btnTextSpan.innerText = "Save & Start Swiping";
-            });
+                if(direction === 'right') {
+                    // Temporary alert for testing
+                    if(Math.random() > 0.5) {
+                        tg.showAlert("🎉 It's a Match! You and " + profiles[currentCardIndex-1].name + " liked each other.");
+                    }
+                }
+            }, 300); // 300ms matches the CSS transition time
+        }
+
+        // Button Event Listeners
+        document.getElementById('btn-pass').addEventListener('click', () => handleSwipe('left'));
+        document.getElementById('btn-like').addEventListener('click', () => handleSwipe('right'));
+        document.getElementById('btn-superlike').addEventListener('click', () => {
+            tg.showAlert("Super Like requires Premium! ⭐️");
         });
+
     </script>
 </body>
 </html>
