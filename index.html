@@ -2,18 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Habesha Date</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-        .btn-primary { background: linear-gradient(135deg, #FF952B 0%, #FF7F00 100%); color: white; }
-    </style>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { botOrange: '#FF952B', buna: '#2C1E16' } } } }
+    </script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 font-sans overflow-hidden">
 
-    <!-- NAVIGATION BAR -->
+    <!-- Views -->
+    <div id="view-swipe" class="w-full h-screen pt-4 pb-20 px-4">
+        <h2 class="text-2xl font-bold text-botOrange text-center mb-4">Find Matches</h2>
+        <div id="card-container" class="relative w-full h-[60vh] max-w-sm mx-auto">
+            <p class="text-center text-gray-500 mt-10">Loading profiles...</p>
+        </div>
+    </div>
+
+    <div id="view-matches" class="hidden w-full h-screen pt-16 px-4">
+        <h2 class="text-2xl font-bold text-buna mb-4">Your Matches</h2>
+        <div id="matches-list" class="space-y-4">
+            <p class="text-gray-500 italic">No matches yet. Keep swiping! ❤️</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
     <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 py-3 flex justify-around items-center z-50">
         <button onclick="showView('view-swipe')" class="flex flex-col items-center text-botOrange">
             <i class="ph-fill ph-fire text-2xl"></i>
@@ -25,60 +40,51 @@
         </button>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
-    <div class="app-container pt-8 px-4 pb-24">
-        
-        <!-- VIEW SWIPE -->
-        <div id="view-swipe">
-            <h2 class="text-2xl font-bold text-center text-orange-500 mb-6">Find Matches</h2>
-            <div id="card-container" class="h-[60vh] flex items-center justify-center">
-                <p class="text-gray-500 animate-pulse">Loading profiles...</p>
-            </div>
-        </div>
-
-        <!-- VIEW MATCHES -->
-        <div id="view-matches" class="hidden">
-            <h2 class="text-2xl font-bold text-center mb-6">Your Matches</h2>
-            <div id="matches-list" class="space-y-4">
-                <p class="text-gray-500 text-center italic">No matches yet. Keep swiping! ❤️</p>
-            </div>
-        </div>
-    </div>
-
     <script>
-        const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
         const tg = window.Telegram.WebApp;
         tg.expand();
-        const user = tg.initDataUnsafe.user;
+        const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
+        const userTelegramData = tg.initDataUnsafe?.user;
 
         function showView(viewId) {
             document.getElementById('view-swipe').classList.add('hidden');
             document.getElementById('view-matches').classList.add('hidden');
             document.getElementById(viewId).classList.remove('hidden');
             if (viewId === 'view-matches') fetchMatchesList();
+            else fetchMatches();
+        }
+
+        async function fetchMatches() {
+            if (!userTelegramData) return;
+            const container = document.getElementById('card-container');
+            try {
+                // FIXED: Using /api/matches-list/ to match main.py
+                const response = await fetch(`${BACKEND_URL}/api/matches-list/${userTelegramData.id}`);
+                const data = await response.json();
+                console.log("Matches response:", data);
+                container.innerHTML = data.matches?.length ? "Profiles loaded!" : "No profiles nearby.";
+            } catch (err) {
+                container.innerHTML = "Error loading. Check console.";
+                console.error(err);
+            }
         }
 
         async function fetchMatchesList() {
             const list = document.getElementById('matches-list');
+            if (!userTelegramData) return;
             try {
-                const response = await fetch(`${BACKEND_URL}/api/matches-list/${user.id}`);
+                const response = await fetch(`${BACKEND_URL}/api/matches-list/${userTelegramData.id}`);
                 const data = await response.json();
-                if (data.matches && data.matches.length > 0) {
-                    list.innerHTML = data.matches.map(m => `
-                        <div class="flex items-center p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                            <div class="w-14 h-14 bg-orange-200 rounded-full flex items-center justify-center font-bold text-orange-700 mr-4">${m.name[0]}</div>
-                            <div>
-                                <h3 class="font-bold">${m.name}</h3>
-                                <p class="text-xs text-orange-500">Tap to chat</p>
-                            </div>
-                        </div>
-                    `).join('');
+                if (data.matches?.length) {
+                    list.innerHTML = data.matches.map(m => `<div class="p-3 bg-white rounded-xl shadow-sm">${m.name}</div>`).join('');
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error("Error loading matches", e);
+            }
         }
-        
-        // Initial load
-        showView('view-swipe');
+
+        // Initialize
+        fetchMatches();
     </script>
 </body>
 </html>
