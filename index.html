@@ -13,14 +13,52 @@
 </head>
 <body class="bg-gray-50 font-sans overflow-hidden">
 
-    <!-- Views -->
-    <div id="view-swipe" class="w-full h-screen pt-4 pb-20 px-4">
+    <!-- Loading Screen -->
+    <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center">
+        <i class="ph-fill ph-spinner-gap animate-spin text-4xl text-botOrange mb-4"></i>
+        <p class="text-gray-500 font-medium">Loading your profile...</p>
+    </div>
+
+    <!-- Registration View -->
+    <div id="view-registration" class="hidden w-full h-screen p-6 bg-white flex flex-col justify-center max-w-md mx-auto">
+        <h2 class="text-3xl font-bold text-buna mb-2 text-center">Welcome! 👋</h2>
+        <p class="text-gray-500 text-center mb-8">Let's set up your profile.</p>
+        
+        <input id="reg-name" type="text" placeholder="Your Name" class="w-full p-4 mb-4 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+        
+        <div class="flex gap-4 mb-4">
+            <select id="reg-gender" class="w-1/2 p-4 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                <option value="" disabled selected>I am a...</option>
+                <option value="male">Man</option>
+                <option value="female">Woman</option>
+            </select>
+            
+            <input id="reg-age" type="number" placeholder="Age" class="w-1/2 p-4 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+        </div>
+
+        <select id="reg-interest" class="w-full p-4 mb-4 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+            <option value="" disabled selected>Interested in...</option>
+            <option value="female">Women</option>
+            <option value="male">Men</option>
+            <option value="both">Everyone</option>
+        </select>
+
+        <textarea id="reg-bio" placeholder="A short bio about you..." rows="3" class="w-full p-4 mb-6 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange"></textarea>
+        
+        <button onclick="submitRegistration()" class="w-full p-4 bg-botOrange text-white font-bold rounded-xl shadow-lg shadow-orange-200 active:scale-95 transition-transform">
+            Join Habesha Date
+        </button>
+    </div>
+
+    <!-- Swipe View -->
+    <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-20 px-4 flex-col">
         <h2 class="text-2xl font-bold text-botOrange text-center mb-4">Find Matches</h2>
-        <div id="card-container" class="relative w-full h-[60vh] max-w-sm mx-auto">
-            <p class="text-center text-gray-500 mt-10">Loading profiles...</p>
+        <div id="card-container" class="relative w-full flex-grow max-w-sm mx-auto flex items-center justify-center">
+            <p class="text-center text-gray-500">Loading profiles...</p>
         </div>
     </div>
 
+    <!-- Matches View -->
     <div id="view-matches" class="hidden w-full h-screen pt-16 px-4">
         <h2 class="text-2xl font-bold text-buna mb-4">Your Matches</h2>
         <div id="matches-list" class="space-y-4">
@@ -29,7 +67,7 @@
     </div>
 
     <!-- Navigation -->
-    <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 py-3 flex justify-around items-center z-50">
+    <div id="nav-bar" class="hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 py-3 flex justify-around items-center z-50">
         <button onclick="showView('view-swipe')" class="flex flex-col items-center text-botOrange">
             <i class="ph-fill ph-fire text-2xl"></i>
             <span class="text-[10px] font-bold">Swipe</span>
@@ -48,52 +86,135 @@
         let userTelegramData = tg.initDataUnsafe?.user;
         if (!userTelegramData) {
             console.warn("No Telegram user found, using test ID");
-            userTelegramData = { id: '723718730' }; 
+            userTelegramData = { id: '111111111', first_name: "Local Tester" }; 
         }
 
         let profiles = [];
         let currentCardIndex = 0;
 
+        async function initApp() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/check-user/${userTelegramData.id}`);
+                const data = await response.json();
+                
+                document.getElementById('view-loading').classList.add('hidden');
+                
+                if (data.exists === false) {
+                    // Show Registration
+                    if (userTelegramData.first_name) {
+                        document.getElementById('reg-name').value = userTelegramData.first_name;
+                    }
+                    document.getElementById('view-registration').classList.remove('hidden');
+                } else {
+                    // Show Main App
+                    showView('view-swipe');
+                }
+            } catch (err) {
+                console.error("Initialization error:", err);
+                document.getElementById('view-loading').innerHTML = `<p class="text-red-500">Cannot connect to server. Try again later.</p>`;
+            }
+        }
+
+        async function submitRegistration() {
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Registering...";
+            btn.disabled = true;
+
+            const ageVal = parseInt(document.getElementById('reg-age').value);
+
+            const payload = {
+                telegram_id: userTelegramData.id.toString(),
+                name: document.getElementById('reg-name').value,
+                gender: document.getElementById('reg-gender').value,
+                age: isNaN(ageVal) ? 18 : ageVal, // Default to 18 if they left it blank to prevent 422 error
+                interested_in: document.getElementById('reg-interest').value,
+                bio: document.getElementById('reg-bio').value
+            };
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    document.getElementById('view-registration').classList.add('hidden');
+                    showView('view-swipe');
+                } else {
+                    alert("Registration failed. Please fill all fields.");
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                alert("Network error.");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
         function showView(viewId) {
             document.getElementById('view-swipe').classList.add('hidden');
             document.getElementById('view-matches').classList.add('hidden');
+            document.getElementById('view-registration').classList.add('hidden');
             document.getElementById(viewId).classList.remove('hidden');
+            
+            document.getElementById('nav-bar').classList.remove('hidden');
+            document.getElementById('nav-bar').classList.add('flex');
+
             if (viewId === 'view-matches') fetchMatchesList();
             else fetchMatches();
         }
 
         function renderCards() {
             const container = document.getElementById('card-container');
-            if (profiles.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 mt-10">No profiles found.</p>';
+            if (profiles.length === 0 || currentCardIndex >= profiles.length) {
+                container.innerHTML = '<p class="text-center text-gray-500 mt-10">No profiles found nearby.</p>';
                 return;
             }
             const profile = profiles[currentCardIndex];
             container.innerHTML = `
-                <div class="w-full h-full bg-white rounded-3xl shadow-lg p-6 flex flex-col items-center">
-                    <div class="w-24 h-24 bg-gray-200 rounded-full mb-4"></div>
-                    <h3 class="text-2xl font-bold text-buna">${profile.name || 'Unknown'}</h3>
-                    <p class="text-gray-600 mt-2">${profile.bio || 'No bio available.'}</p>
+                <div class="w-full max-h-[70vh] bg-white rounded-3xl shadow-xl p-6 flex flex-col items-center border border-gray-100">
+                    <div class="w-32 h-32 bg-gray-200 rounded-full mb-4 flex items-center justify-center text-gray-400 mt-4">
+                        <i class="ph-fill ph-user text-6xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-buna">${profile.name || 'Unknown'}, ${profile.age || '?'}</h3>
+                    <p class="text-botOrange font-medium mt-1">${profile.location || 'Addis Ababa'}</p>
+                    <p class="text-gray-600 mt-4 text-center px-4">${profile.bio || 'No bio available.'}</p>
+                    
+                    <div class="mt-auto pt-8 w-full flex justify-around pb-4">
+                        <button onclick="nextCard()" class="w-16 h-16 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform">
+                            <i class="ph-bold ph-x text-3xl"></i>
+                        </button>
+                        <button onclick="nextCard()" class="w-16 h-16 bg-gradient-to-tr from-botOrange to-orange-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-95 transition-transform">
+                            <i class="ph-fill ph-heart text-3xl"></i>
+                        </button>
+                    </div>
                 </div>
             `;
         }
 
+        function nextCard() {
+            currentCardIndex++;
+            renderCards();
+        }
+
         async function fetchMatches() {
             const container = document.getElementById('card-container');
-            container.innerHTML = '<p class="text-center">Loading profiles...</p>';
+            container.innerHTML = '<i class="ph-fill ph-spinner-gap animate-spin text-4xl text-botOrange"></i>';
             
             try {
-                // Pointing to test-all-users to bypass filtering logic
-                const response = await fetch(`${BACKEND_URL}/api/test-all-users`);
+                // Fetching potential matches, excluding the current user
+                const response = await fetch(`${BACKEND_URL}/api/get-potential-matches/${userTelegramData.id}`);
                 const data = await response.json();
-                console.log("API Response:", data);
                 
                 profiles = data.matches || [];
                 currentCardIndex = 0;
                 renderCards();
             } catch (err) {
                 console.error("Fetch Error:", err);
-                container.innerHTML = "Error loading. Check console.";
+                container.innerHTML = '<p class="text-center text-red-500">Error loading profiles.</p>';
             }
         }
 
@@ -103,17 +224,17 @@
                 const response = await fetch(`${BACKEND_URL}/api/matches-list/${userTelegramData.id}`);
                 const data = await response.json();
                 if (data.matches?.length) {
-                    list.innerHTML = data.matches.map(m => `<div class="p-3 bg-white rounded-xl shadow-sm">${m.name}</div>`).join('');
+                    list.innerHTML = data.matches.map(m => `<div class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 font-medium">${m.name}</div>`).join('');
                 } else {
-                    list.innerHTML = '<p class="text-gray-500 italic">No matches yet.</p>';
+                    list.innerHTML = '<p class="text-gray-500 italic text-center mt-10">No matches yet.</p>';
                 }
             } catch (e) {
                 console.error("Error loading matches", e);
             }
         }
 
-        // Initialize
-        fetchMatches();
+        // Start the app!
+        initApp();
     </script>
 </body>
 </html>
