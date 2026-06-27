@@ -45,7 +45,6 @@
         tg.expand();
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
         
-        // Use Telegram user if available, otherwise use your hardcoded ID for testing
         let userTelegramData = tg.initDataUnsafe?.user;
         if (!userTelegramData) {
             console.warn("No Telegram user found, using test ID");
@@ -84,8 +83,8 @@
             container.innerHTML = '<p class="text-center">Loading profiles...</p>';
             
             try {
-                console.log("Fetching for ID:", userTelegramData.id);
-                const response = await fetch(`${BACKEND_URL}/api/get-potential-matches/${userTelegramData.id}`);
+                // Pointing to test-all-users to bypass filtering logic
+                const response = await fetch(`${BACKEND_URL}/api/test-all-users`);
                 const data = await response.json();
                 console.log("API Response:", data);
                 
