@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration - Habesha Date</title>
+    
+    <!-- Telegram Web App SDK (Required for Telegram integration) -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Defensive fix: Wait for tailwind to be defined before setting config
         (function() {
             const checkTailwind = setInterval(() => {
                 if (window.tailwind) {
@@ -38,59 +41,164 @@
 
         <!-- Page 1: Basics -->
         <div id="page-1" class="space-y-4">
-            <input id="reg-name" type="text" placeholder="Full Name" class="w-full p-3 border rounded-xl">
+            <input id="reg-name" type="text" placeholder="Full Name" class="w-full p-3 border rounded-xl" required>
             <div class="flex gap-2">
-                <select id="reg-gender" class="w-1/2 p-3 border rounded-xl"><option value="">Gender</option><option>Man</option><option>Woman</option></select>
-                <input id="reg-age" type="number" placeholder="Age" min="18" class="w-1/2 p-3 border rounded-xl">
+                <select id="reg-gender" class="w-1/2 p-3 border rounded-xl">
+                    <option value="">Gender</option>
+                    <option value="Man">Man</option>
+                    <option value="Woman">Woman</option>
+                </select>
+                <input id="reg-age" type="number" placeholder="Age" min="18" class="w-1/2 p-3 border rounded-xl" required>
             </div>
-            <select id="reg-interest" class="w-full p-3 border rounded-xl"><option value="">Interested In</option><option>Women</option><option>Men</option><option>Everyone</option></select>
-            <select id="reg-location" class="w-full p-3 border rounded-xl"><option value="">Living City</option><option>Addis Ababa</option><option>Bahir Dar</option><option>Hawassa</option><option>Diaspora</option></select>
+            <select id="reg-interest" class="w-full p-3 border rounded-xl">
+                <option value="">Interested In</option>
+                <option value="Women">Women</option>
+                <option value="Men">Men</option>
+                <option value="Everyone">Everyone</option>
+            </select>
+            <div class="space-y-3">
+                <select id="reg-location" class="w-full p-3 border rounded-xl" onchange="toggleInput('reg-location', 'reg-location-other')">
+                    <option value="">Living City</option>
+                    <option value="Addis Ababa">Addis Ababa</option>
+                    <option value="Bahir Dar">Bahir Dar</option>
+                    <option value="Hawassa">Hawassa</option>
+                    <option value="Diaspora">Diaspora</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input id="reg-location-other" type="text" placeholder="Type your city..." class="w-full p-3 border rounded-xl hidden">
+            </div>
             <button onclick="nextPage(2)" class="w-full p-3 bg-botOrange text-white rounded-xl font-bold mt-4">Next: Lifestyle</button>
         </div>
 
         <!-- Page 2: Lifestyle & Background -->
         <div id="page-2" class="hidden space-y-4">
             <input id="reg-height" type="text" placeholder="Height (e.g. 1.70m)" class="w-full p-3 border rounded-xl">
-            <select id="reg-religion" class="w-full p-3 border rounded-xl"><option value="">Religion</option><option>Orthodox</option><option>Muslim</option><option>Protestant</option><option>Catholic</option></select>
-            <select id="reg-education" class="w-full p-3 border rounded-xl"><option value="">Education Level</option><option>High School</option><option>Bachelor's</option><option>Master's</option></select>
+            
+            <div class="space-y-3">
+                <select id="reg-religion" class="w-full p-3 border rounded-xl" onchange="toggleInput('reg-religion', 'reg-religion-other')">
+                    <option value="">Religion</option>
+                    <option value="Orthodox">Orthodox</option>
+                    <option value="Muslim">Muslim</option>
+                    <option value="Protestant">Protestant</option>
+                    <option value="Catholic">Catholic</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input id="reg-religion-other" type="text" placeholder="Specify religion..." class="w-full p-3 border rounded-xl hidden">
+            </div>
+
+            <select id="reg-education" class="w-full p-3 border rounded-xl">
+                <option value="">Education Level</option>
+                <option value="None">None</option>
+                <option value="High School">High School</option>
+                <option value="Bachelor's">Bachelor's</option>
+                <option value="Master's">Master's</option>
+            </select>
+
             <input id="reg-occupation" type="text" placeholder="Occupation" class="w-full p-3 border rounded-xl">
             <div class="flex gap-2">
-                <select id="reg-drinking" class="w-1/2 p-3 border rounded-xl"><option value="">Drinking</option><option>Never</option><option>Socially</option></select>
-                <select id="reg-smoking" class="w-1/2 p-3 border rounded-xl"><option value="">Smoking</option><option>Never</option><option>Socially</option></select>
+                <select id="reg-drinking" class="w-1/2 p-3 border rounded-xl">
+                    <option value="">Drinking</option>
+                    <option value="Never">Never</option>
+                    <option value="Socially">Socially</option>
+                </select>
+                <select id="reg-smoking" class="w-1/2 p-3 border rounded-xl">
+                    <option value="">Smoking</option>
+                    <option value="Never">Never</option>
+                    <option value="Socially">Socially</option>
+                </select>
             </div>
-            <select id="reg-kids" class="w-full p-3 border rounded-xl"><option value="">Family Plans</option><option>Want kids</option><option>Don't want kids</option></select>
+            <select id="reg-kids" class="w-full p-3 border rounded-xl">
+                <option value="">Family Plans</option>
+                <option value="Want kids">Want kids</option>
+                <option value="Don't want kids">Don't want kids</option>
+            </select>
             <button onclick="nextPage(3)" class="w-full p-3 bg-botOrange text-white rounded-xl font-bold mt-4">Next: Bio</button>
         </div>
 
         <!-- Page 3: About You -->
         <div id="page-3" class="hidden space-y-4">
             <textarea id="reg-bio" placeholder="Tell us about yourself..." class="w-full p-3 border rounded-xl h-32"></textarea>
-            <button onclick="submitData()" class="w-full p-3 bg-green-600 text-white rounded-xl font-bold mt-4">Complete Registration</button>
+            <button id="submit-btn" onclick="submitData()" class="w-full p-3 bg-green-600 text-white rounded-xl font-bold mt-4">Complete Registration</button>
         </div>
     </div>
 
     <script>
+        const API_BASE_URL = "YOUR_RENDER_URL_HERE"; 
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        function toggleInput(selectId, inputId) {
+            const select = document.getElementById(selectId);
+            const input = document.getElementById(inputId);
+            if (select.value === 'Other') {
+                input.classList.remove('hidden');
+            } else {
+                input.classList.add('hidden');
+                input.value = '';
+            }
+        }
+
         function nextPage(step) {
-            // Age validation check
-            if(step === 2) {
-                const age = document.getElementById('reg-age').value;
-                if(!age || age < 18) { 
-                    alert("You must be 18+ to use this app!"); 
-                    return; 
+            if (step === 2) {
+                if (!document.getElementById('reg-name').value || !document.getElementById('reg-age').value) {
+                    alert("Please fill in basic details!");
+                    return;
                 }
             }
-            
             document.getElementById('page-1').classList.add('hidden');
             document.getElementById('page-2').classList.add('hidden');
             document.getElementById('page-3').classList.add('hidden');
             document.getElementById('page-' + step).classList.remove('hidden');
-            document.getElementById('progress-bar').style.width = (step * 33) + '%';
-            document.getElementById('reg-title').innerText = "Step " + step + ": Details";
+            document.getElementById('progress-bar').style.width = (step * 33.3) + '%';
         }
 
-        function submitData() {
-            // Here you gather all values and call your API
-            alert("Registration logic triggered!");
+        async function submitData() {
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.innerText = "Creating Profile...";
+            submitBtn.disabled = true;
+
+            const telegramId = tg.initDataUnsafe?.user?.id?.toString() || ("test_" + Math.floor(Math.random() * 100000));
+
+            let location = document.getElementById('reg-location').value;
+            if (location === 'Other') location = document.getElementById('reg-location-other').value;
+            
+            let religion = document.getElementById('reg-religion').value;
+            if (religion === 'Other') religion = document.getElementById('reg-religion-other').value;
+
+            const extras = [
+                location ? `📍 ${location}` : '',
+                document.getElementById('reg-height').value ? `📏 ${document.getElementById('reg-height').value}` : '',
+                religion ? `🙏 ${religion}` : '',
+                document.getElementById('reg-education').value ? `🎓 ${document.getElementById('reg-education').value}` : '',
+                document.getElementById('reg-occupation').value ? `💼 ${document.getElementById('reg-occupation').value}` : ''
+            ].filter(Boolean).join(" | ");
+
+            const payload = {
+                telegram_id: telegramId,
+                name: document.getElementById('reg-name').value,
+                gender: document.getElementById('reg-gender').value,
+                age: parseInt(document.getElementById('reg-age').value),
+                bio: (document.getElementById('reg-bio').value || "") + (extras ? "\n\n" + extras : ""),
+                interested_in: document.getElementById('reg-interest').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/register`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    alert("Registration successful!");
+                    tg.close();
+                } else {
+                    alert("Error registering.");
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                alert("Network error.");
+                submitBtn.disabled = false;
+            }
         }
     </script>
 </body>
