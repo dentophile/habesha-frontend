@@ -23,7 +23,7 @@
         <p class="text-gray-500 font-medium">Loading...</p>
     </div>
 
-    <!-- Registration View -->
+    <!-- Registration / Edit View -->
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
         <div class="max-w-md mx-auto p-6 py-10">
             <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center transition-all">Step 1: Basics</h2>
@@ -40,7 +40,8 @@
                     <span class="text-xs text-gray-500">Upload Photo</span>
                 </div>
                 
-                <input id="reg-name" type="text" placeholder="Full Name" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
+                <!-- Nickname (Optional) -->
+                <input id="reg-name" type="text" placeholder="Nickname (Optional)" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
                 
                 <div class="flex gap-2">
                     <select id="reg-gender" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
@@ -58,7 +59,6 @@
                     <option value="Everyone">Everyone</option>
                 </select>
 
-                <!-- New: Intention -->
                 <select id="reg-intention" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                     <option value="">Looking For</option>
                     <option value="Marriage">Marriage</option>
@@ -67,7 +67,6 @@
                     <option value="Friendship">Friendship</option>
                 </select>
                 
-                <!-- Location Select -->
                 <select id="reg-location" onchange="toggleOtherLocation()" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                     <option value="">Living City</option>
                     <option value="Addis Ababa">Addis Ababa</option>
@@ -78,7 +77,6 @@
                     <option value="Other">Other</option>
                 </select>
                 
-                <!-- Hidden Input for 'Other' Location -->
                 <input id="reg-location-other" type="text" placeholder="Please type your city" class="hidden w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
                 
                 <button onclick="validateAndNext(1)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md">Next</button>
@@ -107,7 +105,6 @@
                 
                 <input id="reg-occupation" type="text" placeholder="Occupation" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
 
-                <!-- New: Kids -->
                 <select id="reg-kids" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                     <option value="">Kids</option>
                     <option value="Don't have kids">Don't have kids</option>
@@ -116,7 +113,6 @@
                     <option value="Don't want kids">Don't want kids</option>
                 </select>
 
-                <!-- New: Drinking & Smoking -->
                 <div class="flex gap-2">
                     <select id="reg-drinking" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                         <option value="">Drinking</option>
@@ -155,9 +151,16 @@
 
     <!-- Swipe View -->
     <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-20 px-4 flex-col bg-gray-100">
-        <h2 class="text-center font-bold text-xl text-buna mb-4">Discover</h2>
-        <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full bg-white rounded-2xl shadow-xl overflow-hidden">
-            <p class="text-gray-400">No more profiles to show.</p>
+        <!-- New Header with Edit Button -->
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-4 mt-2">
+            <h2 class="font-bold text-2xl text-buna">Discover</h2>
+            <button onclick="openEditProfile()" class="text-botOrange text-sm font-bold flex items-center gap-1.5 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-gray-50 transition">
+                <i class="ph-bold ph-user-circle-gear text-lg"></i> Edit Profile
+            </button>
+        </div>
+
+        <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
+            <p class="text-gray-400 font-medium">No more profiles to show.</p>
         </div>
     </div>
 
@@ -168,6 +171,8 @@
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
         const cleanTelegramId = String(tg.initDataUnsafe?.user?.id || Math.random()).trim();
         let selectedPhotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+        
+        let isEditing = false;
 
         function showAlert(message) {
             if (tg.showAlert) {
@@ -213,7 +218,6 @@
 
         function validateAndNext(currentStep) {
             if (currentStep === 1) {
-                const name = document.getElementById('reg-name').value.trim();
                 const gender = document.getElementById('reg-gender').value;
                 const age = document.getElementById('reg-age').value;
                 const interest = document.getElementById('reg-interest').value;
@@ -224,8 +228,9 @@
                     location = document.getElementById('reg-location-other').value.trim();
                 }
 
-                if (!name || !gender || !age || !interest || !intention || !location) {
-                    return showAlert("Please fill out all basic information fields.");
+                // Name is no longer checked here because it is Optional
+                if (!gender || !age || !interest || !intention || !location) {
+                    return showAlert("Please fill out all required basic fields.");
                 }
                 if (age < 18) {
                     return showAlert("You must be at least 18 years old to use Habesha Date.");
@@ -254,11 +259,25 @@
             
             document.getElementById('page-' + step).classList.remove('hidden');
             
-            const titles = ["Step 1: Basics", "Step 2: Details", "Step 3: Bio"];
+            // Dynamic titles based on whether they are creating or editing
+            const titles = isEditing 
+                ? ["Edit Profile: Basics", "Edit Profile: Details", "Edit Profile: Bio"] 
+                : ["Step 1: Basics", "Step 2: Details", "Step 3: Bio"];
+                
             const progress = ["33.3%", "66.6%", "100%"];
             
             document.getElementById('reg-title').innerText = titles[step - 1];
             document.getElementById('progress-bar').style.width = progress[step - 1];
+        }
+
+        function openEditProfile() {
+            isEditing = true;
+            document.getElementById('view-swipe').classList.add('hidden');
+            document.getElementById('view-registration').classList.remove('hidden');
+            
+            // Reset UI for Editing
+            goToPage(1); 
+            document.getElementById('submit-btn').innerHTML = `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>`;
         }
 
         async function submitRegistration() {
@@ -270,24 +289,29 @@
                 finalLocation = document.getElementById('reg-location-other').value.trim();
             }
 
+            // Fallback for optional name
+            let finalName = document.getElementById('reg-name').value.trim();
+            if (!finalName) {
+                finalName = tg.initDataUnsafe?.user?.first_name || "Anonymous";
+            }
+
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Saving...`;
             submitBtn.disabled = true;
 
             const payload = {
                 telegram_id: cleanTelegramId,
-                name: document.getElementById('reg-name').value,
+                name: finalName, // Uses typed Nickname, or Telegram First Name
                 age: parseInt(document.getElementById('reg-age').value),
                 gender: document.getElementById('reg-gender').value,
                 interested_in: document.getElementById('reg-interest').value,
-                location: finalLocation, // Uses the dynamic logic you requested
+                location: finalLocation, 
                 height: document.getElementById('reg-height').value,
                 religion: document.getElementById('reg-religion').value,
                 education: document.getElementById('reg-education').value,
                 occupation: document.getElementById('reg-occupation').value,
-                bio: document.getElementById('reg-bio').value,
+                bio: bio,
                 photo_url: selectedPhotoUrl,
-                // Newly added fields
                 intention: document.getElementById('reg-intention').value,
                 kids: document.getElementById('reg-kids').value,
                 drinking: document.getElementById('reg-drinking').value,
@@ -306,11 +330,19 @@
                     throw new Error(err.detail || "Server Error");
                 }
                 
+                // Done. Reset states and return to swipe view.
+                isEditing = false;
                 document.getElementById('view-registration').classList.add('hidden');
                 document.getElementById('view-swipe').classList.remove('hidden');
-            } catch (err) {
-                showAlert("Registration failed: " + err.message);
+                
+                // Reset button UI for future edits
                 submitBtn.innerHTML = `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
+                submitBtn.disabled = false;
+                
+                if(tg.showAlert) tg.showAlert("Profile successfully saved!");
+            } catch (err) {
+                showAlert("Failed to save profile: " + err.message);
+                submitBtn.innerHTML = isEditing ? `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>` : `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
                 submitBtn.disabled = false;
             }
         }
