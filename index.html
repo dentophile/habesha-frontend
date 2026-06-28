@@ -26,6 +26,18 @@
         </div>
     </div>
 
+    <!-- Custom Confirm Box -->
+    <div id="custom-confirm" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 px-4 transition-opacity">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
+            <h3 class="text-xl font-bold mb-2 text-red-500">Unmatch</h3>
+            <p class="text-gray-600 mb-6">Are you sure you want to unmatch? You will not be able to talk to them anymore.</p>
+            <div class="flex gap-3">
+                <button onclick="closeConfirm()" class="w-1/2 p-3 bg-gray-200 text-gray-700 rounded-xl font-bold">Cancel</button>
+                <button onclick="executeUnmatch()" class="w-1/2 p-3 bg-red-500 text-white rounded-xl font-bold">Unmatch</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Loading View -->
     <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300">
         <i class="ph-fill ph-spinner-gap animate-spin text-5xl text-botOrange mb-4"></i>
@@ -43,13 +55,10 @@
 
             <div id="page-1" class="space-y-4 transition-all">
                 
-                <!-- NEW: Interactive Photo Upload -->
                 <div class="mb-6 flex flex-col items-center justify-center mx-auto relative cursor-pointer group" onclick="document.getElementById('file-upload').click()">
                     <div id="photo-preview" class="bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl h-32 w-32 flex flex-col items-center justify-center overflow-hidden bg-cover bg-center transition group-hover:bg-gray-200 shadow-sm relative">
                         <i id="photo-icon" class="ph ph-camera text-3xl text-gray-500 mb-1"></i>
                         <span id="photo-text" class="text-xs text-gray-500">Upload Photo</span>
-                        
-                        <!-- Overlay for changing photo -->
                         <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-xl">
                             <i class="ph-bold ph-pencil-simple text-white text-2xl"></i>
                         </div>
@@ -105,6 +114,777 @@
                     <option value="">Religion</option>
                     <option value="Orthodox">Orthodox</option>
                     <option value="Muslim">Muslim</option>
+                    <option value="Protestant">Protestant</option>
+                    <option value="Catholic">Catholic</option>
+                    <option value="Other">Other</option>
+                </select>
+                
+                <select id="reg-education" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                    <option value="">Education</option>
+                    <option value="Uneducated">Uneducated</option>
+                    <option value="High School">High School</option>
+                    <option value="Bachelor's">Bachelor's</option>
+                    <option value="Master's">Master's</option>
+                </select>
+                
+                <input id="reg-occupation" type="text" placeholder="Occupation" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+
+                <select id="reg-kids" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                    <option value="">Kids</option>
+                    <option value="Don't have kids">Don't have kids</option>
+                    <option value="Have kids">Have kids</option>
+                    <option value="Want someday">Want someday</option>
+                    <option value="Don't want kids">Don't want kids</option>
+                </select>
+
+                <div class="flex gap-2">
+                    <select id="reg-drinking" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                        <option value="">Drinking</option>
+                        <option value="No">No</option>
+                        <option value="Socially">Socially</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                    <select id="reg-smoking" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                        <option value="">Smoking</option>
+                        <option value="No">No</option>
+                        <option value="Occasionally">Occasionally</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </div>
+                
+                <div class="flex gap-2">
+                    <button onclick="goToPage(1)" class="w-1/3 p-4 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">Back</button>
+                    <button onclick="validateAndNext(2)" class="w-2/3 p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md">Next</button>
+                </div>
+            </div>
+
+            <div id="page-3" class="hidden space-y-4 transition-all">
+                <textarea id="reg-bio" placeholder="Tell us about yourself... (Hobbies, what you're looking for)" class="w-full p-4 border rounded-xl bg-gray-50 h-32 focus:outline-none focus:border-botOrange resize-none"></textarea>
+                
+                <div class="flex gap-2">
+                    <button onclick="goToPage(2)" class="w-1/3 p-4 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">Back</button>
+                    <button id="submit-btn" onclick="submitRegistration()" class="w-2/3 p-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition shadow-md flex justify-center items-center gap-2">
+                        <span>Complete</span>
+                        <i class="ph-bold ph-check-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Swipe View -->
+    <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-100 overflow-hidden relative">
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-4 mt-2">
+            <h2 class="font-bold text-2xl text-buna">Discover</h2>
+            <button onclick="openEditProfile()" class="text-botOrange text-sm font-bold flex items-center gap-1.5 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-gray-50 transition">
+                <i class="ph-bold ph-user-circle-gear text-lg"></i> Edit Profile
+            </button>
+        </div>
+
+        <div id="card-container" class="relative w-full max-w-sm mx-auto flex items-center justify-center h-full min-h-[60vh] max-h-[75vh] bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
+            <p class="text-gray-400 font-medium">No more profiles to show.</p>
+        </div>
+
+        <!-- NEW: Full Profile Details Modal (Hidden by default) -->
+        <div id="profile-details-modal" class="hidden absolute bottom-0 left-0 w-full h-[75%] bg-white rounded-t-3xl z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden transition-transform duration-300 transform translate-y-full">
+            <div class="w-full flex justify-end p-4 pb-0">
+                <button onclick="closeProfileDetails()" class="bg-gray-100 p-2 rounded-full text-gray-500 hover:bg-gray-200 active:scale-95">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            <div id="profile-details-content" class="flex-1 overflow-y-auto p-6 pt-2 pb-24">
+                <!-- Content injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Matches View -->
+    <div id="view-matches" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-50 overflow-y-auto">
+        <h2 class="font-bold text-3xl text-buna mb-6 mt-4 px-2">Your Matches <span class="text-botOrange">❤️</span></h2>
+        <div id="matches-container" class="w-full max-w-sm mx-auto space-y-4 pb-10">
+            <p class="text-gray-400 text-center mt-10">Loading matches...</p>
+        </div>
+    </div>
+
+    <!-- Chat View -->
+    <div id="view-chat" class="hidden w-full h-screen bg-gray-50 flex-col z-[60] fixed top-0 left-0 overflow-hidden">
+        <div class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 shadow-sm shrink-0">
+            <button onclick="closeChat()" class="text-gray-500 p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition">
+                <i class="ph-bold ph-arrow-left text-2xl"></i>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-cover bg-center bg-gray-200" id="chat-header-photo"></div>
+            <div class="flex-1 overflow-hidden">
+                <h3 class="font-bold text-buna truncate" id="chat-header-name">Name</h3>
+                <p class="text-xs text-green-500 font-medium">Matched!</p>
+            </div>
+            <!-- NEW: Unmatch Button Trigger -->
+            <button onclick="confirmUnmatch()" class="text-gray-400 hover:text-red-500 p-2 transition">
+                <i class="ph-bold ph-dots-three-vertical text-2xl"></i>
+            </button>
+        </div>
+
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col scroll-smooth">
+            <!-- Messages will be injected here -->
+        </div>
+
+        <div class="bg-white border-t border-gray-200 p-3 flex gap-2 items-center shrink-0">
+            <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKeyPress(event)" class="flex-1 bg-gray-100 border-transparent focus:bg-white focus:border-botOrange focus:ring-1 focus:ring-botOrange rounded-full px-4 py-3 outline-none transition">
+            <button onclick="sendMessage()" class="w-12 h-12 bg-botOrange text-white rounded-full flex items-center justify-center hover:bg-orange-500 active:scale-95 transition shadow-sm shrink-0">
+                <i class="ph-fill ph-paper-plane-right text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('swipe')" id="tab-swipe" class="flex flex-col items-center text-botOrange transition-colors">
+            <i class="ph-bold ph-cards text-2xl mb-1"></i>
+            <span class="text-xs font-bold">Discover</span>
+        </button>
+        <button onclick="switchTab('matches')" id="tab-matches" class="flex flex-col items-center text-gray-400 hover:text-botOrange transition-colors">
+            <i class="ph-bold ph-chats-circle text-2xl mb-1"></i>
+            <span class="text-xs font-bold">Matches</span>
+        </button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
+        const cleanTelegramId = String(tg.initDataUnsafe?.user?.id || Math.random()).trim();
+        
+        let selectedPhotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+        let selectedPhotoFile = null;
+        
+        let isEditing = false;
+        let profiles = [];
+        let currentCardIndex = 0;
+        
+        let activeChatId = null;
+        let chatPollInterval = null;
+
+        function showAlert(message) {
+            if (tg.showAlert) {
+                tg.showAlert(message);
+            } else {
+                document.getElementById('custom-alert-msg').innerText = message;
+                document.getElementById('custom-alert').classList.remove('hidden');
+            }
+        }
+
+        function closeAlert() {
+            document.getElementById('custom-alert').classList.add('hidden');
+        }
+
+        // Initialize
+        async function initApp() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
+                const data = await response.json();
+                
+                document.getElementById('view-loading').classList.add('hidden');
+                
+                if (!data.exists) {
+                    document.getElementById('reg-name').value = tg.initDataUnsafe?.user?.first_name || "";
+                    document.getElementById('view-registration').classList.remove('hidden');
+                } else {
+                    document.getElementById('view-swipe').classList.remove('hidden');
+                    document.getElementById('bottom-nav').classList.remove('hidden'); 
+                    await loadDiscoverProfiles();
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('view-loading').innerHTML = `
+                    <i class="ph-fill ph-warning-circle text-5xl text-red-500 mb-4"></i>
+                    <p class="text-red-500 font-bold">Failed to connect to server.</p>
+                    <p class="text-gray-500 text-sm mt-2">Please try again later.</p>`;
+            }
+        }
+
+        // --- Discover & Swipe Functions ---
+
+        async function loadDiscoverProfiles() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/get-potential-matches/${cleanTelegramId}`);
+                const data = await res.json();
+                profiles = data.matches || [];
+                renderCards();
+            } catch (e) {
+                console.error("Failed to load profiles", e);
+                profiles = [];
+                renderCards();
+            }
+        }
+
+        function renderCards() {
+            const container = document.getElementById('card-container');
+            
+            if (currentCardIndex >= profiles.length || profiles.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-6">
+                        <i class="ph-duotone ph-sparkle text-6xl text-gray-300 mb-2"></i>
+                        <p class="text-gray-400 font-medium">You've seen everyone.</p>
+                        <p class="text-gray-400 text-sm mt-2">Check back later for more profiles!</p>
+                    </div>`;
+                return;
+            }
+
+            const profile = profiles[currentCardIndex];
+            const photoToUse = profile.photo_url || "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80";
+
+            container.innerHTML = `
+                <div class="w-full h-full flex flex-col relative">
+                    <!-- Photo Area -->
+                    <div class="flex-1 bg-gray-200 bg-cover bg-center relative" style="background-image: url('${photoToUse}')">
+                        <!-- NEW: Info Button to trigger Details -->
+                        <button onclick="showProfileDetails()" class="absolute bottom-4 right-4 w-10 h-10 bg-black bg-opacity-60 text-white rounded-full flex items-center justify-center backdrop-blur-sm active:scale-95 shadow-md">
+                            <i class="ph-bold ph-info text-2xl"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Basic Info -->
+                    <div class="p-4 bg-white flex-shrink-0">
+                        <h3 class="text-2xl font-bold">${profile.name}, ${profile.age || '?'}</h3>
+                        <p class="text-gray-500 text-sm mt-1 line-clamp-2">${profile.bio || 'Ready to mingle!'}</p>
+                    </div>
+                    
+                    <!-- Swipe Controls -->
+                    <div class="mt-auto w-full flex justify-around items-center pt-5 pb-6 bg-white border-t border-gray-50 px-6">
+                        <button onclick="handleSwipe(false)" class="w-14 h-14 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform hover:bg-red-50">
+                            <i class="ph-bold ph-x text-2xl"></i>
+                        </button>
+                        
+                        <!-- NEW: Skip Button (Scroll without voting) -->
+                        <button onclick="skipCard()" class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
+                            <i class="ph-bold ph-caret-down text-2xl"></i>
+                        </button>
+
+                        <button onclick="handleSwipe(true)" class="w-14 h-14 bg-gradient-to-tr from-botOrange to-orange-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-95 transition-transform">
+                            <i class="ph-fill ph-heart text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // NEW: Skip Card function (Just moves to the next profile)
+        function skipCard() {
+            nextCard();
+        }
+
+        // NEW: Show full profile details
+        function showProfileDetails() {
+            const profile = profiles[currentCardIndex];
+            if(!profile) return;
+
+            const content = document.getElementById('profile-details-content');
+            content.innerHTML = `
+                <h3 class="text-3xl font-bold text-buna mb-2">${profile.name}, ${profile.age}</h3>
+                <p class="text-gray-600 mb-6">${profile.bio || ''}</p>
+                
+                <h4 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-3">About</h4>
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="bg-gray-50 p-3 rounded-xl flex items-center gap-2">
+                        <i class="ph-bold ph-ruler text-botOrange"></i>
+                        <span class="text-sm font-medium">${profile.height || 'N/A'}</span>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-xl flex items-center gap-2">
+                        <i class="ph-bold ph-map-pin text-botOrange"></i>
+                        <span class="text-sm font-medium">${profile.location || 'N/A'}</span>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-xl flex items-center gap-2">
+                        <i class="ph-bold ph-briefcase text-botOrange"></i>
+                        <span class="text-sm font-medium truncate">${profile.occupation || 'N/A'}</span>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-xl flex items-center gap-2">
+                        <i class="ph-bold ph-graduation-cap text-botOrange"></i>
+                        <span class="text-sm font-medium truncate">${profile.education || 'N/A'}</span>
+                    </div>
+                </div>
+
+                <h4 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-3">Lifestyle</h4>
+                <div class="space-y-3 mb-6">
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="text-gray-500 text-sm">Religion</span>
+                        <span class="font-medium text-sm">${profile.religion || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="text-gray-500 text-sm">Looking For</span>
+                        <span class="font-medium text-sm">${profile.intention || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="text-gray-500 text-sm">Kids</span>
+                        <span class="font-medium text-sm">${profile.kids || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="text-gray-500 text-sm">Drinking</span>
+                        <span class="font-medium text-sm">${profile.drinking || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 text-sm">Smoking</span>
+                        <span class="font-medium text-sm">${profile.smoking || 'N/A'}</span>
+                    </div>
+                </div>
+            `;
+
+            const modal = document.getElementById('profile-details-modal');
+            modal.classList.remove('hidden');
+            // Small timeout to allow browser to render block before animating translation
+            setTimeout(() => {
+                modal.classList.remove('translate-y-full');
+            }, 10);
+        }
+
+        function closeProfileDetails() {
+            const modal = document.getElementById('profile-details-modal');
+            modal.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300); // Wait for transition
+        }
+
+
+        async function handleSwipe(isLike) {
+            const swiperId = cleanTelegramId;
+            const swipedId = profiles[currentCardIndex].telegram_id; 
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/swipe`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ swiper_id: swiperId, swiped_id: swipedId, is_like: isLike })
+                });
+                
+                const data = await response.json();
+                if (data.match) {
+                    showAlert("It's a Match! ❤️");
+                }
+            } catch (e) {
+                console.error("Swipe failed:", e);
+            }
+            
+            nextCard();
+        }
+
+        function nextCard() {
+            closeProfileDetails(); // Ensure modal is closed when moving to next
+            currentCardIndex++;
+            renderCards();
+        }
+
+        function switchTab(tab) {
+            document.getElementById('view-swipe').classList.add('hidden');
+            document.getElementById('view-matches').classList.add('hidden');
+            
+            document.getElementById('tab-swipe').classList.replace('text-botOrange', 'text-gray-400');
+            document.getElementById('tab-matches').classList.replace('text-botOrange', 'text-gray-400');
+            
+            if (tab === 'swipe') {
+                document.getElementById('view-swipe').classList.remove('hidden');
+                document.getElementById('tab-swipe').classList.replace('text-gray-400', 'text-botOrange');
+            } else if (tab === 'matches') {
+                document.getElementById('view-matches').classList.remove('hidden');
+                document.getElementById('tab-matches').classList.replace('text-gray-400', 'text-botOrange');
+                loadMatchesList();
+            }
+        }
+
+        // --- Matches & Chat ---
+
+        async function loadMatchesList() {
+            const container = document.getElementById('matches-container');
+            container.innerHTML = `<div class="flex justify-center mt-10"><i class="ph ph-spinner animate-spin text-3xl text-botOrange"></i></div>`;
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/matches-list/${cleanTelegramId}`);
+                const data = await response.json();
+                
+                if (!data.matches || data.matches.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center mt-10">
+                            <i class="ph-duotone ph-ghost text-6xl text-gray-300 mb-2"></i>
+                            <p class="text-gray-500 font-medium">No matches yet. Keep swiping!</p>
+                        </div>`;
+                    return;
+                }
+
+                container.innerHTML = data.matches.map(match => `
+                    <div onclick="openChat('${match.telegram_id}', '${match.name.replace(/'/g, "\\'")}', '${match.photo_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"}')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition active:scale-95">
+                        <div class="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0 bg-cover bg-center" style="background-image: url('${match.photo_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"}')"></div>
+                        <div class="flex-1 overflow-hidden">
+                            <h4 class="font-bold text-lg text-buna truncate">${match.name}</h4>
+                            <p class="text-sm text-gray-500 truncate">${match.bio || "Say hi!"}</p>
+                        </div>
+                        <div class="w-10 h-10 bg-orange-50 text-botOrange rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="ph-fill ph-chat-teardrop-text text-xl"></i>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<p class="text-red-500 text-center mt-10">Failed to load matches.</p>`;
+            }
+        }
+
+        async function openChat(matchId, matchName, matchPhoto) {
+            activeChatId = matchId;
+            
+            document.getElementById('chat-header-name').innerText = matchName;
+            document.getElementById('chat-header-photo').style.backgroundImage = `url('${matchPhoto}')`;
+            
+            document.getElementById('view-chat').classList.replace('hidden', 'flex');
+            
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = `<div class="flex justify-center mt-4"><i class="ph ph-spinner animate-spin text-botOrange text-3xl"></i></div>`;
+            
+            await loadChatHistory(matchId, matchName);
+
+            chatPollInterval = setInterval(() => {
+                if (activeChatId === matchId) {
+                    loadChatHistory(matchId, matchName, true);
+                }
+            }, 3000);
+        }
+
+        async function loadChatHistory(matchId, matchName, isPolling = false) {
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/get-messages/${cleanTelegramId}/${matchId}`);
+                const data = await response.json();
+                
+                if (!data.messages || data.messages.length === 0) {
+                    if (!isPolling) {
+                        messagesContainer.innerHTML = `
+                            <div class="text-center text-xs text-gray-400 my-4">Today</div>
+                            <div class="flex justify-start">
+                                <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%]">
+                                    You matched with ${matchName}! Break the ice.
+                                </div>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                const isAtBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 100;
+
+                messagesContainer.innerHTML = data.messages.map(msg => {
+                    const isMe = msg.sender_id === cleanTelegramId;
+                    const contentText = msg.content || msg.message || ""; 
+                    
+                    if (isMe) {
+                        return `
+                            <div class="flex justify-end">
+                                <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words">
+                                    ${contentText}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="flex justify-start">
+                                <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%] break-words">
+                                    ${contentText}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }).join('');
+
+                if (isAtBottom || !isPolling) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+                
+            } catch (err) {
+                console.error("Failed to fetch chat history", err);
+            }
+        }
+
+        function closeChat() {
+            activeChatId = null;
+            if (chatPollInterval) {
+                clearInterval(chatPollInterval);
+                chatPollInterval = null;
+            }
+            document.getElementById('view-chat').classList.replace('flex', 'hidden');
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const messageText = input.value.trim();
+            if (!messageText || !activeChatId) return;
+            
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            messagesContainer.innerHTML += `
+                <div class="flex justify-end opacity-70">
+                    <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words">
+                        ${messageText}
+                    </div>
+                </div>
+            `;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            input.value = '';
+            
+            try {
+                await fetch(`${BACKEND_URL}/api/send-message`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        sender_id: cleanTelegramId, 
+                        receiver_id: activeChatId, 
+                        message: messageText 
+                    })
+                });
+                
+                loadChatHistory(activeChatId, document.getElementById('chat-header-name').innerText, true);
+            } catch (err) {
+                console.error("Send error:", err);
+                showAlert("Failed to send message.");
+            }
+        }
+
+        // NEW: Unmatch Functions
+        function confirmUnmatch() {
+            document.getElementById('custom-confirm').classList.remove('hidden');
+        }
+
+        function closeConfirm() {
+            document.getElementById('custom-confirm').classList.add('hidden');
+        }
+
+        async function executeUnmatch() {
+            closeConfirm();
+            if(!activeChatId) return;
+
+            const matchIdToUnmatch = activeChatId;
+            closeChat(); // Instantly close the chat UI
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/unmatch`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        user_id: cleanTelegramId, 
+                        match_id: matchIdToUnmatch 
+                    })
+                });
+
+                if (response.ok) {
+                    showAlert("You have unmatched with this person.");
+                    loadMatchesList(); // Refresh the matches list so they disappear
+                } else {
+                    showAlert("Failed to unmatch.");
+                }
+            } catch (err) {
+                console.error("Unmatch error:", err);
+                showAlert("Error connecting to server.");
+            }
+        }
+
+
+        // --- Registration & Edit Functions ---
+
+        function handlePhotoSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedPhotoFile = file;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('photo-preview');
+                    const icon = document.getElementById('photo-icon');
+                    const text = document.getElementById('photo-text');
+                    
+                    preview.style.backgroundImage = `url(${e.target.result})`;
+                    preview.classList.remove('border-dashed');
+                    icon.classList.add('hidden');
+                    text.classList.add('hidden');
+                    
+                    selectedPhotoUrl = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function toggleOtherLocation() {
+            const select = document.getElementById('reg-location');
+            const otherInput = document.getElementById('reg-location-other');
+            
+            if (select.value === 'Other') {
+                otherInput.classList.remove('hidden');
+            } else {
+                otherInput.classList.add('hidden');
+                otherInput.value = '';
+            }
+        }
+
+        function validateAndNext(currentStep) {
+            if (currentStep === 1) {
+                const gender = document.getElementById('reg-gender').value;
+                const age = document.getElementById('reg-age').value;
+                const interest = document.getElementById('reg-interest').value;
+                const intention = document.getElementById('reg-intention').value;
+                
+                let location = document.getElementById('reg-location').value;
+                if (location === 'Other') {
+                    location = document.getElementById('reg-location-other').value.trim();
+                }
+
+                if (!gender || !age || !interest || !intention || !location) {
+                    return showAlert("Please fill out all required basic fields.");
+                }
+                if (age < 18) {
+                    return showAlert("You must be at least 18 years old.");
+                }
+                goToPage(2);
+            } 
+            else if (currentStep === 2) {
+                const height = document.getElementById('reg-height').value.trim();
+                const religion = document.getElementById('reg-religion').value;
+                const education = document.getElementById('reg-education').value;
+                const kids = document.getElementById('reg-kids').value;
+                const drinking = document.getElementById('reg-drinking').value;
+                const smoking = document.getElementById('reg-smoking').value;
+                
+                if (!height || !religion || !education || !kids || !drinking || !smoking) {
+                    return showAlert("Please fill out all detail and lifestyle fields.");
+                }
+                goToPage(3);
+            }
+        }
+
+        function goToPage(step) {
+            document.getElementById('page-1').classList.add('hidden');
+            document.getElementById('page-2').classList.add('hidden');
+            document.getElementById('page-3').classList.add('hidden');
+            
+            document.getElementById('page-' + step).classList.remove('hidden');
+            
+            const titles = isEditing 
+                ? ["Edit Profile: Basics", "Edit Profile: Details", "Edit Profile: Bio"] 
+                : ["Step 1: Basics", "Step 2: Details", "Step 3: Bio"];
+                
+            const progress = ["33.3%", "66.6%", "100%"];
+            
+            document.getElementById('reg-title').innerText = titles[step - 1];
+            document.getElementById('progress-bar').style.width = progress[step - 1];
+        }
+
+        function openEditProfile() {
+            isEditing = true;
+            document.getElementById('view-swipe').classList.add('hidden');
+            document.getElementById('view-matches').classList.add('hidden');
+            document.getElementById('bottom-nav').classList.add('hidden'); 
+            document.getElementById('view-registration').classList.remove('hidden');
+            
+            goToPage(1); 
+            document.getElementById('submit-btn').innerHTML = `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>`;
+        }
+
+        async function submitRegistration() {
+            const bio = document.getElementById('reg-bio').value.trim();
+            if(!bio) return showAlert("Please write a short bio!");
+
+            let finalLocation = document.getElementById('reg-location').value;
+            if (finalLocation === 'Other') {
+                finalLocation = document.getElementById('reg-location-other').value.trim();
+            }
+
+            let finalName = document.getElementById('reg-name').value.trim();
+            if (!finalName) {
+                finalName = tg.initDataUnsafe?.user?.first_name || "Anonymous";
+            }
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Processing...`;
+            submitBtn.disabled = true;
+
+            try {
+                let finalPhotoUrl = selectedPhotoUrl;
+
+                if (selectedPhotoFile) {
+                    submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Uploading Photo...`;
+                    
+                    const formData = new FormData();
+                    formData.append('file', selectedPhotoFile);
+                    formData.append('telegram_id', cleanTelegramId);
+
+                    const uploadRes = await fetch(`${BACKEND_URL}/api/upload-photo`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!uploadRes.ok) throw new Error("Failed to upload photo.");
+                    
+                    const uploadData = await uploadRes.json();
+                    finalPhotoUrl = uploadData.photo_url; 
+                }
+
+                submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Saving Profile...`;
+
+                const payload = {
+                    telegram_id: cleanTelegramId,
+                    name: finalName,
+                    age: parseInt(document.getElementById('reg-age').value),
+                    gender: document.getElementById('reg-gender').value,
+                    interested_in: document.getElementById('reg-interest').value,
+                    location: finalLocation, 
+                    height: document.getElementById('reg-height').value,
+                    religion: document.getElementById('reg-religion').value,
+                    education: document.getElementById('reg-education').value,
+                    occupation: document.getElementById('reg-occupation').value,
+                    bio: bio,
+                    photo_url: finalPhotoUrl, 
+                    intention: document.getElementById('reg-intention').value,
+                    kids: document.getElementById('reg-kids').value,
+                    drinking: document.getElementById('reg-drinking').value,
+                    smoking: document.getElementById('reg-smoking').value
+                };
+
+                const response = await fetch(`${BACKEND_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) throw new Error("Server Error");
+                
+                isEditing = false;
+                document.getElementById('view-registration').classList.add('hidden');
+                
+                document.getElementById('view-swipe').classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+                
+                await loadDiscoverProfiles();
+                
+                submitBtn.innerHTML = `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
+                submitBtn.disabled = false;
+                
+                if(tg.showAlert) tg.showAlert("Profile successfully saved!");
+            } catch (err) {
+                showAlert("Error: " + err.message);
+                submitBtn.innerHTML = isEditing ? `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>` : `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
+                submitBtn.disabled = false;
+            }
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
+
+
+```
                     <option value="Protestant">Protestant</option>
                     <option value="Catholic">Catholic</option>
                     <option value="Other">Other</option>
