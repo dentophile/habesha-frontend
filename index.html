@@ -262,6 +262,7 @@
         
         let activeChatId = null;
         let chatPollInterval = null;
+        let wakeLock = null; // Used to keep screen awake
 
         function showAlert(message) {
             if (tg.showAlert) {
@@ -276,8 +277,40 @@
             document.getElementById('custom-alert').classList.add('hidden');
         }
 
+        // --- Screen Wake Lock & App Visibility Functions ---
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) {
+                console.log("Wake Lock not supported or denied by device.");
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                // App woke up from sleep
+                requestWakeLock();
+                
+                // Restart polling if we were in a chat
+                if (activeChatId) {
+                    const currentName = document.getElementById('chat-header-name').innerText;
+                    startChatPolling(activeChatId, currentName);
+                }
+
+                // Force webview to recalculate layout to un-freeze touch buttons (Crucial for iOS WebViews)
+                window.dispatchEvent(new Event('resize'));
+            } else {
+                // App went to background/sleep. Stop polling to save battery and prevent crashes.
+                stopChatPolling();
+            }
+        });
+
         // Initialize
         async function initApp() {
+            requestWakeLock(); // Attempt to keep screen awake immediately
+
             try {
                 const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
                 const data = await response.json();
@@ -322,7 +355,7 @@
             
             // Reached the end of the list (Empty State)
             if (currentCardIndex >= profiles.length || profiles.length === 0) {
-                // If they have profiles, show the UP arrow to recover them!
+                // If they have profiles, show the UP arrow to recover them
                 let backBtnHtml = '';
                 if (profiles.length > 0) {
                     backBtnHtml = `
@@ -375,7 +408,6 @@
                             <button onclick="prevCard()" class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
                                 <i class="ph-bold ph-caret-up text-2xl"></i>
                             </button>
-                            <!-- UPDATED DOWN BUTTON: Call scrollNext() instead of nextCard() -->
                             <button onclick="scrollNext()" class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
                                 <i class="ph-bold ph-caret-down text-2xl"></i>
                             </button>
@@ -389,10 +421,8 @@
             `;
         }
 
-        // --- NEW: Safe Scrolling Functions ---
-        
+        // Safe Scrolling Functions
         function scrollNext() {
-            // Stop at the last profile if scrolling
             if (currentCardIndex < profiles.length - 1) {
                 closeProfileDetails();
                 currentCardIndex++;
@@ -432,7 +462,6 @@
                 console.error("Swipe failed:", e);
             }
             
-            // Advance the card. If it's the last card, let it go to the "empty" state (where they can still scroll back)
             closeProfileDetails();
             currentCardIndex++;
             renderCards();
@@ -563,6 +592,23 @@
             }
         }
 
+        // --- Controlled Polling ---
+        function startChatPolling(matchId, matchName) {
+            stopChatPolling(); // Clear existing interval if any
+            chatPollInterval = setInterval(() => {
+                if (activeChatId === matchId) {
+                    loadChatHistory(matchId, matchName, true);
+                }
+            }, 3000);
+        }
+
+        function stopChatPolling() {
+            if (chatPollInterval) {
+                clearInterval(chatPollInterval);
+                chatPollInterval = null;
+            }
+        }
+
         async function openChat(matchId, matchName, matchPhoto) {
             activeChatId = matchId;
             
@@ -575,12 +621,7 @@
             messagesContainer.innerHTML = `<div class="flex justify-center mt-4"><i class="ph ph-spinner animate-spin text-botOrange text-3xl"></i></div>`;
             
             await loadChatHistory(matchId, matchName);
-
-            chatPollInterval = setInterval(() => {
-                if (activeChatId === matchId) {
-                    loadChatHistory(matchId, matchName, true);
-                }
-            }, 3000);
+            startChatPolling(matchId, matchName);
         }
 
         async function loadChatHistory(matchId, matchName, isPolling = false) {
@@ -640,10 +681,7 @@
 
         function closeChat() {
             activeChatId = null;
-            if (chatPollInterval) {
-                clearInterval(chatPollInterval);
-                chatPollInterval = null;
-            }
+            stopChatPolling();
             document.getElementById('view-chat').classList.replace('flex', 'hidden');
         }
 
