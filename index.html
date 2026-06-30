@@ -36,6 +36,26 @@
         </div>
     </div>
 
+    <div id="report-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-50 px-4 transition-opacity">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h3 class="text-xl font-bold mb-2 text-red-500 flex items-center gap-2"><i class="ph-bold ph-flag"></i> Report User</h3>
+            <p class="text-gray-600 mb-4 text-sm">Why are you reporting this profile?</p>
+            
+            <select id="report-reason" class="w-full p-3 border rounded-xl bg-gray-50 focus:outline-none focus:border-red-500 mb-4">
+                <option value="Fake Profile / Spam">Fake Profile / Spam</option>
+                <option value="Inappropriate Content">Inappropriate Content</option>
+                <option value="Harassment / Abusive">Harassment / Abusive</option>
+                <option value="Underage">Underage</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <div class="flex gap-3">
+                <button onclick="closeReportModal()" class="w-1/2 p-3 bg-gray-200 text-gray-700 rounded-xl font-bold">Cancel</button>
+                <button id="submit-report-btn" onclick="submitReport()" class="w-1/2 p-3 bg-red-500 text-white rounded-xl font-bold flex justify-center items-center">Submit</button>
+            </div>
+        </div>
+    </div>
+
     <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300">
         <i class="ph-fill ph-spinner-gap animate-spin text-5xl text-botOrange mb-4"></i>
         <p class="text-gray-500 font-medium">Loading...</p>
@@ -180,7 +200,7 @@
             <p class="text-gray-400 font-medium">No more profiles to show.</p>
         </div>
 
-        <div id="profile-details-modal" class="hidden absolute bottom-0 left-0 w-full h-[75%] bg-white rounded-t-3xl z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden transition-transform duration-300 transform translate-y-full">
+        <div id="profile-details-modal" class="hidden absolute bottom-0 left-0 w-full h-[85%] bg-white rounded-t-3xl z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden transition-transform duration-300 transform translate-y-full">
             <div class="w-full flex justify-end p-4 pb-0">
                 <button onclick="closeProfileDetails()" class="bg-gray-100 p-2 rounded-full text-gray-500 hover:bg-gray-200 active:scale-95">
                     <i class="ph-bold ph-x text-xl"></i>
@@ -255,6 +275,7 @@
         let activeChatId = null;
         let chatPollInterval = null;
         let wakeLock = null;
+        let userToReport = null; // Store ID for reporting
 
         function showAlert(message) {
             if (tg.showAlert) {
@@ -499,6 +520,10 @@
                         <span class="font-medium text-sm">${profile.smoking || 'N/A'}</span>
                     </div>
                 </div>
+
+                <button onclick="openReportModal('${profile.telegram_id}')" class="w-full mt-4 mb-4 p-4 text-red-500 font-bold bg-red-50 rounded-xl hover:bg-red-100 transition flex items-center justify-center gap-2 shadow-sm border border-red-100">
+                    <i class="ph-bold ph-flag"></i> Report Profile
+                </button>
             `;
 
             const modal = document.getElementById('profile-details-modal');
@@ -514,6 +539,51 @@
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300); 
+        }
+
+        // --- Trust & Safety: Reporting ---
+        function openReportModal(reportedId) {
+            userToReport = reportedId;
+            document.getElementById('report-modal').classList.remove('hidden');
+        }
+
+        function closeReportModal() {
+            userToReport = null;
+            document.getElementById('report-modal').classList.add('hidden');
+        }
+
+        async function submitReport() {
+            if (!userToReport) return;
+            
+            const reason = document.getElementById('report-reason').value;
+            const btn = document.getElementById('submit-report-btn');
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i>`;
+            btn.disabled = true;
+
+            try {
+                await fetch(`${BACKEND_URL}/api/report`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        reporter_id: cleanTelegramId, 
+                        reported_id: userToReport, 
+                        reason: reason 
+                    })
+                });
+                
+                closeReportModal();
+                showAlert("Report submitted. Our team will review this profile.");
+                
+                // Automatically swipe left on them
+                await handleSwipe(false);
+                
+            } catch (err) {
+                console.error(err);
+                showAlert("Failed to submit report.");
+            } finally {
+                btn.innerHTML = `Submit`;
+                btn.disabled = false;
+            }
         }
 
         function switchTab(tab) {
@@ -875,7 +945,6 @@
             document.getElementById('submit-btn').innerHTML = `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>`;
         }
 
-        // 🛑 NEW SUBMIT FUNCTION WITH AI ERROR CATCHING & PHOTO AI CATCHING 🛑
         async function submitRegistration() {
             const bio = document.getElementById('reg-bio').value.trim();
             if(!bio) return showAlert("Please write a short bio!");
@@ -909,7 +978,6 @@
                         body: formData
                     });
 
-                    // 🛑 Catch the AI 400 Bad Request Error for PHOTO Verification!
                     if (!uploadRes.ok) {
                         const errorData = await uploadRes.json();
                         throw new Error(errorData.detail || "Failed to upload photo.");
@@ -946,7 +1014,6 @@
                     body: JSON.stringify(payload)
                 });
                 
-                // 🛑 Catch the AI 400 Bad Request Error for BIO Verification!
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.detail || "Server Error: Could not complete registration.");
@@ -967,7 +1034,6 @@
                 
                 if(tg.showAlert) tg.showAlert("Profile successfully saved!");
             } catch (err) {
-                // This alert box will now perfectly display EITHER the Bio rejection OR the Photo rejection!
                 showAlert("Error: " + err.message);
                 submitBtn.innerHTML = isEditing ? `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>` : `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
                 submitBtn.disabled = false;
