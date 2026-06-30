@@ -17,6 +17,7 @@
 </head>
 <body class="bg-gray-50 font-sans overflow-hidden text-buna">
 
+    <!-- Custom Alert Box -->
     <div id="custom-alert" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 px-4">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
             <h3 class="text-xl font-bold mb-2">Notice</h3>
@@ -25,6 +26,7 @@
         </div>
     </div>
 
+    <!-- Custom Confirm Box -->
     <div id="custom-confirm" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 px-4 transition-opacity">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
             <h3 class="text-xl font-bold mb-2 text-red-500">Unmatch</h3>
@@ -36,6 +38,7 @@
         </div>
     </div>
 
+    <!-- Report Modal -->
     <div id="report-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-50 px-4 transition-opacity">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
             <h3 class="text-xl font-bold mb-2 text-red-500 flex items-center gap-2"><i class="ph-bold ph-flag"></i> Report User</h3>
@@ -56,11 +59,13 @@
         </div>
     </div>
 
+    <!-- Loading View -->
     <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300">
         <i class="ph-fill ph-spinner-gap animate-spin text-5xl text-botOrange mb-4"></i>
         <p class="text-gray-500 font-medium">Loading...</p>
     </div>
 
+    <!-- Registration / Edit View -->
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
         <div class="max-w-md mx-auto p-6 py-10">
             <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center transition-all">Step 1: Basics</h2>
@@ -188,6 +193,7 @@
         </div>
     </div>
 
+    <!-- Swipe View -->
     <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-100 overflow-hidden relative">
         <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-4 mt-2">
             <h2 class="font-bold text-2xl text-buna">Discover</h2>
@@ -200,6 +206,7 @@
             <p class="text-gray-400 font-medium">No more profiles to show.</p>
         </div>
 
+        <!-- Full Profile Details Modal -->
         <div id="profile-details-modal" class="hidden absolute bottom-0 left-0 w-full h-[85%] bg-white rounded-t-3xl z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden transition-transform duration-300 transform translate-y-full">
             <div class="w-full flex justify-end p-4 pb-0">
                 <button onclick="closeProfileDetails()" class="bg-gray-100 p-2 rounded-full text-gray-500 hover:bg-gray-200 active:scale-95">
@@ -207,10 +214,12 @@
                 </button>
             </div>
             <div id="profile-details-content" class="flex-1 overflow-y-auto p-6 pt-2 pb-24">
-                </div>
+                <!-- Content injected here -->
+            </div>
         </div>
     </div>
 
+    <!-- Matches View -->
     <div id="view-matches" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-50 overflow-y-auto">
         <h2 class="font-bold text-3xl text-buna mb-6 mt-4 px-2">Your Matches <span class="text-botOrange">❤️</span></h2>
         <div id="matches-container" class="w-full max-w-sm mx-auto space-y-4 pb-10">
@@ -218,6 +227,7 @@
         </div>
     </div>
 
+    <!-- Chat View -->
     <div id="view-chat" class="hidden w-full h-screen bg-gray-50 flex-col z-[60] fixed top-0 left-0 overflow-hidden">
         <div class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 shadow-sm shrink-0">
             <button onclick="closeChat()" class="text-gray-500 p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition">
@@ -234,7 +244,8 @@
         </div>
 
         <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col scroll-smooth">
-            </div>
+            <!-- Messages will be injected here -->
+        </div>
 
         <div class="bg-white border-t border-gray-200 p-3 flex gap-2 items-center shrink-0">
             <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKeyPress(event)" class="flex-1 bg-gray-100 border-transparent focus:bg-white focus:border-botOrange focus:ring-1 focus:ring-botOrange rounded-full px-4 py-3 outline-none transition">
@@ -244,6 +255,7 @@
         </div>
     </div>
 
+    <!-- Bottom Navigation -->
     <div id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <button onclick="switchTab('swipe')" id="tab-swipe" class="flex flex-col items-center text-botOrange transition-colors">
             <i class="ph-bold ph-cards text-2xl mb-1"></i>
@@ -265,6 +277,10 @@
         // Default Avatar Image
         const DEFAULT_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
         
+        // Deep Link Interceptor
+        const urlParams = new URLSearchParams(window.location.search);
+        window.pendingChatTarget = urlParams.get('chat');
+
         let selectedPhotoUrl = DEFAULT_AVATAR;
         let selectedPhotoFile = null;
         
@@ -329,9 +345,15 @@
                     document.getElementById('view-registration').classList.remove('hidden');
                 } else {
                     window.myProfileData = data.profile;
-                    document.getElementById('view-swipe').classList.remove('hidden');
                     document.getElementById('bottom-nav').classList.remove('hidden'); 
-                    await loadDiscoverProfiles();
+                    
+                    if (window.pendingChatTarget) {
+                        switchTab('matches'); 
+                        loadDiscoverProfiles(); 
+                    } else {
+                        document.getElementById('view-swipe').classList.remove('hidden');
+                        await loadDiscoverProfiles();
+                    }
                 }
             } catch (err) {
                 console.error(err);
@@ -573,8 +595,6 @@
                 
                 closeReportModal();
                 showAlert("Report submitted. Our team will review this profile.");
-                
-                // Automatically swipe left on them
                 await handleSwipe(false);
                 
             } catch (err) {
@@ -633,6 +653,18 @@
                         </div>
                     </div>
                 `).join('');
+                
+                if (window.pendingChatTarget) {
+                    const targetMatch = data.matches.find(m => m.telegram_id === window.pendingChatTarget);
+                    if (targetMatch) {
+                        openChat(
+                            targetMatch.telegram_id, 
+                            targetMatch.name.replace(/'/g, "\\'"), 
+                            targetMatch.photo_url || DEFAULT_AVATAR
+                        );
+                    }
+                    window.pendingChatTarget = null;
+                }
                 
             } catch (err) {
                 console.error(err);
