@@ -242,7 +242,7 @@
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
         const cleanTelegramId = String(tg.initDataUnsafe?.user?.id || Math.random()).trim();
         
-        // ⚠️ Default Avatar Image
+        // Default Avatar Image
         const DEFAULT_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
         
         let selectedPhotoUrl = DEFAULT_AVATAR;
@@ -875,7 +875,7 @@
             document.getElementById('submit-btn').innerHTML = `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>`;
         }
 
-        // 🛑 NEW SUBMIT FUNCTION WITH AI ERROR CATCHING 🛑
+        // 🛑 NEW SUBMIT FUNCTION WITH AI ERROR CATCHING & PHOTO AI CATCHING 🛑
         async function submitRegistration() {
             const bio = document.getElementById('reg-bio').value.trim();
             if(!bio) return showAlert("Please write a short bio!");
@@ -909,7 +909,11 @@
                         body: formData
                     });
 
-                    if (!uploadRes.ok) throw new Error("Failed to upload photo.");
+                    // 🛑 Catch the AI 400 Bad Request Error for PHOTO Verification!
+                    if (!uploadRes.ok) {
+                        const errorData = await uploadRes.json();
+                        throw new Error(errorData.detail || "Failed to upload photo.");
+                    }
                     
                     const uploadData = await uploadRes.json();
                     finalPhotoUrl = uploadData.photo_url; 
@@ -942,15 +946,10 @@
                     body: JSON.stringify(payload)
                 });
                 
-                // 🛑 Catch the AI 400 Bad Request Error specifically!
+                // 🛑 Catch the AI 400 Bad Request Error for BIO Verification!
                 if (!response.ok) {
                     const errorData = await response.json();
-                    showAlert(errorData.detail || "Server Error: Could not complete registration.");
-                    
-                    // Reset the button so they can try again
-                    submitBtn.innerHTML = isEditing ? `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>` : `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
-                    submitBtn.disabled = false;
-                    return; // Exit the function early!
+                    throw new Error(errorData.detail || "Server Error: Could not complete registration.");
                 }
                 
                 window.myProfileData = payload;
@@ -968,6 +967,7 @@
                 
                 if(tg.showAlert) tg.showAlert("Profile successfully saved!");
             } catch (err) {
+                // This alert box will now perfectly display EITHER the Bio rejection OR the Photo rejection!
                 showAlert("Error: " + err.message);
                 submitBtn.innerHTML = isEditing ? `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>` : `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
                 submitBtn.disabled = false;
