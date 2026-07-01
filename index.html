@@ -746,45 +746,252 @@
                 }
 
                 const isAtBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 100;
+Adding message interactions brings the app up to modern chat standards. We need to implement a "soft delete" (so the message says "deleted" rather than vanishing completely), an edit flag, and an emoji reaction system.
 
+To build this, we will update the database schema, add three new backend endpoints, and introduce a clickable action menu to the frontend chat bubbles.
+
+### Step 1: Update the Database Setup (Supabase)
+
+Your database needs to know if a message has been altered.
+
+1. Open your **Supabase Dashboard** and go to the **SQL Editor**.
+2. Run this exact query to add the required columns:
+
+```sql
+ALTER TABLE messages 
+ADD COLUMN is_edited BOOLEAN DEFAULT FALSE,
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE,
+ADD COLUMN reaction TEXT DEFAULT NULL;
+
+```
+
+---
+
+### Step 2: The Backend Updates (`main.py`)
+
+**1. Add the Data Models**
+Find your `# --- DATA MODELS ---` section and add these two new Pydantic models at the bottom of that list:
+
+```python
+class EditAction(BaseModel):
+    new_text: str
+
+class ReactAction(BaseModel):
+    emoji: str
+
+```
+
+**2. Add the New Endpoints**
+Find your `# --- ENDPOINTS ---` section. Add these three new API routes right below your `/api/send-message` and `/api/get-messages` endpoints:
+
+```python
+@app.put("/api/edit-message/{message_id}")
+def edit_message(message_id: str, action: EditAction):
+    try:
+        supabase.table("messages").update({
+            "content": action.new_text, 
+            "is_edited": True
+        }).eq("id", message_id).execute()
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/delete-message/{message_id}")
+def delete_message(message_id: str):
+    try:
+        supabase.table("messages").update({
+            "is_deleted": True, 
+            "content": "🚫 This message was deleted"
+        }).eq("id", message_id).execute()
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/react-message/{message_id}")
+def react_message(message_id: str, action: ReactAction):
+    try:
+        supabase.table("messages").update({
+            "reaction": action.emoji
+        }).eq("id", message_id).execute()
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+```
+
+---
+
+### Step 3: The Frontend Updates (`index.html`)
+
+**1. Add the UI Action Menu**
+We need a pop-up menu that appears when a user clicks on a message. Paste this HTML directly above your final `<script>` tag (right after the bottom navigation HTML block):
+
+```html
+    <!-- Message Action Modal -->
+    <div id="msg-action-modal" class="hidden fixed inset-0 z-[120] flex items-end justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-t-3xl w-full p-6 pb-12 shadow-2xl space-y-4 transform transition-transform translate-y-full" id="msg-action-box">
+            <h3 class="text-center font-bold text-gray-400 text-sm mb-4">Message Actions</h3>
+            
+            <div class="flex justify-around bg-gray-50 p-3 rounded-2xl mb-4 text-2xl">
+                <button onclick="sendReaction('❤️')" class="hover:scale-125 transition">❤️</button>
+                <button onclick="sendReaction('😂')" class="hover:scale-125 transition">😂</button>
+                <button onclick="sendReaction('😮')" class="hover:scale-125 transition">😮</button>
+                <button onclick="sendReaction('😢')" class="hover:scale-125 transition">😢</button>
+                <button onclick="sendReaction('👍')" class="hover:scale-125 transition">👍</button>
+            </div>
+
+            <button id="btn-edit-msg" class="w-full p-4 bg-gray-100 text-buna rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-200">
+                <i class="ph-bold ph-pencil-simple"></i> Edit Message
+            </button>
+            <button id="btn-delete-msg" class="w-full p-4 bg-red-50 text-red-500 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-red-100">
+                <i class="ph-bold ph-trash"></i> Delete Message
+            </button>
+            <button onclick="closeMsgMenu()" class="w-full p-4 bg-white text-gray-500 rounded-xl font-bold mt-2">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+```
+
+**2. Add the Action JavaScript Functions**
+Inside your `<script>` block, paste these functions somewhere near your other chat logic (e.g., above the `sendMessage()` function):
+
+```javascript
+        let selectedMsgId = null;
+
+        function openMsgMenu(id, isMe, currentText, isDeleted) {
+            selectedMsgId = id;
+            const modal = document.getElementById('msg-action-modal');
+            const box = document.getElementById('msg-action-box');
+            
+            // Allow edits and deletes only if the user sent it AND it's not already deleted
+            if (isMe && !isDeleted) {
+                document.getElementById('btn-edit-msg').style.display = 'flex';
+                document.getElementById('btn-delete-msg').style.display = 'flex';
+                
+                document.getElementById('btn-edit-msg').onclick = () => triggerEdit(currentText);
+                document.getElementById('btn-delete-msg').onclick = () => triggerDelete();
+            } else {
+                document.getElementById('btn-edit-msg').style.display = 'none';
+                document.getElementById('btn-delete-msg').style.display = 'none';
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => box.classList.remove('translate-y-full'), 10);
+        }
+
+        function closeMsgMenu() {
+            const modal = document.getElementById('msg-action-modal');
+            const box = document.getElementById('msg-action-box');
+            box.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                selectedMsgId = null;
+            }, 300);
+        }
+
+        async function sendReaction(emoji) {
+            if (!selectedMsgId) return;
+            const id = selectedMsgId;
+            closeMsgMenu();
+            try {
+                await fetch(`${BACKEND_URL}/api/react-message/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ emoji: emoji })
+                });
+                loadChatHistory(activeChatId, document.getElementById('chat-header-name').innerText, true);
+            } catch(e) { console.error(e); }
+        }
+
+        async function triggerDelete() {
+            if (!selectedMsgId || !confirm("Delete this message?")) return;
+            const id = selectedMsgId;
+            closeMsgMenu();
+            try {
+                await fetch(`${BACKEND_URL}/api/delete-message/${id}`, { method: 'DELETE' });
+                loadChatHistory(activeChatId, document.getElementById('chat-header-name').innerText, true);
+            } catch(e) { console.error(e); }
+        }
+
+        async function triggerEdit(oldText) {
+            if (!selectedMsgId) return;
+            const newText = prompt("Edit message:", oldText);
+            if (!newText || newText === oldText) {
+                closeMsgMenu();
+                return;
+            }
+            
+            const id = selectedMsgId;
+            closeMsgMenu();
+            try {
+                await fetch(`${BACKEND_URL}/api/edit-message/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ new_text: newText })
+                });
+                loadChatHistory(activeChatId, document.getElementById('chat-header-name').innerText, true);
+            } catch(e) { console.error(e); }
+        }
+
+```
+
+**3. Update Chat Rendering Logic**
+Replace the `.innerHTML` assignment inside your `loadChatHistory` function with this updated version to render the UI elements and make bubbles clickable:
+
+```javascript
                 messagesContainer.innerHTML = data.messages.map(msg => {
                     const isMe = msg.sender_id === cleanTelegramId;
                     const contentText = msg.content || msg.message || ""; 
                     
-                    // Format timestamp cleanly (e.g., 11:20 AM)
                     let timeStr = "";
                     if (msg.created_at) {
                         const dateObj = new Date(msg.created_at);
                         timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     }
 
+                    // Format Status Flags
+                    const isDeleted = msg.is_deleted === true;
+                    const editTag = msg.is_edited && !isDeleted ? `<span class="italic text-[9px] ml-1 opacity-70">(edited)</span>` : "";
+                    const reactionTag = msg.reaction ? `<div class="absolute -bottom-2 -right-2 bg-white rounded-full shadow-sm text-sm p-0.5 border border-gray-100 z-10 cursor-pointer">${msg.reaction}</div>` : "";
+                    const deletedStyle = isDeleted ? "italic text-gray-400 opacity-70" : "";
+                    
+                    // Escape text for the click function
+                    const safeText = isDeleted ? "" : contentText.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+
                     if (isMe) {
-                        // Render double ticks if read, single tick if sent
                         const ticks = msg.is_read ? "✓✓" : "✓";
                         const tickColor = msg.is_read ? "text-blue-200" : "text-gray-300";
 
                         return `
-                            <div class="flex justify-end">
-                                <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words flex flex-col">
+                            <div class="flex justify-end mb-2 relative group cursor-pointer" onclick="openMsgMenu('${msg.id}', true, '${safeText}', ${isDeleted})">
+                                <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words flex flex-col relative ${deletedStyle}">
                                     <span>${contentText}</span>
                                     <div class="flex items-center justify-end gap-1 text-[10px] opacity-80 mt-0.5 self-end">
-                                        <span>${timeStr}</span>
-                                        <span class="${tickColor} font-bold">${ticks}</span>
+                                        <span>${timeStr}</span> ${editTag}
+                                        <span class="${tickColor} font-bold ml-1">${ticks}</span>
                                     </div>
+                                    ${reactionTag}
                                 </div>
                             </div>
                         `;
                     } else {
                         return `
-                            <div class="flex justify-start">
-                                <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%] break-words flex flex-col">
+                            <div class="flex justify-start mb-2 relative group cursor-pointer" onclick="openMsgMenu('${msg.id}', false, '${safeText}', ${isDeleted})">
+                                <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%] break-words flex flex-col relative ${deletedStyle}">
                                     <span>${contentText}</span>
-                                    <span class="text-[10px] text-gray-400 text-right mt-0.5 self-end">${timeStr}</span>
+                                    <div class="flex items-center gap-1 text-[10px] text-gray-400 mt-0.5 self-end text-right">
+                                        <span>${timeStr}</span> ${editTag}
+                                    </div>
+                                    ${reactionTag}
                                 </div>
                             </div>
                         `;
                     }
                 }).join('');
+
+```
 
                 if (isAtBottom || !isPolling) {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
