@@ -719,10 +719,15 @@
             startChatPolling(matchId, matchName);
         }
 
-        async function loadChatHistory(matchId, matchName, isPolling = false) {
+   async function loadChatHistory(matchId, matchName, isPolling = false) {
             const messagesContainer = document.getElementById('chat-messages');
             
             try {
+                // 1. Tell the backend we've opened the chat and read incoming messages
+                if (!isPolling) {
+                    await fetch(`${BACKEND_URL}/api/mark-messages-read/${cleanTelegramId}/${matchId}`, { method: 'POST' });
+                }
+
                 const response = await fetch(`${BACKEND_URL}/api/get-messages/${cleanTelegramId}/${matchId}`);
                 const data = await response.json();
                 
@@ -746,19 +751,35 @@
                     const isMe = msg.sender_id === cleanTelegramId;
                     const contentText = msg.content || msg.message || ""; 
                     
+                    // Format timestamp cleanly (e.g., 11:20 AM)
+                    let timeStr = "";
+                    if (msg.created_at) {
+                        const dateObj = new Date(msg.created_at);
+                        timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+
                     if (isMe) {
+                        // Render double ticks if read, single tick if sent
+                        const ticks = msg.is_read ? "✓✓" : "✓";
+                        const tickColor = msg.is_read ? "text-blue-200" : "text-gray-300";
+
                         return `
                             <div class="flex justify-end">
-                                <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words">
-                                    ${contentText}
+                                <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words flex flex-col">
+                                    <span>${contentText}</span>
+                                    <div class="flex items-center justify-end gap-1 text-[10px] opacity-80 mt-0.5 self-end">
+                                        <span>${timeStr}</span>
+                                        <span class="${tickColor} font-bold">${ticks}</span>
+                                    </div>
                                 </div>
                             </div>
                         `;
                     } else {
                         return `
                             <div class="flex justify-start">
-                                <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%] break-words">
-                                    ${contentText}
+                                <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%] break-words flex flex-col">
+                                    <span>${contentText}</span>
+                                    <span class="text-[10px] text-gray-400 text-right mt-0.5 self-end">${timeStr}</span>
                                 </div>
                             </div>
                         `;
@@ -767,6 +788,11 @@
 
                 if (isAtBottom || !isPolling) {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+                
+                // If polling finds unread messages from the match while chat is open, mark them read instantly
+                if (isPolling && data.messages.some(m => m.sender_id === matchId && !m.is_read)) {
+                    await fetch(`${BACKEND_URL}/api/mark-messages-read/${cleanTelegramId}/${matchId}`, { method: 'POST' });
                 }
                 
             } catch (err) {
