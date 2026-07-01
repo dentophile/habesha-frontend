@@ -68,6 +68,20 @@
     <!-- Registration / Edit View -->
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
         <div class="max-w-md mx-auto p-6 py-10">
+            
+            <!-- NEW: My Stats Banner (Only visible during edit) -->
+            <div id="my-stats" class="hidden bg-orange-50 rounded-2xl p-4 mb-6 border border-orange-100 flex justify-around text-center shadow-sm">
+                <div>
+                    <p class="text-xs text-orange-600 font-bold uppercase tracking-wider">Total Likes</p>
+                    <p id="stat-likes" class="text-2xl font-bold text-buna mt-1">0</p>
+                </div>
+                <div class="w-px bg-orange-200 h-10 my-auto"></div>
+                <div>
+                    <p class="text-xs text-orange-600 font-bold uppercase tracking-wider">Joined</p>
+                    <p id="stat-joined" class="text-lg font-bold text-buna mt-1">-</p>
+                </div>
+            </div>
+
             <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center transition-all">Step 1: Basics</h2>
             
             <div class="w-full bg-gray-200 h-2 rounded-full mb-8 overflow-hidden">
@@ -274,10 +288,8 @@
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
         const cleanTelegramId = String(tg.initDataUnsafe?.user?.id || Math.random()).trim();
         
-        // Default Avatar Image
         const DEFAULT_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
         
-        // Deep Link Interceptor
         const urlParams = new URLSearchParams(window.location.search);
         window.pendingChatTarget = urlParams.get('chat');
 
@@ -291,7 +303,7 @@
         let activeChatId = null;
         let chatPollInterval = null;
         let wakeLock = null;
-        let userToReport = null; // Store ID for reporting
+        let userToReport = null;
 
         function showAlert(message) {
             if (tg.showAlert) {
@@ -306,7 +318,6 @@
             document.getElementById('custom-alert').classList.add('hidden');
         }
 
-        // --- Screen Wake Lock ---
         async function requestWakeLock() {
             try {
                 if ('wakeLock' in navigator) {
@@ -330,7 +341,6 @@
             }
         });
 
-        // Initialize
         async function initApp() {
             requestWakeLock(); 
 
@@ -364,7 +374,6 @@
             }
         }
 
-        // --- Discover & Swipe Functions ---
         async function loadDiscoverProfiles() {
             try {
                 const res = await fetch(`${BACKEND_URL}/api/get-potential-matches/${cleanTelegramId}`);
@@ -494,9 +503,16 @@
             const profile = profiles[currentCardIndex];
             if(!profile) return;
 
+            // Format Registration Date
+            const joinedDate = profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recently';
+
             const content = document.getElementById('profile-details-content');
             content.innerHTML = `
-                <h3 class="text-3xl font-bold text-buna mb-2">${profile.name}, ${profile.age}</h3>
+                <div class="flex items-end justify-between mb-2">
+                    <h3 class="text-3xl font-bold text-buna leading-none">${profile.name}, ${profile.age}</h3>
+                </div>
+                <p class="text-xs text-gray-400 font-medium tracking-wide uppercase mb-6"><i class="ph-bold ph-calendar-blank"></i> Joined ${joinedDate}</p>
+                
                 <p class="text-gray-600 mb-6">${profile.bio || ''}</p>
                 
                 <h4 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-3">About</h4>
@@ -937,6 +953,16 @@
             document.getElementById('view-registration').classList.remove('hidden');
             
             if (window.myProfileData) {
+                // Populate Profile Stats
+                document.getElementById('my-stats').classList.remove('hidden');
+                document.getElementById('stat-likes').innerText = window.myProfileData.likes_received || "0";
+                
+                const joinedDate = window.myProfileData.created_at 
+                    ? new Date(window.myProfileData.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) 
+                    : 'Recently';
+                document.getElementById('stat-joined').innerText = joinedDate;
+
+                // Populate Form Fields
                 document.getElementById('reg-name').value = window.myProfileData.name || '';
                 document.getElementById('reg-age').value = window.myProfileData.age || '';
                 document.getElementById('reg-gender').value = window.myProfileData.gender || '';
@@ -971,6 +997,8 @@
                     document.getElementById('photo-icon').classList.add('hidden');
                     document.getElementById('photo-text').classList.add('hidden');
                 }
+            } else {
+                document.getElementById('my-stats').classList.add('hidden');
             }
 
             goToPage(1); 
@@ -1051,7 +1079,13 @@
                     throw new Error(errorData.detail || "Server Error: Could not complete registration.");
                 }
                 
-                window.myProfileData = payload;
+                // Keep the stats intact in memory
+                const preservedStats = {
+                    likes_received: window.myProfileData ? window.myProfileData.likes_received : 0,
+                    created_at: window.myProfileData ? window.myProfileData.created_at : new Date().toISOString()
+                };
+                
+                window.myProfileData = { ...payload, ...preservedStats };
 
                 isEditing = false;
                 document.getElementById('view-registration').classList.add('hidden');
