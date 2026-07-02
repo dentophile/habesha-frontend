@@ -684,23 +684,26 @@
             } catch (err) { showAlert("Failed to send message."); }
         }
 
-        // --- MESSAGE ACTIONS (Edit, Delete, React) ---
+// --- MESSAGE ACTIONS (Edit, Delete, React) ---
         function openMsgMenu(id, isMe, currentText, isDeleted) {
             selectedMsgId = id;
             const modal = document.getElementById('msg-action-modal');
             const box = document.getElementById('msg-action-box');
             
-            if (isMe && !isDeleted) {
+            // 1. DELETE is always available for ANY message
+            document.getElementById('btn-delete-msg').style.display = 'flex';
+            document.getElementById('btn-delete-msg').onclick = () => triggerDelete();
+
+            // 2. EDIT is ONLY available for YOUR OWN messages
+            if (isMe) {
                 document.getElementById('btn-edit-msg').style.display = 'flex';
-                document.getElementById('btn-delete-msg').style.display = 'flex';
                 document.getElementById('btn-edit-msg').onclick = () => triggerEdit(currentText);
-                document.getElementById('btn-delete-msg').onclick = () => triggerDelete();
             } else {
                 document.getElementById('btn-edit-msg').style.display = 'none';
-                document.getElementById('btn-delete-msg').style.display = 'none';
             }
 
-            modal.classList.remove('hidden'); setTimeout(() => box.classList.remove('translate-y-full'), 10);
+            modal.classList.remove('hidden'); 
+            setTimeout(() => box.classList.remove('translate-y-full'), 10);
         }
 
         function closeMsgMenu() {
