@@ -592,21 +592,19 @@
                     }
 
                     // Format Status Flags
-                    const isDeleted = msg.is_deleted === true;
-                    const editTag = msg.is_edited && !isDeleted ? `<span class="italic text-[9px] ml-1 opacity-70">(edited)</span>` : "";
+                    const editTag = msg.is_edited ? `<span class="italic text-[9px] ml-1 opacity-70">(edited)</span>` : "";
                     const reactionTag = msg.reaction ? `<div class="absolute -bottom-2 -right-2 bg-white rounded-full shadow-sm text-sm p-0.5 border border-gray-100 z-10 cursor-pointer">${msg.reaction}</div>` : "";
-                    const deletedStyle = isDeleted ? "italic text-gray-400 opacity-70" : "";
                     
                     // Escape text for the click function
-                    const safeText = isDeleted ? "" : contentText.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+                    const safeText = contentText.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
 
                     if (isMe) {
                         const ticks = msg.is_read ? "✓✓" : "✓";
                         const tickColor = msg.is_read ? "text-blue-200" : "text-gray-300";
 
                         return `
-                            <div class="flex justify-end mb-2 relative group cursor-pointer" onclick="openMsgMenu('${msg.id}', true, '${safeText}', ${isDeleted})">
-                                <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words flex flex-col relative ${deletedStyle}">
+                            <div class="flex justify-end mb-2 relative group cursor-pointer" onclick="openMsgMenu('${msg.id}', true, '${safeText}', false)">
+                                <div class="bg-botOrange text-white px-4 py-2 rounded-2xl rounded-tr-sm shadow-sm max-w-[75%] break-words flex flex-col relative">
                                     <span>${contentText}</span>
                                     <div class="flex items-center justify-end gap-1 text-[10px] opacity-80 mt-0.5 self-end">
                                         <span>${timeStr}</span> ${editTag}
@@ -618,8 +616,8 @@
                         `;
                     } else {
                         return `
-                            <div class="flex justify-start mb-2 relative group cursor-pointer" onclick="openMsgMenu('${msg.id}', false, '${safeText}', ${isDeleted})">
-                                <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%] break-words flex flex-col relative ${deletedStyle}">
+                            <div class="flex justify-start mb-2 relative group cursor-pointer" onclick="openMsgMenu('${msg.id}', false, '${safeText}', false)">
+                                <div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%] break-words flex flex-col relative">
                                     <span>${contentText}</span>
                                     <div class="flex items-center gap-1 text-[10px] text-gray-400 mt-0.5 self-end text-right">
                                         <span>${timeStr}</span> ${editTag}
@@ -640,6 +638,22 @@
 
         function closeChat() {
             activeChatId = null; stopChatPolling(); document.getElementById('view-chat').classList.replace('flex', 'hidden');
+        }
+
+        // NEW: Function to open direct Telegram chat
+        function openTelegramDirect() {
+            if (!activeChatId) return;
+            
+            // This format works reliably on mobile Telegram apps
+            const tgLink = `tg://user?id=${activeChatId}`;
+            
+            // Telegram Web App API to open links
+            if (tg.openTelegramLink) {
+                tg.openTelegramLink(tgLink);
+            } else {
+                // Fallback for older clients
+                window.location.href = tgLink;
+            }
         }
 
         function handleChatKeyPress(event) { if (event.key === 'Enter') sendMessage(); }
