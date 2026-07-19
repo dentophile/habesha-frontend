@@ -389,6 +389,7 @@
                         <div class="flex items-center gap-2 mb-1">
                             <h3 class="text-2xl font-bold">${profile.name}, ${profile.age || '?'}</h3>
                             <span class="text-sm font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-lg">${profile.gender || ''}</span>
+                            <span class="text-sm font-bold text-red-500 px-2 py-0.5 bg-red-50 rounded-lg flex items-center gap-1"><i class="ph-fill ph-heart"></i> ${profile.total_likes || 0}</span>
                         </div>
                         <p class="text-gray-500 text-sm mt-1 line-clamp-2">${profile.bio || 'Ready to mingle!'}</p>
                     </div>
@@ -448,7 +449,10 @@
 
             document.getElementById('profile-details-content').innerHTML = `
                 <h3 class="text-3xl font-bold text-buna mb-2">${profile.name}, ${profile.age}</h3>
-                <p class="text-xs text-gray-400 mb-4 font-medium"><i class="ph-fill ph-calendar-blank"></i> Joined: ${joinDate}</p>
+                <div class="flex items-center gap-4 mb-4">
+                    <p class="text-xs text-gray-400 font-medium"><i class="ph-fill ph-calendar-blank"></i> Joined: ${joinDate}</p>
+                    <p class="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-fill ph-heart"></i> ${profile.total_likes || 0} Likes</p>
+                </div>
                 <p class="text-gray-600 mb-6">${profile.bio || 'No bio provided.'}</p>
                 
                 <h4 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-3">About</h4>
