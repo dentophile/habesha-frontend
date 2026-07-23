@@ -57,12 +57,25 @@
         </div>
     </div>
 
-    <!-- Loading View -->
-    <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300">
-        <i class="ph-fill ph-spinner-gap animate-spin text-5xl text-botOrange mb-4"></i>
-        <p class="text-gray-500 font-medium">Loading...</p>
+<!-- Loading View -->
+    <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300 bg-white z-[200] fixed inset-0">
+        
+        <!-- Romantic Kissing Animation (GIF) -->
+        <div class="relative w-40 h-40 mb-6">
+            <div class="absolute inset-0 bg-orange-100 rounded-full animate-ping opacity-50"></div>
+            <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExc29xaHUwM3FjYnozbWdya2YybDkwY3YwcXR0c3IzbXN4a3Y1YTNpeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKoWXm3okO1kgHC/giphy.gif" 
+                 alt="Romantic kissing animation" 
+                 class="relative w-full h-full rounded-full object-cover shadow-xl border-4 border-white z-10">
+        </div>
+        
+        <!-- Pulsing Loading Text -->
+        <div class="flex items-center gap-2 animate-pulse">
+            <i class="ph-fill ph-heart text-red-500 text-xl"></i>
+            <p class="text-botOrange font-bold text-lg tracking-wide">Finding your match...</p>
+            <i class="ph-fill ph-heart text-red-500 text-xl"></i>
+        </div>
+        
     </div>
-
     <!-- Registration / Edit View -->
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
         <!-- Stats Banner (Only visible during profile editing) -->
