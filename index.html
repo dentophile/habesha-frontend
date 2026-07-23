@@ -376,6 +376,11 @@
             const profile = profiles[currentCardIndex];
             const photoToUse = profile.photo_url || DEFAULT_AVATAR;
 
+            // Conditionally render the Like badge only if the backend returns likes > 0
+            const likesDisplay = (profile.total_likes && profile.total_likes > 0)
+                ? `<span class="text-sm font-bold text-red-500 px-2 py-0.5 bg-red-50 rounded-lg flex items-center gap-1"><i class="ph-fill ph-heart"></i> ${profile.total_likes}</span>`
+                : ``;
+
             container.innerHTML = `
                 <div class="w-full h-full flex flex-col relative">
                     <div class="flex-1 bg-gray-200 bg-cover bg-center relative" style="background-image: url('${photoToUse}')">
@@ -385,13 +390,18 @@
                         </button>
                     </div>
                     
-                    <div class="p-4 bg-white flex-shrink-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <h3 class="text-2xl font-bold">${profile.name}, ${profile.age || '?'}</h3>
-                            <span class="text-sm font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-lg">${profile.gender || ''}</span>
-                            <span class="text-sm font-bold text-red-500 px-2 py-0.5 bg-red-50 rounded-lg flex items-center gap-1"><i class="ph-fill ph-heart"></i> ${profile.total_likes || 0}</span>
+                    <div class="p-4 bg-white flex-shrink-0 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h3 class="text-2xl font-bold">${profile.name}, ${profile.age || '?'}</h3>
+                                <span class="text-sm font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-lg">${profile.gender || ''}</span>
+                                ${likesDisplay}
+                            </div>
+                            <p class="text-gray-500 text-sm mt-1 line-clamp-2">${profile.bio || 'Ready to mingle!'}</p>
                         </div>
-                        <p class="text-gray-500 text-sm mt-1 line-clamp-2">${profile.bio || 'Ready to mingle!'}</p>
+                        
+                        <!-- Amharic Instruction Hint appended here -->
+                        <p class="text-center text-[13px] text-gray-400 mt-3 pt-3 border-t border-dashed border-gray-200 font-medium tracking-wide">ለማጣመር የ ❤️ ምልክቱን ይጫኑ</p>
                     </div>
                     
                     <div class="mt-auto w-full flex justify-around items-center pt-4 pb-6 bg-white border-t border-gray-50 px-4">
