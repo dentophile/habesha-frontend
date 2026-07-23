@@ -925,6 +925,7 @@
 
                 const payload = {
                     telegram_id: cleanTelegramId,
+                    username: tg.initDataUnsafe?.user?.username || "", // <-- Grabs the username silently!
                     name: finalName,
                     age: parseInt(document.getElementById('reg-age').value),
                     gender: document.getElementById('reg-gender').value,
