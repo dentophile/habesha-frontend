@@ -388,6 +388,18 @@
 
             const profile = profiles[currentCardIndex];
             const photoToUse = profile.photo_url || DEFAULT_AVATAR;
+            
+            // Calculate if the user is "New" (Joined in the last 7 days)
+            let newBadge = "";
+            if (profile.created_at) { 
+                const joinDate = new Date(profile.created_at);
+                const now = new Date();
+                const daysOld = (now - joinDate) / (1000 * 60 * 60 * 24);
+                
+                if (daysOld <= 7) {
+                    newBadge = `<span class="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ml-2 shadow-sm animate-pulse">✨ New</span>`;
+                }
+            }
 
             // Conditionally render the Like badge only if the backend returns likes > 0
             const likesDisplay = (profile.total_likes && profile.total_likes > 0)
@@ -405,10 +417,11 @@
                     
                     <div class="p-4 bg-white flex-shrink-0 flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
+                            <div class="flex items-center flex-wrap gap-2 mb-1">
                                 <h3 class="text-2xl font-bold">${profile.name}, ${profile.age || '?'}</h3>
                                 <span class="text-sm font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-lg">${profile.gender || ''}</span>
                                 ${likesDisplay}
+                                ${newBadge}
                             </div>
                             <p class="text-gray-500 text-sm mt-1 line-clamp-2">${profile.bio || 'Ready to mingle!'}</p>
                         </div>
