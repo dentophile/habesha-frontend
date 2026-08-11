@@ -57,9 +57,8 @@
         </div>
     </div>
 
-<!-- Loading View -->
+    <!-- Loading View -->
     <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300 bg-white z-[200] fixed inset-0">
-        
         <!-- Romantic Kissing Animation (GIF) -->
         <div class="relative w-40 h-40 mb-6">
             <div class="absolute inset-0 bg-orange-100 rounded-full animate-ping opacity-50"></div>
@@ -74,8 +73,8 @@
             <p class="text-botOrange font-bold text-lg tracking-wide">Finding your match...</p>
             <i class="ph-fill ph-heart text-red-500 text-xl"></i>
         </div>
-        
     </div>
+
     <!-- Registration / Edit View -->
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
         <!-- Stats Banner (Only visible during profile editing) -->
@@ -186,8 +185,14 @@
 
     <!-- Swipe View -->
     <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-100 overflow-hidden relative">
-        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-4 mt-2">
-            <h2 class="font-bold text-2xl text-buna">Discover</h2>
+        <div class="w-full max-w-sm mx-auto flex justify-between items-start mb-4 mt-2">
+            <div class="flex flex-col">
+                <h2 class="font-bold text-2xl text-buna">Discover</h2>
+                <!-- Total Matched Users Badge -->
+                <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 mt-0.5 bg-red-50 px-2 py-0.5 rounded-md inline-block shadow-sm animate-pulse border border-red-100">
+                    🔥 <span id="matched-num">0</span> users matched!
+                </p>
+            </div>
             <button onclick="openEditProfile()" class="text-botOrange text-sm font-bold flex items-center gap-1.5 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-gray-50 transition">
                 <i class="ph-bold ph-user-circle-gear text-lg"></i> Edit Profile
             </button>
@@ -318,6 +323,20 @@
             document.getElementById('custom-alert').classList.add('hidden');
         }
 
+        async function loadAppStats() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/stats`);
+                const data = await response.json();
+                
+                if (data.matched_users_count > 0) {
+                    document.getElementById('matched-num').innerText = data.matched_users_count;
+                    document.getElementById('total-matched-count').classList.remove('hidden');
+                }
+            } catch (e) {
+                console.error("Failed to load stats", e);
+            }
+        }
+
         async function initApp() {
             try {
                 const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
@@ -331,6 +350,8 @@
                 } else {
                     window.myProfileData = data.profile;
                     document.getElementById('bottom-nav').classList.remove('hidden'); 
+                    
+                    loadAppStats();
                     
                     if (window.pendingChatTarget) {
                         switchTab('matches'); 
@@ -680,18 +701,15 @@
             activeChatId = null; stopChatPolling(); document.getElementById('view-chat').classList.replace('flex', 'hidden');
         }
 
-        // NEW: Function to open direct Telegram chat
+        // Function to open direct Telegram chat
         function openTelegramDirect() {
             if (!activeChatId) return;
             
-            // This format works reliably on mobile Telegram apps
             const tgLink = `tg://user?id=${activeChatId}`;
             
-            // Telegram Web App API to open links
             if (tg.openTelegramLink) {
                 tg.openTelegramLink(tgLink);
             } else {
-                // Fallback for older clients
                 window.location.href = tgLink;
             }
         }
@@ -724,17 +742,15 @@
             } catch (err) { showAlert("Failed to send message."); }
         }
 
-// --- MESSAGE ACTIONS (Edit, Delete, React) ---
+        // --- MESSAGE ACTIONS (Edit, Delete, React) ---
         function openMsgMenu(id, isMe, currentText, isDeleted) {
             selectedMsgId = id;
             const modal = document.getElementById('msg-action-modal');
             const box = document.getElementById('msg-action-box');
             
-            // 1. DELETE is always available for ANY message
             document.getElementById('btn-delete-msg').style.display = 'flex';
             document.getElementById('btn-delete-msg').onclick = () => triggerDelete();
 
-            // 2. EDIT is ONLY available for YOUR OWN messages
             if (isMe) {
                 document.getElementById('btn-edit-msg').style.display = 'flex';
                 document.getElementById('btn-edit-msg').onclick = () => triggerEdit(currentText);
@@ -951,7 +967,7 @@
 
                 const payload = {
                     telegram_id: cleanTelegramId,
-                    username: tg.initDataUnsafe?.user?.username || "", // <-- Grabs the username silently!
+                    username: tg.initDataUnsafe?.user?.username || "",
                     name: finalName,
                     age: parseInt(document.getElementById('reg-age').value),
                     gender: document.getElementById('reg-gender').value,
