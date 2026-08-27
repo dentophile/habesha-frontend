@@ -378,10 +378,19 @@
             }
         }
 
-        async function initApp() {
+       async function initApp() {
             try {
                 const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
                 const data = await response.json();
+
+                // 👇 NEW: Display the suspension screen and stop the app from loading
+                if (data.banned) {
+                    document.getElementById('view-loading').innerHTML = `
+                        <i class="ph-fill ph-prohibit text-6xl text-red-500 mb-4"></i>
+                        <h2 class="text-2xl font-bold text-red-500 mb-2">Account Suspended</h2>
+                        <p class="text-gray-600 text-center px-6 text-sm">Your account has been permanently suspended for violating our community guidelines.</p>`;
+                    return; 
+                }
                 
                 document.getElementById('view-loading').classList.add('hidden');
                 
