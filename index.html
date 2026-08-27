@@ -58,14 +58,18 @@
     </div>
 
     <!-- Loading View -->
-    <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300 bg-white z-[200] fixed inset-0">
-        <!-- Romantic Kissing Animation (GIF) -->
-        <div class="relative w-40 h-40 mb-6">
-            <div class="absolute inset-0 bg-orange-100 rounded-full animate-ping opacity-50"></div>
-            <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExc29xaHUwM3FjYnozbWdya2YybDkwY3YwcXR0c3IzbXN4a3Y1YTNpeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKoWXm3okO1kgHC/giphy.gif" 
-                 alt="Romantic kissing animation" 
-                 class="relative w-full h-full rounded-full object-cover shadow-xl border-4 border-white z-10">
+   <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300 bg-white z-[200] fixed inset-0">
+        
+        <div class="relative w-32 h-32 mb-8 flex items-center justify-center">
+            <div class="absolute inset-0 bg-red-100 rounded-full animate-ping opacity-60"></div>
+            <i class="ph-fill ph-heart text-red-500 text-7xl z-10 transform transition-transform animate-bounce"></i>
         </div>
+        
+        <div class="flex items-center gap-2 animate-pulse">
+            <p class="text-botOrange font-bold text-lg tracking-wide">Finding your match...</p>
+        </div>
+        
+    </div>
         <!-- Pulsing Loading Text -->
         <div class="flex items-center gap-2 animate-pulse">
             <i class="ph-fill ph-heart text-red-500 text-xl"></i>
