@@ -438,15 +438,17 @@
             try {
                 const res = await fetch(`${BACKEND_URL}/api/get-potential-matches/${cleanTelegramId}`);
                 const data = await res.json();
-                profiles = data.matches || [];
-                renderCards();
+                
+                // 👇 UPDATED: Store in allProfiles and apply filter 👇
+                allProfiles = data.matches || [];
+                applyNewUserFilter();
+                
             } catch (e) {
                 console.error("Failed to load profiles", e);
-                profiles = [];
-                renderCards();
+                allProfiles = [];
+                applyNewUserFilter();
             }
         }
-
         function renderCards() {
             const container = document.getElementById('card-container');
             
