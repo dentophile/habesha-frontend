@@ -449,6 +449,38 @@
                 applyNewUserFilter();
             }
         }
+        // 👇 NEW FILTER LOGIC 👇
+        function toggleNewUsers() {
+            showingNewOnly = !showingNewOnly;
+            const btn = document.getElementById('filter-new-btn');
+            
+            if (showingNewOnly) {
+                btn.classList.replace('bg-gray-100', 'bg-green-500');
+                btn.classList.replace('text-gray-600', 'text-white');
+            } else {
+                btn.classList.replace('bg-green-500', 'bg-gray-100');
+                btn.classList.replace('text-white', 'text-gray-600');
+            }
+            applyNewUserFilter();
+        }
+
+        function applyNewUserFilter() {
+            if (showingNewOnly) {
+                // Filter to only show users created in the last 7 days
+                profiles = allProfiles.filter(p => {
+                    if (!p.created_at) return false;
+                    const daysOld = (new Date() - new Date(p.created_at)) / (1000 * 60 * 60 * 24);
+                    return daysOld <= 7;
+                });
+            } else {
+                // Show everyone
+                profiles = [...allProfiles];
+            }
+            
+            // Reset the card index and re-render the view
+            currentCardIndex = 0;
+            renderCards();
+        }
         function renderCards() {
             const container = document.getElementById('card-container');
             
