@@ -187,10 +187,15 @@
     </div>
 
     <!-- Swipe View -->
-    <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-100 overflow-hidden relative">
-        <div class="w-full max-w-sm mx-auto flex justify-between items-start mb-4 mt-2">
+    <div class="w-full max-w-sm mx-auto flex justify-between items-start mb-4 mt-2">
             <div class="flex flex-col">
-                <h2 class="font-bold text-2xl text-buna">Discover</h2>
+                <div class="flex items-center gap-3">
+                    <h2 class="font-bold text-2xl text-buna">Discover</h2>
+                    <!-- 👇 NEW FILTER BUTTON 👇 -->
+                    <button id="filter-new-btn" onclick="toggleNewUsers()" class="bg-gray-100 text-gray-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm transition active:scale-95">
+                        ✨ New Only
+                    </button>
+                </div>
                 <!-- Total Matched Users Badge -->
                 <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 mt-0.5 bg-red-50 px-2 py-0.5 rounded-md inline-block shadow-sm animate-pulse border border-red-100">
                     🔥 <span id="matched-num">0</span> users matched!
