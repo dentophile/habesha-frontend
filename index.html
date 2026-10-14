@@ -195,40 +195,35 @@
     </div>
 
   <!-- Swipe View -->
-    <div id="view-swipe" class="hidden w-full h-[100dvh] pt-4 pb-[80px] px-4 flex-col bg-gray-100 overflow-hidden relative">
-        
-        <!-- Header -->
-        <div class="w-full max-w-sm mx-auto flex justify-between items-start mb-3 shrink-0">
-            <div class="flex flex-col">
-                <div class="flex items-center gap-3">
-                    <h2 class="font-bold text-2xl text-buna">Discover</h2>
-                    <button id="filter-new-btn" onclick="toggleNewUsers()" class="bg-gray-100 text-gray-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm transition active:scale-95">
-                        ✨ New Only
-                    </button>
-                </div>
-                <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 mt-0.5 bg-red-50 px-2 py-0.5 rounded-md inline-block shadow-sm border border-red-100">
-                    🔥 <span id="matched-num">0</span> users matched!
-                </p>
-            </div>
-            <button onclick="openEditProfile()" class="text-botOrange text-sm font-bold flex items-center gap-1.5 bg-white px-4 py-2 rounded-full shadow-sm hover:bg-gray-50 transition">
-                <i class="ph-bold ph-user-circle-gear text-lg"></i> Edit Profile
-            </button>
-        </div>
+   <!-- Compact Top Action Row -->
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-2 shrink-0 gap-1">
+            <!-- Discover Title -->
+            <h2 class="font-bold text-xl text-buna shrink-0 tracking-tight">Discover</h2>
+            
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-1.5">
+                <!-- New Users Toggle -->
+                <button id="filter-new-btn" onclick="toggleNewUsers()" class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2.5 py-1.5 rounded-full uppercase tracking-wider shadow-sm transition active:scale-95 flex items-center gap-1">
+                    ✨ New
+                </button>
+                
+                <!-- Get App Button -->
+                <button onclick="showDownloadInstructions()" class="bg-orange-50 text-botOrange border border-orange-200 text-[10px] font-bold px-2.5 py-1.5 rounded-full uppercase tracking-wider shadow-sm transition active:scale-95 flex items-center gap-1">
+                    <i class="ph-bold ph-android-logo text-sm"></i> App
+                </button>
 
-        <!-- Promo Banner -->
-        <div id="promo-banner" class="w-full max-w-sm mx-auto bg-gradient-to-r from-orange-100 to-orange-50 p-3 rounded-2xl mb-3 flex items-center justify-between shadow-sm border border-orange-200 shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="bg-white w-10 h-10 rounded-full flex items-center justify-center text-botOrange shadow-sm shrink-0">
-                    <i class="ph-bold ph-android-logo text-2xl"></i>
-                </div>
-                <div class="flex flex-col">
-                    <h4 class="font-bold text-sm text-buna">Get the Mobile App!</h4>
-                    <p class="text-[11px] text-gray-500 leading-tight">Faster, smoother, always logged in.</p>
-                </div>
+                <!-- Edit Profile -->
+                <button onclick="openEditProfile()" class="bg-white text-botOrange text-[10px] font-bold px-2.5 py-1.5 rounded-full shadow-sm border border-gray-100 hover:bg-gray-50 transition active:scale-95 flex items-center gap-1">
+                    <i class="ph-bold ph-user-circle-gear text-sm"></i> Edit
+                </button>
             </div>
-            <button onclick="showDownloadInstructions()" class="bg-botOrange text-white font-bold text-xs px-3 py-2 rounded-xl shadow-sm active:scale-95 transition shrink-0">
-                Download
-            </button>
+        </div>
+        
+        <!-- Total Matched Users Badge (Kept just below so it doesn't break the row) -->
+        <div class="w-full max-w-sm mx-auto flex justify-start mb-3 shrink-0">
+            <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md shadow-sm border border-red-100">
+                🔥 <span id="matched-num">0</span> users matched!
+            </p>
         </div>
 
         <!-- The Fixed Card Container -->
