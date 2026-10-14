@@ -513,8 +513,13 @@
 
         function renderCards() {
             const container = document.getElementById('card-container');
+            const topLikesBadge = document.getElementById('top-card-likes');
+            const topLikesCount = document.getElementById('top-card-likes-count');
             
             if (currentCardIndex >= profiles.length || profiles.length === 0) {
+                // Hide the top badge if there are no cards
+                if(topLikesBadge) { topLikesBadge.classList.remove('flex'); topLikesBadge.classList.add('hidden'); }
+                
                 let backBtnHtml = profiles.length > 0 ? `
                     <div class="mt-auto w-full flex justify-center items-center pt-4 pb-6 bg-white border-t border-gray-50 px-4">
                         <button onclick="prevCard()" class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
@@ -536,6 +541,14 @@
 
             const profile = profiles[currentCardIndex];
             const photoToUse = profile.photo_url || DEFAULT_AVATAR;
+            
+            // Show or hide the top row badge dynamically based on this specific user's likes
+            if (profile.total_likes && profile.total_likes > 0) {
+                if(topLikesCount) topLikesCount.innerText = profile.total_likes;
+                if(topLikesBadge) { topLikesBadge.classList.remove('hidden'); topLikesBadge.classList.add('flex'); }
+            } else {
+                if(topLikesBadge) { topLikesBadge.classList.remove('flex'); topLikesBadge.classList.add('hidden'); }
+            }
             
             let newBadge = "";
             if (profile.created_at) { 
