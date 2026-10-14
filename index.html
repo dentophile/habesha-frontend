@@ -373,8 +373,9 @@
             document.getElementById('custom-alert').classList.add('hidden');
         }
 
-        function showDownloadInstructions() {
-            showAlert("📱 To download the Habesha Date Android App, close this window and type /app in the Telegram bot!");
+       function showDownloadInstructions() {
+            // This instantly closes the Web App and triggers the bot
+            tg.openTelegramLink("https://t.me/ethiopia_date_bot?start=app");
         }
 
         async function loadAppStats() {
