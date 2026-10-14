@@ -396,54 +396,44 @@
             }
         }
 
-       async function initApp() {
+     async function submitAppLogin() {
+            const tgIdInput = document.getElementById('login-tg-id').value.trim();
+            const pinInput = document.getElementById('login-pin').value.trim();
+            const btn = document.getElementById('login-btn');
+
+            if (!tgIdInput || !pinInput) return showAlert("Please enter both your Telegram ID and PIN.");
+
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Logging in...`;
+            btn.disabled = true;
+
             try {
-                const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
-                const data = await response.json();
+                const response = await fetch(`${BACKEND_URL}/api/app-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: tgIdInput, pin: pinInput })
+                });
 
-                // 👇 NEW: Display the suspension screen and stop the app from loading
-                if (data.banned) {
-                    document.getElementById('view-loading').innerHTML = `
-                        <i class="ph-fill ph-prohibit text-6xl text-red-500 mb-4"></i>
-                        <h2 class="text-2xl font-bold text-red-500 mb-2">Account Suspended</h2>
-                        <p class="text-gray-600 text-center px-6 text-sm">Your account has been permanently suspended for violating our community guidelines.</p>`;
-                    return; 
+                if (!response.ok) {
+                    throw new Error("Invalid ID or PIN. Please generate a new one in the bot.");
                 }
-                
-                document.getElementById('view-loading').classList.add('hidden');
-                
-                if (!data.exists) {
-                    document.getElementById('reg-name').value = tg.initDataUnsafe?.user?.first_name || "";
-                    document.getElementById('view-registration').classList.remove('hidden');
-                } else {
-                    window.myProfileData = data.profile;
-                    document.getElementById('bottom-nav').classList.remove('hidden'); 
-                    
-                    // Reveal Secret Admin Tab if applicable
-                    if (data.is_admin) {
-                        document.getElementById('tab-admin').classList.remove('hidden');
-                        document.getElementById('tab-admin').classList.add('flex');
-                    }
 
-                    loadAppStats();
-                    
-                    if (window.pendingChatTarget) {
-                        switchTab('matches'); 
-                        loadDiscoverProfiles(); 
-                    } else {
-                        document.getElementById('view-swipe').classList.remove('hidden');
-                        await loadDiscoverProfiles();
-                    }
-                }
+                // Success! Save ID to phone memory so they stay logged in
+                localStorage.setItem("habesha_user_id", tgIdInput);
+                cleanTelegramId = tgIdInput;
+                
+                // Hide login screen and load the app
+                document.getElementById('view-external-login').classList.add('hidden');
+                document.getElementById('view-external-login').classList.remove('flex');
+                document.getElementById('view-loading').classList.remove('hidden');
+                
+                await initApp();
+
             } catch (err) {
-                console.error(err);
-                document.getElementById('view-loading').innerHTML = `
-                    <i class="ph-fill ph-warning-circle text-5xl text-red-500 mb-4"></i>
-                    <p class="text-red-500 font-bold">Failed to connect to server.</p>
-                    <p class="text-gray-500 text-sm mt-2">Please try again later.</p>`;
+                showAlert(err.message);
+                btn.innerHTML = "Login";
+                btn.disabled = false;
             }
         }
-
         // --- DISCOVER LOGIC ---
         async function loadDiscoverProfiles() {
             try {
