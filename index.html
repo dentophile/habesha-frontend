@@ -395,8 +395,7 @@
                 console.error("Failed to load stats", e);
             }
         }
-
-     async function submitAppLogin() {
+        async function submitAppLogin() {
             const tgIdInput = document.getElementById('login-tg-id').value.trim();
             const pinInput = document.getElementById('login-pin').value.trim();
             const btn = document.getElementById('login-btn');
@@ -432,6 +431,43 @@
                 showAlert(err.message);
                 btn.innerHTML = "Login";
                 btn.disabled = false;
+            }
+        }
+
+    async function initApp() {
+            // 1. Check if running outside Telegram without a saved login
+            if (!cleanTelegramId || cleanTelegramId === "undefined" || cleanTelegramId === "null") {
+                document.getElementById('view-loading').classList.add('hidden');
+                document.getElementById('view-external-login').classList.remove('hidden');
+                document.getElementById('view-external-login').classList.add('flex');
+                return; // Stop loading here until they log in
+            }
+
+            try {
+                // 2. Check if the user already has an account in Supabase
+                const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
+                
+                if (!response.ok) {
+                    throw new Error("Failed to reach the server.");
+                }
+
+                const data = await response.json();
+
+                if (data.exists) {
+                    // 3A. User exists -> Fetch their matches and load the main swiping app
+                    // (Ensure this matches whatever your actual fetch matches function is named)
+                    await loadMatches(); 
+                    
+                    document.getElementById('view-loading').classList.add('hidden');
+                    document.getElementById('view-main').classList.remove('hidden');
+                } else {
+                    // 3B. User is new -> Show the profile registration screen
+                    document.getElementById('view-loading').classList.add('hidden');
+                    document.getElementById('view-register').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error initializing app:", error);
+                showAlert("Could not connect to the server. Please check your connection.");
             }
         }
         // --- DISCOVER LOGIC ---
