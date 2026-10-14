@@ -572,11 +572,10 @@ container.innerHTML = `
                 }
             }
 
-            // Conditionally render the Like badge only if the backend returns likes > 0
+           // Conditionally render the Like badge only if the backend returns likes > 0
             const likesDisplay = (profile.total_likes && profile.total_likes > 0)
                 ? `<span class="text-sm font-bold text-red-500 px-2 py-0.5 bg-red-50 rounded-lg flex items-center gap-1"><i class="ph-fill ph-heart"></i> \${profile.total_likes}</span>`
                 : ``;
-
             container.innerHTML = `
                 <div class="w-full h-full flex flex-col overflow-y-auto no-scrollbar relative bg-white">
                     
