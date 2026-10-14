@@ -70,6 +70,21 @@
         </div>
         
     </div>
+    <!-- External App Login View -->
+    <div id="view-external-login" class="hidden w-full h-screen flex-col items-center justify-center p-6 bg-white z-[300] fixed inset-0">
+        <div class="w-24 h-24 bg-botOrange text-white rounded-full flex items-center justify-center mb-6 shadow-lg">
+            <i class="ph-fill ph-heart text-5xl"></i>
+        </div>
+        <h2 class="text-3xl font-bold text-buna mb-2">Habesha Date</h2>
+        <p class="text-gray-500 text-center mb-8 text-sm px-4">Open the Telegram bot and type <b>/app</b> to get your login PIN.</p>
+        
+        <input id="login-tg-id" type="number" placeholder="Telegram ID" class="w-full max-w-xs p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange mb-3 text-center font-bold">
+        <input id="login-pin" type="number" placeholder="6-Digit PIN" class="w-full max-w-xs p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange mb-6 text-center tracking-[0.5em] font-bold text-xl">
+        
+        <button id="login-btn" onclick="submitAppLogin()" class="w-full max-w-xs p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md">
+            Login
+        </button>
+    </div>
 
     <!-- Registration / Edit View -->
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
