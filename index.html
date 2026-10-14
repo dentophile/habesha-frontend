@@ -550,15 +550,14 @@
                             <i class="ph-bold ph-caret-up text-2xl"></i>
                         </button>
                     </div>` : '';
-
-                container.innerHTML = `
-                   <div class="w-full flex-1 flex flex-col relative">
+container.innerHTML = `
+                    <div class="w-full flex-1 flex flex-col relative bg-white">
                         <div class="flex-1 flex flex-col items-center justify-center p-6 text-center">
                             <i class="ph-duotone ph-sparkle text-6xl text-gray-300 mb-2"></i>
                             <p class="text-gray-400 font-medium">You've seen everyone.</p>
                             <p class="text-gray-400 text-sm mt-2">Check back later for more profiles!</p>
                         </div>
-                        ${backBtnHtml}
+                        \${backBtnHtml}
                     </div>`;
                 return;
             }
@@ -580,33 +579,34 @@
 
             // Conditionally render the Like badge only if the backend returns likes > 0
             const likesDisplay = (profile.total_likes && profile.total_likes > 0)
-                ? `<span class="text-sm font-bold text-red-500 px-2 py-0.5 bg-red-50 rounded-lg flex items-center gap-1"><i class="ph-fill ph-heart"></i> ${profile.total_likes}</span>`
+                ? `<span class="text-sm font-bold text-red-500 px-2 py-0.5 bg-red-50 rounded-lg flex items-center gap-1"><i class="ph-fill ph-heart"></i> \${profile.total_likes}</span>`
                 : ``;
 
             container.innerHTML = `
-                <div class="w-full flex-1 flex flex-col relative">
-                    <div class="flex-1 bg-gray-200 bg-cover bg-center relative" style="background-image: url('${photoToUse}')">
-                        <button onclick="showProfileDetails()" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 px-6 py-2.5 bg-black bg-opacity-60 text-white rounded-full flex items-center gap-2 backdrop-blur-md active:scale-95 shadow-xl border border-white border-opacity-20 hover:bg-opacity-80 transition z-10">
-                            <i class="ph-bold ph-info text-xl"></i>
+                <div class="w-full h-full flex flex-col overflow-y-auto no-scrollbar relative bg-white">
+                    
+                    <!-- The Photo (Locked Minimum Height to stop squishing) -->
+                    <div class="w-full min-h-[350px] flex-1 bg-gray-200 bg-cover bg-center relative shrink-0" style="background-image: url('${photoToUse}')">
+                        <button onclick="showProfileDetails()" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-2.5 bg-black bg-opacity-60 text-white rounded-full flex items-center gap-2 backdrop-blur-md active:scale-95 shadow-lg border border-white border-opacity-20 z-10">
+                            <i class="ph-bold ph-info text-lg"></i>
                             <span class="font-bold text-sm tracking-wide">View Profile</span>
                         </button>
                     </div>
                     
-                    <div class="p-4 bg-white flex-shrink-0 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center flex-wrap gap-2 mb-1">
-                                <h3 class="text-2xl font-bold">${profile.name}, ${profile.age || '?'}</h3>
-                                <span class="text-sm font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-lg">${profile.gender || ''}</span>
-                                ${likesDisplay}
-                                ${newBadge}
-                            </div>
-                            <p class="text-gray-500 text-sm mt-1 line-clamp-2">${profile.bio || 'Ready to mingle!'}</p>
+                    <!-- The Info -->
+                    <div class="p-4 shrink-0 bg-white">
+                        <div class="flex items-center flex-wrap gap-2 mb-1">
+                            <h3 class="text-2xl font-bold text-buna">${profile.name}, ${profile.age || '?'}</h3>
+                            <span class="text-sm font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-lg">${profile.gender || ''}</span>
+                            ${likesDisplay}
+                            ${newBadge}
                         </div>
-                        
-                        <p class="text-center text-[13px] text-gray-400 mt-3 pt-3 border-t border-dashed border-gray-200 font-medium tracking-wide">ለማጣመር የ ❤️ ምልክቱን ይጫኑ</p>
+                        <p class="text-gray-500 text-sm mt-1 line-clamp-2">${profile.bio || 'Ready to mingle!'}</p>
+                        <p class="text-center text-[11px] text-gray-400 mt-3 pt-3 border-t border-dashed border-gray-200 font-medium tracking-wide">ለማጣመር የ ❤️ ምልክቱን ይጫኑ</p>
                     </div>
                     
-                    <div class="mt-auto w-full flex justify-around items-center pt-4 pb-6 bg-white border-t border-gray-50 px-4">
+                    <!-- The Swipe Buttons -->
+                    <div class="w-full flex justify-around items-center p-4 pb-6 bg-white shrink-0 mt-auto">
                         <button onclick="handleSwipe(false)" class="w-14 h-14 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform hover:bg-red-50">
                             <i class="ph-bold ph-x text-2xl"></i>
                         </button>
