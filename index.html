@@ -185,7 +185,13 @@
     <div id="view-swipe" class="hidden w-full h-[100dvh] pt-4 pb-[80px] px-4 flex-col bg-gray-100 overflow-hidden relative">
         <!-- Compact Top Action Row -->
         <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-2 shrink-0 gap-1">
-            <h2 class="font-bold text-xl text-buna shrink-0 tracking-tight">Discover</h2>
+           <!-- Discover Title & Dynamic Like Badge -->
+            <div class="flex items-center gap-2 shrink-0">
+                <h2 class="font-bold text-xl text-buna tracking-tight">Discover</h2>
+                <span id="top-card-likes" class="hidden items-center gap-1 bg-red-50 text-red-500 px-2 py-0.5 rounded-md text-[11px] font-bold border border-red-100 shadow-sm transition-all">
+                    <i class="ph-fill ph-heart"></i> <span id="top-card-likes-count">0</span>
+                </span>
+            </div>
             <div class="flex items-center gap-1.5">
                 <button id="filter-new-btn" onclick="toggleNewUsers()" class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2.5 py-1.5 rounded-full uppercase tracking-wider shadow-sm transition active:scale-95 flex items-center gap-1">
                     ✨ New
