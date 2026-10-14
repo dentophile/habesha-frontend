@@ -194,21 +194,19 @@
         </div>
     </div>
 
-   <!-- Swipe View -->
-    <!-- 👇 ADD THIS MISSING LINE BACK IN 👇 -->
-    <div id="view-swipe" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-100 overflow-hidden relative">
+  <!-- Swipe View -->
+    <div id="view-swipe" class="hidden w-full h-[100dvh] pt-4 pb-[80px] px-4 flex-col bg-gray-100 overflow-hidden relative">
         
-        <div class="w-full max-w-sm mx-auto flex justify-between items-start mb-4 mt-2">
+        <!-- Header -->
+        <div class="w-full max-w-sm mx-auto flex justify-between items-start mb-3 shrink-0">
             <div class="flex flex-col">
                 <div class="flex items-center gap-3">
                     <h2 class="font-bold text-2xl text-buna">Discover</h2>
-                    <!-- 👇 NEW FILTER BUTTON 👇 -->
                     <button id="filter-new-btn" onclick="toggleNewUsers()" class="bg-gray-100 text-gray-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm transition active:scale-95">
                         ✨ New Only
                     </button>
                 </div>
-                <!-- Total Matched Users Badge -->
-                <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 mt-0.5 bg-red-50 px-2 py-0.5 rounded-md inline-block shadow-sm animate-pulse border border-red-100">
+                <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 mt-0.5 bg-red-50 px-2 py-0.5 rounded-md inline-block shadow-sm border border-red-100">
                     🔥 <span id="matched-num">0</span> users matched!
                 </p>
             </div>
@@ -216,8 +214,9 @@
                 <i class="ph-bold ph-user-circle-gear text-lg"></i> Edit Profile
             </button>
         </div>
-        <!-- 👇 App Promo Banner 👇 -->
-        <div id="promo-banner" class="w-full max-w-sm mx-auto bg-gradient-to-r from-orange-100 to-orange-50 p-3 rounded-2xl mb-4 flex items-center justify-between shadow-sm border border-orange-200">
+
+        <!-- Promo Banner -->
+        <div id="promo-banner" class="w-full max-w-sm mx-auto bg-gradient-to-r from-orange-100 to-orange-50 p-3 rounded-2xl mb-3 flex items-center justify-between shadow-sm border border-orange-200 shrink-0">
             <div class="flex items-center gap-3">
                 <div class="bg-white w-10 h-10 rounded-full flex items-center justify-center text-botOrange shadow-sm shrink-0">
                     <i class="ph-bold ph-android-logo text-2xl"></i>
@@ -231,10 +230,10 @@
                 Download
             </button>
         </div>
-        <!-- 👆 End Promo Banner 👆 -->
 
-        <div id="card-container" class="relative w-full max-w-sm mx-auto flex flex-col flex-1 min-h-[50vh] mb-2 bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
-            <p class="text-gray-400 font-medium">No more profiles to show.</p>
+        <!-- The Fixed Card Container -->
+        <div id="card-container" class="w-full max-w-sm mx-auto flex-1 min-h-0 bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200 relative mb-4">
+            <p class="text-gray-400 font-medium flex h-full items-center justify-center">Loading profiles...</p>
         </div>
 
         <!-- Full Profile Details Modal -->
@@ -244,12 +243,9 @@
                     <i class="ph-bold ph-x text-xl"></i>
                 </button>
             </div>
-            <div id="profile-details-content" class="flex-1 overflow-y-auto p-6 pt-2 pb-24">
-                <!-- Content injected here -->
-            </div>
+            <div id="profile-details-content" class="flex-1 overflow-y-auto p-6 pt-2 pb-24"></div>
         </div>
     </div>
-
     <!-- Matches View -->
     <div id="view-matches" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-50 overflow-y-auto">
         <h2 class="font-bold text-3xl text-buna mb-6 mt-4 px-2">Your Matches <span class="text-botOrange">❤️</span></h2>
