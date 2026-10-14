@@ -57,19 +57,17 @@
         </div>
     </div>
 
- <!-- Loading View -->
+    <!-- Loading View -->
     <div id="view-loading" class="w-full h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-300 bg-white z-[200] fixed inset-0">
-        
         <div class="relative w-32 h-32 mb-8 flex items-center justify-center">
             <div class="absolute inset-0 bg-red-100 rounded-full animate-ping opacity-60"></div>
             <i class="ph-fill ph-heart text-red-500 text-7xl z-10 transform transition-transform animate-bounce"></i>
         </div>
-        
         <div class="flex items-center gap-2 animate-pulse">
             <p class="text-botOrange font-bold text-lg tracking-wide">Finding your match...</p>
         </div>
-        
     </div>
+
     <!-- External App Login View -->
     <div id="view-external-login" class="hidden w-full h-screen flex-col items-center justify-center p-6 bg-white z-[300] fixed inset-0">
         <div class="w-24 h-24 bg-botOrange text-white rounded-full flex items-center justify-center mb-6 shadow-lg">
@@ -88,7 +86,6 @@
 
     <!-- Registration / Edit View -->
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
-        <!-- Stats Banner (Only visible during profile editing) -->
         <div id="stats-banner" class="hidden bg-gray-50 border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-inner">
             <div class="flex items-center gap-2 text-gray-600">
                 <i class="ph-bold ph-calendar text-botOrange"></i>
@@ -107,7 +104,6 @@
                 <div id="progress-bar" class="bg-botOrange h-full w-1/3 transition-all duration-300"></div>
             </div>
 
-            <!-- Page 1: Basics -->
             <div id="page-1" class="space-y-4 transition-all">
                 <div class="mb-6 flex flex-col items-center justify-center mx-auto relative cursor-pointer group" onclick="document.getElementById('file-upload').click()">
                     <div id="photo-preview" class="bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl h-32 w-32 flex flex-col items-center justify-center overflow-hidden bg-cover bg-center transition group-hover:bg-gray-200 shadow-sm relative">
@@ -146,24 +142,18 @@
                 <button onclick="validateAndNext(1)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md">Next</button>
             </div>
 
-            <!-- Page 2: Details & Lifestyle -->
             <div id="page-2" class="hidden space-y-4 transition-all">
                 <input id="reg-height" type="text" placeholder="Height (e.g. 1.70m)" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
-                
                 <select id="reg-religion" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                     <option value="">Religion</option><option value="Orthodox">Orthodox</option><option value="Muslim">Muslim</option><option value="Protestant">Protestant</option><option value="Catholic">Catholic</option><option value="Other">Other</option>
                 </select>
-                
                 <select id="reg-education" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                     <option value="">Education</option><option value="Uneducated">Uneducated</option><option value="High School">High School</option><option value="Bachelor's">Bachelor's</option><option value="Master's">Master's</option>
                 </select>
-                
                 <input id="reg-occupation" type="text" placeholder="Occupation" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
-
                 <select id="reg-kids" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                     <option value="">Kids</option><option value="Don't have kids">Don't have kids</option><option value="Have kids">Have kids</option><option value="Want someday">Want someday</option><option value="Don't want kids">Don't want kids</option>
                 </select>
-
                 <div class="flex gap-2">
                     <select id="reg-drinking" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                         <option value="">Drinking</option><option value="No">No</option><option value="Socially">Socially</option><option value="Yes">Yes</option>
@@ -172,17 +162,14 @@
                         <option value="">Smoking</option><option value="No">No</option><option value="Occasionally">Occasionally</option><option value="Yes">Yes</option>
                     </select>
                 </div>
-                
                 <div class="flex gap-2">
                     <button onclick="goToPage(1)" class="w-1/3 p-4 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">Back</button>
                     <button onclick="validateAndNext(2)" class="w-2/3 p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md">Next</button>
                 </div>
             </div>
 
-            <!-- Page 3: Bio -->
             <div id="page-3" class="hidden space-y-4 transition-all">
                 <textarea id="reg-bio" placeholder="Tell us about yourself... (Hobbies, what you're looking for)" class="w-full p-4 border rounded-xl bg-gray-50 h-32 focus:outline-none focus:border-botOrange resize-none"></textarea>
-                
                 <div class="flex gap-2">
                     <button onclick="goToPage(2)" class="w-1/3 p-4 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">Back</button>
                     <button id="submit-btn" onclick="submitRegistration()" class="w-2/3 p-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition shadow-md flex justify-center items-center gap-2">
@@ -194,39 +181,30 @@
         </div>
     </div>
 
-  <!-- Swipe View -->
-   <!-- Compact Top Action Row -->
+    <!-- Swipe View -->
+    <div id="view-swipe" class="hidden w-full h-[100dvh] pt-4 pb-[80px] px-4 flex-col bg-gray-100 overflow-hidden relative">
+        <!-- Compact Top Action Row -->
         <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-2 shrink-0 gap-1">
-            <!-- Discover Title -->
             <h2 class="font-bold text-xl text-buna shrink-0 tracking-tight">Discover</h2>
-            
-            <!-- Action Buttons -->
             <div class="flex items-center gap-1.5">
-                <!-- New Users Toggle -->
                 <button id="filter-new-btn" onclick="toggleNewUsers()" class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2.5 py-1.5 rounded-full uppercase tracking-wider shadow-sm transition active:scale-95 flex items-center gap-1">
                     ✨ New
                 </button>
-                
-                <!-- Get App Button -->
                 <button onclick="showDownloadInstructions()" class="bg-orange-50 text-botOrange border border-orange-200 text-[10px] font-bold px-2.5 py-1.5 rounded-full uppercase tracking-wider shadow-sm transition active:scale-95 flex items-center gap-1">
                     <i class="ph-bold ph-android-logo text-sm"></i> App
                 </button>
-
-                <!-- Edit Profile -->
                 <button onclick="openEditProfile()" class="bg-white text-botOrange text-[10px] font-bold px-2.5 py-1.5 rounded-full shadow-sm border border-gray-100 hover:bg-gray-50 transition active:scale-95 flex items-center gap-1">
                     <i class="ph-bold ph-user-circle-gear text-sm"></i> Edit
                 </button>
             </div>
         </div>
         
-        <!-- Total Matched Users Badge (Kept just below so it doesn't break the row) -->
         <div class="w-full max-w-sm mx-auto flex justify-start mb-3 shrink-0">
             <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md shadow-sm border border-red-100">
                 🔥 <span id="matched-num">0</span> users matched!
             </p>
         </div>
 
-        <!-- The Fixed Card Container -->
         <div id="card-container" class="w-full max-w-sm mx-auto flex-1 min-h-0 bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200 relative mb-4">
             <p class="text-gray-400 font-medium flex h-full items-center justify-center">Loading profiles...</p>
         </div>
@@ -241,6 +219,7 @@
             <div id="profile-details-content" class="flex-1 overflow-y-auto p-6 pt-2 pb-24"></div>
         </div>
     </div>
+
     <!-- Matches View -->
     <div id="view-matches" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-50 overflow-y-auto">
         <h2 class="font-bold text-3xl text-buna mb-6 mt-4 px-2">Your Matches <span class="text-botOrange">❤️</span></h2>
@@ -340,7 +319,6 @@
             <i class="ph-bold ph-chats-circle text-2xl mb-1"></i>
             <span class="text-xs font-bold">Matches</span>
         </button>
-        <!-- The Secret Admin Tab -->
         <button onclick="switchTab('admin')" id="tab-admin" class="hidden flex-col items-center text-gray-400 hover:text-red-500 transition-colors">
             <i class="ph-bold ph-detective text-2xl mb-1"></i>
             <span class="text-xs font-bold">Spy</span>
@@ -389,6 +367,10 @@
             document.getElementById('custom-alert').classList.add('hidden');
         }
 
+        function showDownloadInstructions() {
+            showAlert("📱 To download the Habesha Date Android App, close this window and type /app in the Telegram bot!");
+        }
+
         async function loadAppStats() {
             try {
                 const response = await fetch(`${BACKEND_URL}/api/stats`);
@@ -402,6 +384,7 @@
                 console.error("Failed to load stats", e);
             }
         }
+
         async function submitAppLogin() {
             const tgIdInput = document.getElementById('login-tg-id').value.trim();
             const pinInput = document.getElementById('login-pin').value.trim();
@@ -423,11 +406,9 @@
                     throw new Error("Invalid ID or PIN. Please generate a new one in the bot.");
                 }
 
-                // Success! Save ID to phone memory so they stay logged in
                 localStorage.setItem("habesha_user_id", tgIdInput);
                 cleanTelegramId = tgIdInput;
                 
-                // Hide login screen and load the app
                 document.getElementById('view-external-login').classList.add('hidden');
                 document.getElementById('view-external-login').classList.remove('flex');
                 document.getElementById('view-loading').classList.remove('hidden');
@@ -441,59 +422,51 @@
             }
         }
 
-   async function initApp() {
-        // 1. Check if running outside Telegram without a saved login
-        if (!cleanTelegramId || cleanTelegramId === "undefined" || cleanTelegramId === "null") {
-            document.getElementById('view-loading').classList.add('hidden');
-            document.getElementById('view-external-login').classList.remove('hidden');
-            document.getElementById('view-external-login').classList.add('flex');
-            return; // Stop loading here until they log in
-        }
-
-        try {
-            // 2. Check if the user already has an account in Supabase
-            const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
-            
-            if (!response.ok) {
-                throw new Error("Failed to reach the server.");
+        async function initApp() {
+            if (!cleanTelegramId || cleanTelegramId === "undefined" || cleanTelegramId === "null") {
+                document.getElementById('view-loading').classList.add('hidden');
+                document.getElementById('view-external-login').classList.remove('hidden');
+                document.getElementById('view-external-login').classList.add('flex');
+                return; 
             }
 
-            const data = await response.json();
-
-            if (data.exists) {
-                // Save their data globally so "Edit Profile" works
-                window.myProfileData = data.user_data || null;
-
-                // 3A. Fetch profiles using YOUR actual function name
-                await loadDiscoverProfiles(); 
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
                 
-                // Show the main swiping screen and bottom navigation
-                document.getElementById('view-loading').classList.add('hidden');
-                document.getElementById('view-swipe').classList.remove('hidden');
-                document.getElementById('bottom-nav').classList.remove('hidden');
-                
-                // Show admin spy tab if they are an admin
-                if(data.is_admin) {
-                    document.getElementById('tab-admin').classList.remove('hidden');
-                    document.getElementById('tab-admin').classList.add('flex');
+                if (!response.ok) {
+                    throw new Error("Failed to reach the server.");
                 }
-            } else {
-                // 3B. User is new -> Show YOUR actual registration screen
-                document.getElementById('view-loading').classList.add('hidden');
-                document.getElementById('view-registration').classList.remove('hidden');
+
+                const data = await response.json();
+
+                if (data.exists) {
+                    window.myProfileData = data.user_data || null;
+
+                    await loadDiscoverProfiles(); 
+                    
+                    document.getElementById('view-loading').classList.add('hidden');
+                    document.getElementById('view-swipe').classList.remove('hidden');
+                    document.getElementById('bottom-nav').classList.remove('hidden');
+                    
+                    if(data.is_admin) {
+                        document.getElementById('tab-admin').classList.remove('hidden');
+                        document.getElementById('tab-admin').classList.add('flex');
+                    }
+                } else {
+                    document.getElementById('view-loading').classList.add('hidden');
+                    document.getElementById('view-registration').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error initializing app:", error);
+                showAlert("Could not connect to the server. Please check your connection.");
             }
-        } catch (error) {
-            console.error("Error initializing app:", error);
-            showAlert("Could not connect to the server. Please check your connection.");
         }
-    }
-        // --- DISCOVER LOGIC ---
+
         async function loadDiscoverProfiles() {
             try {
                 const res = await fetch(`${BACKEND_URL}/api/get-potential-matches/${cleanTelegramId}`);
                 const data = await res.json();
                 
-                // 👇 UPDATED: Store in allProfiles and apply filter 👇
                 allProfiles = data.matches || [];
                 applyNewUserFilter();
                 
@@ -503,7 +476,7 @@
                 applyNewUserFilter();
             }
         }
-        // 👇 NEW FILTER LOGIC 👇
+
         function toggleNewUsers() {
             showingNewOnly = !showingNewOnly;
             const btn = document.getElementById('filter-new-btn');
@@ -520,21 +493,18 @@
 
         function applyNewUserFilter() {
             if (showingNewOnly) {
-                // Filter to only show users created in the last 7 days
                 profiles = allProfiles.filter(p => {
                     if (!p.created_at) return false;
                     const daysOld = (new Date() - new Date(p.created_at)) / (1000 * 60 * 60 * 24);
                     return daysOld <= 7;
                 });
             } else {
-                // Show everyone
                 profiles = [...allProfiles];
             }
-            
-            // Reset the card index and re-render the view
             currentCardIndex = 0;
             renderCards();
         }
+
         function renderCards() {
             const container = document.getElementById('card-container');
             
@@ -545,14 +515,15 @@
                             <i class="ph-bold ph-caret-up text-2xl"></i>
                         </button>
                     </div>` : '';
-container.innerHTML = `
+
+                container.innerHTML = `
                     <div class="w-full flex-1 flex flex-col relative bg-white">
                         <div class="flex-1 flex flex-col items-center justify-center p-6 text-center">
                             <i class="ph-duotone ph-sparkle text-6xl text-gray-300 mb-2"></i>
                             <p class="text-gray-400 font-medium">You've seen everyone.</p>
                             <p class="text-gray-400 text-sm mt-2">Check back later for more profiles!</p>
                         </div>
-                        \${backBtnHtml}
+                        ${backBtnHtml}
                     </div>`;
                 return;
             }
@@ -560,7 +531,6 @@ container.innerHTML = `
             const profile = profiles[currentCardIndex];
             const photoToUse = profile.photo_url || DEFAULT_AVATAR;
             
-            // Calculate if the user is "New" (Joined in the last 7 days)
             let newBadge = "";
             if (profile.created_at) { 
                 const joinDate = new Date(profile.created_at);
@@ -572,10 +542,6 @@ container.innerHTML = `
                 }
             }
 
-           // Conditionally render the Like badge only if the backend returns likes > 0
-            const likesDisplay = (profile.total_likes && profile.total_likes > 0)
-                ? `<span class="text-sm font-bold text-red-500 px-2 py-0.5 bg-red-50 rounded-lg flex items-center gap-1"><i class="ph-fill ph-heart"></i> \${profile.total_likes}</span>`
-                : ``;
             container.innerHTML = `
                 <div class="w-full h-full flex flex-col overflow-y-auto no-scrollbar relative bg-white">
                     
@@ -592,7 +558,6 @@ container.innerHTML = `
                         <div class="flex items-center flex-wrap gap-2 mb-1">
                             <h3 class="text-2xl font-bold text-buna">${profile.name}, ${profile.age || '?'}</h3>
                             <span class="text-sm font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-lg">${profile.gender || ''}</span>
-                            ${likesDisplay}
                             ${newBadge}
                         </div>
                         <p class="text-gray-500 text-sm mt-1 line-clamp-2">${profile.bio || 'Ready to mingle!'}</p>
@@ -600,7 +565,7 @@ container.innerHTML = `
                     </div>
                     
                     <!-- The Swipe Buttons -->
-                    <div class="w-full flex justify-around items-center p-4 pb-6 bg-white shrink-0 mt-auto">
+                    <div class="w-full flex justify-around items-center p-4 pb-10 bg-white shrink-0 mt-auto">
                         <button onclick="handleSwipe(false)" class="w-14 h-14 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform hover:bg-red-50">
                             <i class="ph-bold ph-x text-2xl"></i>
                         </button>
@@ -692,9 +657,9 @@ container.innerHTML = `
             modal.classList.add('translate-y-full'); setTimeout(() => modal.classList.add('hidden'), 300); 
         }
 
-        // --- REPORT LOGIC ---
         function openReportModal(reportedId) { userToReport = reportedId; document.getElementById('report-modal').classList.remove('hidden'); }
         function closeReportModal() { userToReport = null; document.getElementById('report-modal').classList.add('hidden'); }
+        
         async function submitReport() {
             if (!userToReport) return;
             const btn = document.getElementById('submit-report-btn'); btn.innerHTML = `Wait...`; btn.disabled = true;
@@ -760,7 +725,6 @@ container.innerHTML = `
             } catch (err) { container.innerHTML = `<p class="text-red-500 text-center mt-10">Failed to load matches.</p>`; }
         }
 
-        // --- FULL CHAT ENGINE (With Ticks, Reactions, Edits) ---
         function startChatPolling(matchId, matchName) {
             stopChatPolling(); 
             chatPollInterval = setInterval(() => { if (activeChatId === matchId) loadChatHistory(matchId, matchName, true); }, 3000);
@@ -884,7 +848,6 @@ container.innerHTML = `
             } catch (err) { showAlert("Failed to send message."); }
         }
 
-        // --- MESSAGE ACTIONS (Edit, Delete, React) ---
         function openMsgMenu(id, isMe, currentText, isDeleted) {
             selectedMsgId = id;
             const modal = document.getElementById('msg-action-modal');
@@ -940,9 +903,9 @@ container.innerHTML = `
             } catch(e) {}
         }
 
-        // --- UNMATCH ---
         function confirmUnmatch() { document.getElementById('custom-confirm').classList.remove('hidden'); }
         function closeConfirm() { document.getElementById('custom-confirm').classList.add('hidden'); }
+        
         async function executeUnmatch() {
             closeConfirm();
             if(!activeChatId) return;
@@ -954,7 +917,6 @@ container.innerHTML = `
             } catch (err) { showAlert("Error connecting to server."); }
         }
 
-        // --- REGISTRATION WIZARD LOGIC ---
         function handlePhotoSelect(event) {
             const file = event.target.files[0];
             if (file) {
@@ -1034,12 +996,10 @@ container.innerHTML = `
             if (window.myProfileData) {
                 const mp = window.myProfileData;
                 
-                // Show Banner
                 document.getElementById('stats-banner').classList.remove('hidden');
                 document.getElementById('stat-likes').innerText = `${mp.total_likes || 0} Likes`;
                 document.getElementById('stat-date').innerText = `Joined: ${mp.created_at ? mp.created_at.split('T')[0] : 'Unknown'}`;
                 
-                // Prefill Basic
                 document.getElementById('reg-name').value = mp.name || '';
                 document.getElementById('reg-gender').value = mp.gender || '';
                 document.getElementById('reg-age').value = mp.age || '';
@@ -1056,7 +1016,6 @@ container.innerHTML = `
                     document.getElementById('reg-location-other').classList.add('hidden');
                 }
 
-                // Prefill Details
                 document.getElementById('reg-height').value = mp.height || '';
                 document.getElementById('reg-religion').value = mp.religion || '';
                 document.getElementById('reg-education').value = mp.education || '';
@@ -1065,10 +1024,8 @@ container.innerHTML = `
                 document.getElementById('reg-drinking').value = mp.drinking || '';
                 document.getElementById('reg-smoking').value = mp.smoking || '';
                 
-                // Prefill Bio
                 document.getElementById('reg-bio').value = mp.bio || '';
                 
-                // Prefill Photo
                 if (mp.photo_url) {
                     document.getElementById('photo-preview').style.backgroundImage = `url(${mp.photo_url})`;
                     document.getElementById('photo-preview').classList.remove('border-dashed');
@@ -1146,7 +1103,6 @@ container.innerHTML = `
                 document.getElementById('view-swipe').classList.remove('hidden');
                 document.getElementById('bottom-nav').classList.remove('hidden');
                 
-                // Show spy tab if they are an admin
                 try {
                     const chk = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
                     const chkData = await chk.json();
@@ -1169,10 +1125,6 @@ container.innerHTML = `
                 submitBtn.disabled = false;
             }
         }
-
-        // ----------------------------------------------------
-        // 🕵️ SECRET ADMIN SPY LOGIC
-        // ----------------------------------------------------
 
         async function loadAdminConversations() {
             const container = document.getElementById('admin-container');
@@ -1212,7 +1164,7 @@ container.innerHTML = `
             document.getElementById('admin-chat-messages').innerHTML = `<div class="flex justify-center mt-4"><i class="ph ph-spinner animate-spin text-red-500 text-3xl"></i></div>`;
             
             loadAdminChatHistory();
-            adminChatPollInterval = setInterval(loadAdminChatHistory, 3000); // Live update every 3 seconds
+            adminChatPollInterval = setInterval(loadAdminChatHistory, 3000);
         }
 
         async function loadAdminChatHistory() {
