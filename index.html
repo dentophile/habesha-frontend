@@ -331,7 +331,7 @@
         tg.expand();
         
         const BACKEND_URL = "https://habesha-backend-xhc5.onrender.com";
-        const cleanTelegramId = String(tg.initDataUnsafe?.user?.id || Math.random()).trim();
+        let cleanTelegramId = localStorage.getItem("habesha_user_id") || String(tg.initDataUnsafe?.user?.id || "").trim();
         const DEFAULT_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
         
         const urlParams = new URLSearchParams(window.location.search);
