@@ -731,6 +731,27 @@
             } catch (err) { showAlert("Failed to submit report."); } 
             finally { btn.innerHTML = `Submit`; btn.disabled = false; }
         }
+        async function refreshProfileStats() {
+            if (!cleanTelegramId) return;
+            
+            try {
+                // Fetch your freshest data directly from the database
+                const response = await fetch(`${API_URL}/api/check-user/${cleanTelegramId}`);
+                const data = await response.json();
+                
+                if (data.exists && data.profile) {
+                    window.myProfileData = data.profile; // Update the local save
+                    const mp = data.profile;
+                    
+                    // Update the HTML with the real data
+                    document.getElementById('my-profile-photo').style.backgroundImage = `url('${mp.photo_url || DEFAULT_AVATAR}')`;
+                    document.getElementById('my-profile-name').innerText = `${mp.name || 'User'}, ${mp.age || '?'}`;
+                    document.getElementById('my-profile-likes').innerText = `❤️ ${mp.total_likes || 0} Likes`;
+                }
+            } catch (error) {
+                console.error("Error fetching profile stats:", error);
+            }
+        }
 
         function switchTab(tab) {
             // Include 'profile' in the list of tabs to hide
