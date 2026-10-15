@@ -1069,15 +1069,31 @@
 
         function openEditProfile() {
             isEditing = true;
-            document.getElementById('view-swipe').classList.add('hidden');
-            document.getElementById('view-matches').classList.add('hidden');
+            
+            // Hide all other views
+            const viewSwipe = document.getElementById('view-swipe');
+            if(viewSwipe) viewSwipe.classList.add('hidden');
+            
+            const viewMatches = document.getElementById('view-matches');
+            if(viewMatches) viewMatches.classList.add('hidden');
+            
+            const viewProfile = document.getElementById('view-profile');
+            if(viewProfile) viewProfile.classList.add('hidden'); // Hide the new profile tab
+            
+            const viewAdmin = document.getElementById('view-admin');
+            if(viewAdmin) viewAdmin.classList.add('hidden');
+
             document.getElementById('bottom-nav').classList.add('hidden'); 
             document.getElementById('view-registration').classList.remove('hidden');
             
             if (window.myProfileData) {
                 const mp = window.myProfileData;
                 
-                document.getElementById('stats-banner').classList.remove('hidden');
+                // Show the banner and ensure it uses flex layout for the back button
+                const statsBanner = document.getElementById('stats-banner');
+                statsBanner.classList.remove('hidden');
+                statsBanner.classList.add('flex');
+                
                 document.getElementById('stat-likes').innerText = `${mp.total_likes || 0} Likes`;
                 document.getElementById('stat-date').innerText = `Joined: ${mp.created_at ? mp.created_at.split('T')[0] : 'Unknown'}`;
                 
@@ -1119,7 +1135,6 @@
             goToPage(1); 
             document.getElementById('submit-btn').innerHTML = `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>`;
         }
-
         async function submitRegistration() {
             const bio = document.getElementById('reg-bio').value.trim();
             if(!bio) return showAlert("Please write a short bio to help others get to know you!");
