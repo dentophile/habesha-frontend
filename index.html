@@ -88,12 +88,12 @@
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
         
         <!-- Stats Banner & Back Button (Only visible during profile editing) -->
-        <div id="stats-banner" class="hidden flex-col bg-gray-50 border-b border-gray-200 shadow-inner">
+        <div id="stats-banner" style="display: none;" class="flex-col bg-gray-50 border-b border-gray-200 shadow-inner">
             <!-- Back Button -->
             <div class="px-4 py-2 bg-white border-b border-gray-100 flex items-center">
-                <button onclick="closeEditProfile()" class="text-gray-500 p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition flex items-center gap-2">
+                <button type="button" onclick="closeEditProfile()" class="text-gray-500 p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition flex items-center gap-2">
                     <i class="ph-bold ph-arrow-left text-xl"></i>
-                    <span class="font-bold text-buna text-sm">Cancel Edit</span>
+                    <span class="font-bold text-gray-800 text-sm">Cancel Edit</span>
                 </button>
             </div>
             <!-- Stats -->
@@ -108,6 +108,7 @@
                 </div>
             </div>
         </div>
+
         <div class="max-w-md mx-auto p-6 py-10">
             <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center transition-all">Step 1: Basics</h2>
             
@@ -416,7 +417,6 @@
         }
 
        function showDownloadInstructions() {
-            // This instantly closes the Web App and triggers the bot
             tg.openTelegramLink("https://t.me/ethiopia_date_bot?start=app");
         }
 
@@ -489,7 +489,7 @@
                 const data = await response.json();
 
                 if (data.exists) {
-                    window.myProfileData = data.user_data || null;
+                    window.myProfileData = data.profile || data.user_data || null;
 
                     await loadDiscoverProfiles(); 
                     
@@ -560,7 +560,6 @@
             const topLikesCount = document.getElementById('top-card-likes-count');
             
             if (currentCardIndex >= profiles.length || profiles.length === 0) {
-                // Hide the top badge if there are no cards
                 if(topLikesBadge) { topLikesBadge.classList.remove('flex'); topLikesBadge.classList.add('hidden'); }
                 
                 let backBtnHtml = profiles.length > 0 ? `
@@ -585,7 +584,6 @@
             const profile = profiles[currentCardIndex];
             const photoToUse = profile.photo_url || DEFAULT_AVATAR;
             
-            // Show or hide the top row badge dynamically based on this specific user's likes
             if (profile.total_likes && profile.total_likes > 0) {
                 if(topLikesCount) topLikesCount.innerText = profile.total_likes;
                 if(topLikesBadge) { topLikesBadge.classList.remove('hidden'); topLikesBadge.classList.add('flex'); }
@@ -607,7 +605,6 @@
             container.innerHTML = `
                 <div class="w-full h-full flex flex-col overflow-y-auto no-scrollbar relative bg-white">
                     
-                    <!-- The Photo (Locked Minimum Height to stop squishing) -->
                     <div class="w-full min-h-[350px] flex-1 bg-gray-200 bg-cover bg-center relative shrink-0" style="background-image: url('${photoToUse}')">
                         <button onclick="showProfileDetails()" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-2.5 bg-black bg-opacity-60 text-white rounded-full flex items-center gap-2 backdrop-blur-md active:scale-95 shadow-lg border border-white border-opacity-20 z-10">
                             <i class="ph-bold ph-info text-lg"></i>
@@ -615,7 +612,6 @@
                         </button>
                     </div>
                     
-                    <!-- The Info -->
                     <div class="p-4 shrink-0 bg-white">
                         <div class="flex items-center flex-wrap gap-2 mb-1">
                             <h3 class="text-2xl font-bold text-buna">${profile.name}, ${profile.age || '?'}</h3>
@@ -626,7 +622,6 @@
                         <p class="text-center text-[11px] text-gray-400 mt-3 pt-3 border-t border-dashed border-gray-200 font-medium tracking-wide">ለማጣመር የ ❤️ ምልክቱን ይጫኑ</p>
                     </div>
                     
-                    <!-- The Swipe Buttons -->
                     <div class="w-full flex justify-around items-center p-4 pb-10 bg-white shrink-0 mt-auto">
                         <button onclick="handleSwipe(false)" class="w-14 h-14 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform hover:bg-red-50">
                             <i class="ph-bold ph-x text-2xl"></i>
@@ -731,22 +726,22 @@
             } catch (err) { showAlert("Failed to submit report."); } 
             finally { btn.innerHTML = `Submit`; btn.disabled = false; }
         }
+        
         async function refreshProfileStats() {
             if (!cleanTelegramId) return;
-            
             try {
-                // Fetch your freshest data directly from the database
-                const response = await fetch(`${API_URL}/api/check-user/${cleanTelegramId}`);
+                const response = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
                 const data = await response.json();
                 
                 if (data.exists && data.profile) {
-                    window.myProfileData = data.profile; // Update the local save
+                    window.myProfileData = data.profile; 
                     const mp = data.profile;
                     
-                    // Update the HTML with the real data
-                    document.getElementById('my-profile-photo').style.backgroundImage = `url('${mp.photo_url || DEFAULT_AVATAR}')`;
-                    document.getElementById('my-profile-name').innerText = `${mp.name || 'User'}, ${mp.age || '?'}`;
-                    document.getElementById('my-profile-likes').innerText = `❤️ ${mp.total_likes || 0} Likes`;
+                    const profileLikes = document.getElementById('my-profile-likes');
+                    if (profileLikes) profileLikes.innerText = `❤️ ${mp.total_likes || 0} Likes`;
+                    
+                    const profileName = document.getElementById('my-profile-name');
+                    if (profileName) profileName.innerText = `${mp.name || 'User'}, ${mp.age || '?'}`;
                 }
             } catch (error) {
                 console.error("Error fetching profile stats:", error);
@@ -754,7 +749,6 @@
         }
 
         function switchTab(tab) {
-            // Include 'profile' in the list of tabs to hide
             ['swipe', 'matches', 'admin', 'profile'].forEach(t => {
                 const view = document.getElementById(`view-${t}`);
                 if (view) view.classList.add('hidden');
@@ -777,30 +771,29 @@
                 document.getElementById('tab-admin').classList.replace('text-gray-400', 'text-red-500');
                 loadAdminConversations();
             } else if (tab === 'profile') {
-            document.getElementById('tab-profile').classList.replace('text-gray-400', 'text-botOrange');
-            
-            // Load user data into the profile view instantly
-            if (window.myProfileData) {
-                const mp = window.myProfileData;
-                document.getElementById('my-profile-photo').style.backgroundImage = `url('${mp.photo_url || DEFAULT_AVATAR}')`;
-                document.getElementById('my-profile-name').innerText = `${mp.name || 'User'}, ${mp.age || '?'}`;
-                document.getElementById('my-profile-likes').innerText = `❤️ ${mp.total_likes || 0} Likes`;
-            }
-            
-            // Fetch the true like count from the database in the background
-            if (typeof refreshProfileStats === "function") {
-                refreshProfileStats();
+                document.getElementById('tab-profile').classList.replace('text-gray-400', 'text-botOrange');
+                
+                if (window.myProfileData) {
+                    const mp = window.myProfileData;
+                    document.getElementById('my-profile-photo').style.backgroundImage = `url('${mp.photo_url || DEFAULT_AVATAR}')`;
+                    document.getElementById('my-profile-name').innerText = `${mp.name || 'User'}, ${mp.age || '?'}`;
+                    document.getElementById('my-profile-likes').innerText = `❤️ ${mp.total_likes || 0} Likes`;
+                }
+                
+                if (typeof refreshProfileStats === "function") {
+                    refreshProfileStats();
+                }
             }
         }
-    }
-        // NEW: Log Out Function
+        
         function logoutUser() {
             if (confirm("Are you sure you want to log out?")) {
                 localStorage.removeItem("habesha_user_id");
                 cleanTelegramId = null;
-                window.location.reload(); // Instantly reloads the app to show the PIN login screen
+                window.location.reload();
             }
         }
+        
         async function loadMatchesList() {
             const container = document.getElementById('matches-container');
             container.innerHTML = `<div class="flex justify-center mt-10"><i class="ph ph-spinner animate-spin text-3xl text-botOrange"></i></div>`;
@@ -1092,32 +1085,31 @@
             document.getElementById('progress-bar').style.width = ["33.3%", "66.6%", "100%"][step - 1];
         }
 
+        function closeEditProfile() {
+            isEditing = false;
+            document.getElementById('view-registration').classList.add('hidden');
+            const statsBanner = document.getElementById('stats-banner');
+            if(statsBanner) statsBanner.style.display = 'none';
+            document.getElementById('bottom-nav').classList.remove('hidden');
+            
+            switchTab('profile'); 
+        }
+
         function openEditProfile() {
             isEditing = true;
             
-            // Hide all other views
-            const viewSwipe = document.getElementById('view-swipe');
-            if(viewSwipe) viewSwipe.classList.add('hidden');
-            
-            const viewMatches = document.getElementById('view-matches');
-            if(viewMatches) viewMatches.classList.add('hidden');
-            
-            const viewProfile = document.getElementById('view-profile');
-            if(viewProfile) viewProfile.classList.add('hidden'); // Hide the new profile tab
-            
-            const viewAdmin = document.getElementById('view-admin');
-            if(viewAdmin) viewAdmin.classList.add('hidden');
+            ['view-swipe', 'view-matches', 'view-profile', 'view-admin', 'bottom-nav'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
 
-            document.getElementById('bottom-nav').classList.add('hidden'); 
             document.getElementById('view-registration').classList.remove('hidden');
             
             if (window.myProfileData) {
                 const mp = window.myProfileData;
                 
-                // Show the banner and ensure it uses flex layout for the back button
                 const statsBanner = document.getElementById('stats-banner');
-                statsBanner.classList.remove('hidden');
-                statsBanner.classList.add('flex');
+                if (statsBanner) statsBanner.style.display = 'flex';
                 
                 document.getElementById('stat-likes').innerText = `${mp.total_likes || 0} Likes`;
                 document.getElementById('stat-date').innerText = `Joined: ${mp.created_at ? mp.created_at.split('T')[0] : 'Unknown'}`;
@@ -1160,6 +1152,7 @@
             goToPage(1); 
             document.getElementById('submit-btn').innerHTML = `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>`;
         }
+
         async function submitRegistration() {
             const bio = document.getElementById('reg-bio').value.trim();
             if(!bio) return showAlert("Please write a short bio to help others get to know you!");
@@ -1219,7 +1212,7 @@
                 window.myProfileData = payload; 
                 isEditing = false;
                 
-                document.getElementById('stats-banner').classList.add('hidden');
+                document.getElementById('stats-banner').style.display = 'none';
                 document.getElementById('view-registration').classList.add('hidden');
                 document.getElementById('view-swipe').classList.remove('hidden');
                 document.getElementById('bottom-nav').classList.remove('hidden');
