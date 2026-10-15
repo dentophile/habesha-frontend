@@ -726,7 +726,8 @@
         }
 
         function switchTab(tab) {
-            ['swipe', 'matches', 'admin'].forEach(t => {
+            // Include 'profile' in the list of tabs to hide
+            ['swipe', 'matches', 'admin', 'profile'].forEach(t => {
                 const view = document.getElementById(`view-${t}`);
                 if (view) view.classList.add('hidden');
                 
@@ -747,9 +748,27 @@
             } else if (tab === 'admin') {
                 document.getElementById('tab-admin').classList.replace('text-gray-400', 'text-red-500');
                 loadAdminConversations();
+            } else if (tab === 'profile') {
+                document.getElementById('tab-profile').classList.replace('text-gray-400', 'text-botOrange');
+                
+                // Load user data into the profile view
+                if (window.myProfileData) {
+                    const mp = window.myProfileData;
+                    document.getElementById('my-profile-photo').style.backgroundImage = `url('${mp.photo_url || DEFAULT_AVATAR}')`;
+                    document.getElementById('my-profile-name').innerText = `${mp.name || 'User'}, ${mp.age || '?'}`;
+                    document.getElementById('my-profile-likes').innerText = `❤️ ${mp.total_likes || 0} Likes`;
+                }
             }
         }
 
+        // NEW: Log Out Function
+        function logoutUser() {
+            if (confirm("Are you sure you want to log out?")) {
+                localStorage.removeItem("habesha_user_id");
+                cleanTelegramId = null;
+                window.location.reload(); // Instantly reloads the app to show the PIN login screen
+            }
+        }
         async function loadMatchesList() {
             const container = document.getElementById('matches-container');
             container.innerHTML = `<div class="flex justify-center mt-10"><i class="ph ph-spinner animate-spin text-3xl text-botOrange"></i></div>`;
