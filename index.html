@@ -77,18 +77,53 @@
         </div>
     </div>
 
-    <!-- Premium Upgrade Modal -->
+    <!-- Premium Upgrade Modal (Chapa & Telebirr) -->
     <div id="premium-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-60 px-4 transition-opacity">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center relative overflow-hidden border-2 border-premium">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center relative overflow-hidden border-2 border-premium max-h-[90vh] overflow-y-auto no-scrollbar">
             <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-50 to-pink-50 -z-10"></div>
-            <i class="ph-fill ph-crown text-6xl text-premium mb-2 mt-4 inline-block"></i>
-            <h3 class="text-2xl font-bold mb-2 text-premium">Habesha Premium</h3>
-            <p class="text-gray-700 mb-6 text-sm font-medium">Upgrade to see exactly who liked your profile and unlock Super Likes to stand out!</p>
-            
-            <button onclick="submitPremiumUpgrade()" id="btn-premium-submit" class="w-full p-4 bg-gradient-to-r from-premium to-fuchsia-500 text-white rounded-xl font-bold mb-3 shadow-lg hover:opacity-90 transition">
-                Upgrade Now - 100 ETB/mo
-            </button>
-            <button onclick="closePremiumModal()" class="w-full p-3 text-gray-500 rounded-xl font-bold">Cancel</button>
+            <i class="ph-fill ph-crown text-5xl text-premium mb-1 mt-2 inline-block"></i>
+            <h3 class="text-2xl font-bold mb-1 text-premium">Habesha Premium</h3>
+            <p class="text-gray-600 mb-4 text-xs font-medium">Unlock <b>Who Liked You</b> & <b>Super Likes</b> for <span id="prem-price-label" class="font-bold text-buna">100 ETB</span>/mo!</p>
+
+            <!-- Payment Method Tabs -->
+            <div class="flex bg-gray-100 p-1 rounded-xl mb-4 text-xs font-bold">
+                <button id="tab-pay-telebirr" onclick="switchPaymentTab('telebirr')" class="w-1/2 py-2 rounded-lg bg-white text-buna shadow-sm transition">📱 Direct Telebirr</button>
+                <button id="tab-pay-chapa" onclick="switchPaymentTab('chapa')" class="w-1/2 py-2 rounded-lg text-gray-500 transition">💳 Chapa Checkout</button>
+            </div>
+
+            <!-- Option 1: Direct Telebirr Transfer -->
+            <div id="pay-section-telebirr" class="text-left space-y-3 mb-4">
+                <div class="bg-white p-3.5 rounded-2xl border border-purple-100 shadow-sm text-xs space-y-1.5">
+                    <p class="text-gray-500 font-medium">1. Send <b class="text-buna">100 ETB</b> via Telebirr to:</p>
+                    <div class="flex items-center justify-between bg-purple-50 px-3 py-2 rounded-xl">
+                        <div>
+                            <p id="telebirr-merchant-phone" class="font-bold text-sm text-premium tracking-wide">0911000000</p>
+                            <p id="telebirr-merchant-name" class="text-[10px] text-gray-500">Habesha Date</p>
+                        </div>
+                        <button onclick="copyTelebirrPhone()" class="bg-white text-premium px-2.5 py-1 rounded-lg text-[11px] font-bold shadow-sm border border-purple-100 active:scale-95">Copy</button>
+                    </div>
+                    <p class="text-gray-500 font-medium pt-1">2. Enter your Telebirr SMS Transaction ID below:</p>
+                </div>
+
+                <input id="telebirr-sender-phone" type="tel" placeholder="Your Telebirr Phone (e.g. 0912...)" class="w-full p-3 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:border-premium">
+                <input id="telebirr-tx-ref" type="text" placeholder="Transaction ID (e.g. BD829104...)" class="w-full p-3 border border-gray-200 rounded-xl bg-white text-sm font-bold uppercase focus:outline-none focus:border-premium">
+
+                <button onclick="submitManualTelebirr()" id="btn-telebirr-submit" class="w-full p-3.5 bg-gradient-to-r from-premium to-fuchsia-500 text-white rounded-xl font-bold shadow-lg hover:opacity-90 transition text-sm">
+                    Verify Telebirr Payment
+                </button>
+            </div>
+
+            <!-- Option 2: Instant Chapa Gateway -->
+            <div id="pay-section-chapa" class="hidden space-y-3 mb-4">
+                <div class="bg-white p-4 rounded-2xl border border-purple-100 text-xs text-gray-600 space-y-2">
+                    <p>Pay securely with <b>Telebirr, CBE Birr, Awash, or Bank Card</b> via Chapa and unlock Premium immediately.</p>
+                </div>
+                <button onclick="startChapaCheckout()" id="btn-chapa-submit" class="w-full p-4 bg-green-600 text-white rounded-xl font-bold shadow-lg hover:bg-green-700 transition text-sm flex items-center justify-center gap-2">
+                    <i class="ph-bold ph-shield-check text-lg"></i> Pay 100 ETB with Chapa
+                </button>
+            </div>
+
+            <button onclick="closePremiumModal()" class="w-full p-2.5 text-gray-500 rounded-xl font-bold text-sm">Close</button>
         </div>
     </div>
 
@@ -897,34 +932,112 @@
 
         function openPremiumModal() {
             document.getElementById('premium-modal').classList.remove('hidden');
+            loadPaymentConfig();
         }
 
         function closePremiumModal() {
             document.getElementById('premium-modal').classList.add('hidden');
         }
 
-        async function submitPremiumUpgrade() {
-            const btn = document.getElementById('btn-premium-submit');
-            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Processing...`;
+        function switchPaymentTab(tab) {
+            const telebirrTab = document.getElementById('tab-pay-telebirr');
+            const chapaTab = document.getElementById('tab-pay-chapa');
+            const telebirrSec = document.getElementById('pay-section-telebirr');
+            const chapaSec = document.getElementById('pay-section-chapa');
+
+            if (tab === 'telebirr') {
+                telebirrTab.className = "w-1/2 py-2 rounded-lg bg-white text-buna shadow-sm transition";
+                chapaTab.className = "w-1/2 py-2 rounded-lg text-gray-500 transition";
+                telebirrSec.classList.remove('hidden');
+                chapaSec.classList.add('hidden');
+            } else {
+                chapaTab.className = "w-1/2 py-2 rounded-lg bg-white text-buna shadow-sm transition";
+                telebirrTab.className = "w-1/2 py-2 rounded-lg text-gray-500 transition";
+                chapaSec.classList.remove('hidden');
+                telebirrSec.classList.add('hidden');
+            }
+        }
+
+        async function loadPaymentConfig() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/payment-info`);
+                const info = await res.json();
+                if (info.telebirr_phone) {
+                    document.getElementById('telebirr-merchant-phone').innerText = info.telebirr_phone;
+                }
+                if (info.telebirr_name) {
+                    document.getElementById('telebirr-merchant-name').innerText = info.telebirr_name;
+                }
+                if (info.price_etb) {
+                    document.getElementById('prem-price-label').innerText = `${info.price_etb} ETB`;
+                }
+            } catch (e) {}
+        }
+
+        function copyTelebirrPhone() {
+            const phone = document.getElementById('telebirr-merchant-phone').innerText;
+            navigator.clipboard.writeText(phone);
+            showAlert(`Copied Telebirr number: ${phone}`);
+        }
+
+        async function submitManualTelebirr() {
+            const txRef = document.getElementById('telebirr-tx-ref').value.trim();
+            const senderPhone = document.getElementById('telebirr-sender-phone').value.trim();
+            if (!txRef || txRef.length < 5) {
+                return showAlert("Please enter a valid Telebirr Transaction ID from your SMS receipt.");
+            }
+
+            const btn = document.getElementById('btn-telebirr-submit');
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Submitting...`;
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/payment/manual-telebirr`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: cleanTelegramId,
+                        tx_ref: txRef,
+                        phone_used: senderPhone
+                    })
+                });
+                if (!res.ok) throw new Error("Failed to submit");
+
+                if (window.myProfileData) window.myProfileData.premium_status = "pending_manual";
+                closePremiumModal();
+                showAlert("✅ Receipt submitted! Our admin will verify your Telebirr transfer shortly and you'll get a notification on Telegram.");
+                refreshProfileStats();
+            } catch (e) {
+                showAlert("Could not submit transaction ID. Please try again.");
+            } finally {
+                btn.innerHTML = `Verify Telebirr Payment`;
+                btn.disabled = false;
+            }
+        }
+
+        async function startChapaCheckout() {
+            const btn = document.getElementById('btn-chapa-submit');
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Opening Chapa...`;
             btn.disabled = true;
             try {
-                await fetch(`${BACKEND_URL}/api/upgrade-premium`, {
+                const res = await fetch(`${BACKEND_URL}/api/payment/chapa-initialize`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ telegram_id: cleanTelegramId })
                 });
-                if (window.myProfileData) window.myProfileData.is_premium = true;
-                closePremiumModal();
-                showAlert("Welcome to Habesha Premium! 👑");
-                refreshProfileStats();
-                if (!document.getElementById('view-matches').classList.contains('hidden')) {
-                    renderPremiumLikesSection();
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.detail || "Chapa initialization failed");
+                }
+                if (data.checkout_url) {
+                    window.location.href = data.checkout_url;
                 }
             } catch (e) {
-                showAlert("Upgrade failed. Please try again.");
+                showAlert(e.message || "Chapa is not enabled yet. Please use the Direct Telebirr tab!");
+            } finally {
+                btn.innerHTML = `<i class="ph-bold ph-shield-check text-lg"></i> Pay 100 ETB with Chapa`;
+                btn.disabled = false;
             }
-            btn.innerHTML = `Upgrade Now - 100 ETB/mo`;
-            btn.disabled = false;
         }
 
         function showProfileDetails() {
@@ -1032,6 +1145,11 @@
                         if (premBtn) {
                             premBtn.innerHTML = `<div class="flex items-center gap-3"><i class="ph-fill ph-crown text-xl"></i> Premium Active</div><i class="ph-bold ph-check text-green-500"></i>`;
                             premBtn.onclick = null;
+                        }
+                    } else if (mp.premium_status === 'pending_manual') {
+                        const premBtn = document.getElementById('btn-profile-premium');
+                        if (premBtn) {
+                            premBtn.innerHTML = `<div class="flex items-center gap-3"><i class="ph-bold ph-clock text-xl"></i> Payment Under Review</div><span class="text-xs bg-purple-100 px-2 py-0.5 rounded-full">Pending</span>`;
                         }
                     }
                     if (mp.is_verified) {
