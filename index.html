@@ -314,6 +314,33 @@
             </button>
         </div>
     </div>
+    <!-- Profile & Settings View -->
+    <div id="view-profile" class="hidden w-full h-screen pt-4 pb-24 px-4 flex-col bg-gray-50 overflow-y-auto">
+        <h2 class="font-bold text-3xl text-buna mb-6 mt-4 px-2">My Profile</h2>
+        
+        <div class="w-full max-w-sm mx-auto bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col items-center">
+            <div id="my-profile-photo" class="w-24 h-24 rounded-full bg-gray-200 bg-cover bg-center mb-4 shadow-inner border border-gray-200"></div>
+            <h3 id="my-profile-name" class="text-xl font-bold text-buna">Loading...</h3>
+            <p id="my-profile-likes" class="text-sm text-red-500 font-medium mb-6 bg-red-50 px-3 py-1 rounded-full mt-2">❤️ 0 Likes</p>
+
+            <div class="w-full space-y-3">
+                <button onclick="openEditProfile()" class="w-full bg-orange-50 text-botOrange font-bold p-4 rounded-xl flex items-center justify-between hover:bg-orange-100 transition active:scale-95 shadow-sm">
+                    <div class="flex items-center gap-3"><i class="ph-bold ph-pencil-simple text-xl"></i> Edit Profile</div>
+                    <i class="ph-bold ph-caret-right"></i>
+                </button>
+                
+                <button onclick="showDownloadInstructions()" class="w-full bg-gray-50 text-gray-700 font-bold p-4 rounded-xl flex items-center justify-between hover:bg-gray-100 transition active:scale-95 border border-gray-100">
+                    <div class="flex items-center gap-3"><i class="ph-bold ph-android-logo text-xl"></i> Get Mobile App</div>
+                    <i class="ph-bold ph-caret-right"></i>
+                </button>
+                
+                <button onclick="logoutUser()" class="w-full bg-red-50 text-red-500 font-bold p-4 rounded-xl flex items-center justify-between hover:bg-red-100 transition active:scale-95 border border-red-100">
+                    <div class="flex items-center gap-3"><i class="ph-bold ph-sign-out text-xl"></i> Log Out</div>
+                    <i class="ph-bold ph-caret-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Bottom Navigation -->
     <div id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
