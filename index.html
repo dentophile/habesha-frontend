@@ -84,19 +84,30 @@
         </button>
     </div>
 
-    <!-- Registration / Edit View -->
+   <!-- Registration / Edit View -->
     <div id="view-registration" class="hidden w-full h-screen bg-white overflow-y-auto no-scrollbar pb-24">
-        <div id="stats-banner" class="hidden bg-gray-50 border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-inner">
-            <div class="flex items-center gap-2 text-gray-600">
-                <i class="ph-bold ph-calendar text-botOrange"></i>
-                <span class="text-sm font-medium" id="stat-date">Joined: --</span>
+        
+        <!-- Stats Banner & Back Button (Only visible during profile editing) -->
+        <div id="stats-banner" class="hidden flex-col bg-gray-50 border-b border-gray-200 shadow-inner">
+            <!-- Back Button -->
+            <div class="px-4 py-2 bg-white border-b border-gray-100 flex items-center">
+                <button onclick="closeEditProfile()" class="text-gray-500 p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition flex items-center gap-2">
+                    <i class="ph-bold ph-arrow-left text-xl"></i>
+                    <span class="font-bold text-buna text-sm">Cancel Edit</span>
+                </button>
             </div>
-            <div class="flex items-center gap-2 text-gray-600">
-                <i class="ph-bold ph-heart text-red-500"></i>
-                <span class="text-sm font-medium" id="stat-likes">0 Likes</span>
+            <!-- Stats -->
+            <div class="px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-2 text-gray-600">
+                    <i class="ph-bold ph-calendar text-botOrange"></i>
+                    <span class="text-[11px] font-medium uppercase tracking-wider" id="stat-date">Joined: --</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-600">
+                    <i class="ph-bold ph-heart text-red-500"></i>
+                    <span class="text-[11px] font-bold text-red-500 uppercase tracking-wider" id="stat-likes">0 Likes</span>
+                </div>
             </div>
         </div>
-
         <div class="max-w-md mx-auto p-6 py-10">
             <h2 id="reg-title" class="text-3xl font-bold text-buna mb-2 text-center transition-all">Step 1: Basics</h2>
             
