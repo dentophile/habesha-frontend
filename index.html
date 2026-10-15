@@ -344,20 +344,28 @@
 
     <!-- Bottom Navigation -->
     <div id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <!-- "Home" / Discover -->
         <button onclick="switchTab('swipe')" id="tab-swipe" class="flex flex-col items-center text-botOrange transition-colors">
             <i class="ph-bold ph-cards text-2xl mb-1"></i>
             <span class="text-xs font-bold">Discover</span>
         </button>
+        <!-- Matches -->
         <button onclick="switchTab('matches')" id="tab-matches" class="flex flex-col items-center text-gray-400 hover:text-botOrange transition-colors">
             <i class="ph-bold ph-chats-circle text-2xl mb-1"></i>
             <span class="text-xs font-bold">Matches</span>
         </button>
+        <!-- Profile (NEW) -->
+        <button onclick="switchTab('profile')" id="tab-profile" class="flex flex-col items-center text-gray-400 hover:text-botOrange transition-colors">
+            <i class="ph-bold ph-user text-2xl mb-1"></i>
+            <span class="text-xs font-bold">Profile</span>
+        </button>
+        <!-- Spy (Admin Only) -->
         <button onclick="switchTab('admin')" id="tab-admin" class="hidden flex-col items-center text-gray-400 hover:text-red-500 transition-colors">
             <i class="ph-bold ph-detective text-2xl mb-1"></i>
             <span class="text-xs font-bold">Spy</span>
         </button>
     </div>
-
+    
     <!-- MAIN JAVASCRIPT ENGINE -->
     <script>
         const tg = window.Telegram.WebApp;
