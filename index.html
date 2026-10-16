@@ -417,7 +417,7 @@
                 </div>
             </div>
 
-            <!-- Page 3: Bio, Icebreaker & Voice Bio -->
+            <!-- Page 3: Bio, Icebreaker & Universal Voice Bio -->
             <div id="page-3" class="hidden space-y-4 transition-all">
                 <textarea id="reg-bio" placeholder="Tell us about yourself... (Hobbies, what you're looking for)" class="w-full p-4 border rounded-xl bg-gray-50 h-28 focus:outline-none focus:border-botOrange resize-none"></textarea>
 
@@ -434,18 +434,28 @@
                     </select>
                 </div>
 
-                <!-- Voice Bio Recorder -->
-                <div class="bg-orange-50 border border-orange-100 rounded-2xl p-4 text-center">
-                    <p class="text-xs font-bold text-buna mb-1 flex items-center justify-center gap-1"><i class="ph-fill ph-microphone text-botOrange text-base"></i> Voice Intro (Optional - 15s)</p>
-                    <p class="text-[11px] text-gray-500 mb-3" id="voice-status-text">Profiles with a short voice greeting get 3x more matches!</p>
-                    <div class="flex items-center justify-center gap-2">
-                        <button type="button" id="btn-record-voice" onclick="toggleVoiceRecording()" class="px-4 py-2.5 bg-botOrange text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition">
-                            <i class="ph-fill ph-record text-base"></i> <span id="record-btn-label">Record Voice Bio</span>
+                <!-- Universal Voice Bio Recorder + Native File Fallback -->
+                <div class="bg-orange-50 border border-orange-100 rounded-2xl p-4 text-center space-y-2.5">
+                    <p class="text-xs font-bold text-buna flex items-center justify-center gap-1">
+                        <i class="ph-fill ph-microphone text-botOrange text-base"></i> Voice Intro (Optional - 15s)
+                    </p>
+                    <p class="text-[11px] text-gray-500" id="voice-status-text">Profiles with a short voice greeting get 3x more matches!</p>
+                    
+                    <div class="flex flex-wrap items-center justify-center gap-2">
+                        <button type="button" id="btn-record-voice" onclick="toggleVoiceRecording()" class="px-3.5 py-2.5 bg-botOrange text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition">
+                            <i class="ph-fill ph-record text-base" id="record-btn-icon"></i> <span id="record-btn-label">Record Mic</span>
                         </button>
-                        <button type="button" id="btn-play-recorded" onclick="playRecordedPreview()" class="hidden px-3 py-2.5 bg-white text-buna border border-gray-200 rounded-xl font-bold text-xs items-center gap-1 shadow-sm">
+                        <button type="button" onclick="document.getElementById('voice-file-input').click()" class="px-3.5 py-2.5 bg-white text-buna border border-orange-200 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition">
+                            <i class="ph-bold ph-upload-simple text-botOrange text-sm"></i> Upload Audio
+                        </button>
+                        <button type="button" id="btn-play-recorded" onclick="playRecordedPreview()" class="hidden px-3 py-2.5 bg-green-600 text-white rounded-xl font-bold text-xs items-center gap-1 shadow-sm active:scale-95 transition">
                             <i class="ph-fill ph-play"></i> Listen
                         </button>
+                        <button type="button" id="btn-clear-voice" onclick="clearVoiceBio()" class="hidden px-2.5 py-2.5 bg-red-50 text-red-500 border border-red-100 rounded-xl font-bold text-xs items-center justify-center shadow-sm active:scale-95 transition" title="Remove Voice Bio">
+                            <i class="ph-bold ph-trash"></i>
+                        </button>
                     </div>
+                    <input id="voice-file-input" type="file" accept="audio/*,video/mp4" class="hidden" onchange="handleVoiceFileSelect(event)">
                 </div>
 
                 <div class="flex gap-2 pt-2">
@@ -726,13 +736,15 @@
         let selectedPhotoFiles = { 1: null, 2: null, 3: null };
         let currentPhotoSlideIndex = 0;
 
-        // Voice Bio State
+        // Universal Voice Bio State
         let mediaRecorder = null;
         let audioChunks = [];
         let recordedVoiceBlob = null;
+        let recordedVoiceExt = "webm";
         let recordedVoicePreviewUrl = "";
         let savedVoiceBioUrl = "";
         let isRecordingVoice = false;
+        let recordTimeoutId = null;
         let currentPlayingAudio = null;
 
         let selectedVerifySelfieFile = null;
@@ -982,7 +994,7 @@
             renderCards();
         }
 
-        // --- MULTI-PHOTO CAROUSEL & VOICE BIO PLAYER ---
+        // --- MULTI-PHOTO CAROUSEL & UNIVERSAL VOICE BIO PLAYER ---
         function getProfilePhotoArray(profile) {
             const arr = [profile.photo_url || DEFAULT_AVATAR];
             if (profile.photo_url_2 && profile.photo_url_2.trim() !== "") arr.push(profile.photo_url_2);
@@ -1008,12 +1020,24 @@
         function playProfileVoiceBio(url, event) {
             if (event) event.stopPropagation();
             if (!url) return;
-            if (currentPlayingAudio) {
-                currentPlayingAudio.pause();
-                currentPlayingAudio = null;
+            try {
+                if (currentPlayingAudio) {
+                    currentPlayingAudio.pause();
+                    currentPlayingAudio = null;
+                }
+                const audio = new Audio();
+                audio.preload = "auto";
+                audio.src = url;
+                currentPlayingAudio = audio;
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(() => {
+                        showAlert("Unable to play this audio format on your device.");
+                    });
+                }
+            } catch (err) {
+                showAlert("Could not play voice bio.");
             }
-            currentPlayingAudio = new Audio(url);
-            currentPlayingAudio.play().catch(() => showAlert("Could not play voice bio."));
         }
 
         function renderCards() {
@@ -2003,7 +2027,7 @@
             }
         }
 
-        // --- MULTI-PHOTO & VOICE RECORDING HANDLERS ---
+        // --- MULTI-PHOTO & UNIVERSAL VOICE BIO HANDLERS ---
         function handlePhotoSelect(event, slot = 1) {
             const file = event.target.files[0];
             if (file) {
@@ -2021,37 +2045,67 @@
             }
         }
 
+        function getSupportedAudioMime() {
+            if (typeof MediaRecorder === "undefined") return { mimeType: "", ext: "m4a" };
+            const candidates = [
+                { mimeType: "audio/mp4", ext: "m4a" },
+                { mimeType: "audio/webm;codecs=opus", ext: "webm" },
+                { mimeType: "audio/webm", ext: "webm" },
+                { mimeType: "audio/ogg;codecs=opus", ext: "ogg" }
+            ];
+            for (const c of candidates) {
+                if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(c.mimeType)) {
+                    return c;
+                }
+            }
+            return { mimeType: "", ext: "webm" };
+        }
+
         async function toggleVoiceRecording() {
             const btnLabel = document.getElementById('record-btn-label');
             const statusText = document.getElementById('voice-status-text');
             const playBtn = document.getElementById('btn-play-recorded');
+            const clearBtn = document.getElementById('btn-clear-voice');
 
+            // Stop active recording if currently recording
             if (isRecordingVoice && mediaRecorder) {
-                mediaRecorder.stop();
+                if (recordTimeoutId) clearTimeout(recordTimeoutId);
+                try { mediaRecorder.stop(); } catch (e) {}
                 isRecordingVoice = false;
-                btnLabel.innerText = "Re-record Voice";
+                btnLabel.innerText = "Re-record Mic";
                 return;
             }
 
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                return showAlert("Microphone recording is not supported on this browser.");
+            // Fallback to native file picker if WebView/Browser doesn't support MediaRecorder
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
+                statusText.innerText = "Live mic blocked by your browser—opening audio picker...";
+                document.getElementById('voice-file-input').click();
+                return;
             }
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 audioChunks = [];
-                mediaRecorder = new MediaRecorder(stream);
+                const format = getSupportedAudioMime();
+                recordedVoiceExt = format.ext;
+
+                mediaRecorder = format.mimeType 
+                    ? new MediaRecorder(stream, { mimeType: format.mimeType }) 
+                    : new MediaRecorder(stream);
 
                 mediaRecorder.ondataavailable = e => {
-                    if (e.data.size > 0) audioChunks.push(e.data);
+                    if (e.data && e.data.size > 0) audioChunks.push(e.data);
                 };
 
                 mediaRecorder.onstop = () => {
-                    recordedVoiceBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const finalMime = mediaRecorder.mimeType || format.mimeType || 'audio/webm';
+                    recordedVoiceBlob = new Blob(audioChunks, { type: finalMime });
                     recordedVoicePreviewUrl = URL.createObjectURL(recordedVoiceBlob);
-                    statusText.innerText = "✅ Voice Bio recorded! Tap Listen to preview.";
+                    statusText.innerText = "✅ Voice Bio ready! Tap Listen to preview.";
                     playBtn.classList.remove('hidden');
                     playBtn.classList.add('flex');
+                    clearBtn.classList.remove('hidden');
+                    clearBtn.classList.add('flex');
                     stream.getTracks().forEach(t => t.stop());
                 };
 
@@ -2060,23 +2114,66 @@
                 btnLabel.innerText = "Stop (Recording...)";
                 statusText.innerText = "🎙️ Speak now (up to 15 seconds)...";
 
-                setTimeout(() => {
+                recordTimeoutId = setTimeout(() => {
                     if (isRecordingVoice && mediaRecorder && mediaRecorder.state === "recording") {
-                        mediaRecorder.stop();
+                        try { mediaRecorder.stop(); } catch (e) {}
                         isRecordingVoice = false;
-                        btnLabel.innerText = "Re-record Voice";
+                        btnLabel.innerText = "Re-record Mic";
                     }
                 }, 15000);
             } catch (err) {
-                showAlert("Please allow microphone access to record a voice bio.");
+                statusText.innerText = "Mic permission blocked—tap 'Upload Audio' to attach a voice note!";
+                showAlert("Microphone access is blocked on this device/app. Please tap 'Upload Audio' to pick or record a voice note from your phone!");
             }
+        }
+
+        function handleVoiceFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 8 * 1024 * 1024) {
+                return showAlert("Audio file is too large. Please select a short voice note under 8MB.");
+            }
+            recordedVoiceBlob = file;
+            const parts = (file.name || "").split(".");
+            recordedVoiceExt = parts.length > 1 ? parts.pop().toLowerCase() : "m4a";
+            recordedVoicePreviewUrl = URL.createObjectURL(file);
+
+            document.getElementById('voice-status-text').innerText = `✅ Attached: ${file.name}`;
+            const playBtn = document.getElementById('btn-play-recorded');
+            const clearBtn = document.getElementById('btn-clear-voice');
+            playBtn.classList.remove('hidden');
+            playBtn.classList.add('flex');
+            clearBtn.classList.remove('hidden');
+            clearBtn.classList.add('flex');
+        }
+
+        function clearVoiceBio() {
+            recordedVoiceBlob = null;
+            recordedVoicePreviewUrl = "";
+            savedVoiceBioUrl = "";
+            if (currentPlayingAudio) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio = null;
+            }
+            document.getElementById('voice-file-input').value = "";
+            document.getElementById('voice-status-text').innerText = "Voice Bio removed.";
+            document.getElementById('record-btn-label').innerText = "Record Mic";
+            document.getElementById('btn-play-recorded').classList.add('hidden');
+            document.getElementById('btn-play-recorded').classList.remove('flex');
+            document.getElementById('btn-clear-voice').classList.add('hidden');
+            document.getElementById('btn-clear-voice').classList.remove('flex');
         }
 
         function playRecordedPreview() {
             const url = recordedVoicePreviewUrl || savedVoiceBioUrl;
             if (!url) return;
+            if (currentPlayingAudio) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio = null;
+            }
             const audio = new Audio(url);
-            audio.play();
+            currentPlayingAudio = audio;
+            audio.play().catch(() => showAlert("Could not preview audio on this device."));
         }
 
         function toggleOtherLocation() {
@@ -2211,8 +2308,11 @@
                 if (mp.voice_bio_url) {
                     savedVoiceBioUrl = mp.voice_bio_url;
                     const playBtn = document.getElementById('btn-play-recorded');
+                    const clearBtn = document.getElementById('btn-clear-voice');
                     playBtn.classList.remove('hidden');
                     playBtn.classList.add('flex');
+                    clearBtn.classList.remove('hidden');
+                    clearBtn.classList.add('flex');
                 }
             }
 
@@ -2248,15 +2348,19 @@
                     }
                 }
 
-                // Upload Voice Bio if recorded
+                // Upload Voice Bio if recorded or selected via fallback
                 let finalVoiceUrl = savedVoiceBioUrl;
                 if (recordedVoiceBlob) {
                     const vfd = new FormData();
-                    vfd.append('file', recordedVoiceBlob, 'voice.webm');
+                    vfd.append('file', recordedVoiceBlob, `voice.${recordedVoiceExt || 'webm'}`);
                     vfd.append('telegram_id', cleanTelegramId);
                     const vr = await fetch(`${BACKEND_URL}/api/upload-voice`, { method: 'POST', body: vfd });
-                    const vd = await vr.json();
-                    if (vd.voice_bio_url) finalVoiceUrl = vd.voice_bio_url;
+                    if (vr.ok) {
+                        const vd = await vr.json();
+                        if (vd.voice_bio_url) finalVoiceUrl = vd.voice_bio_url;
+                    } else {
+                        showAlert("Note: Could not upload voice intro (check Supabase 'avatars' bucket MIME settings), saving profile without audio.");
+                    }
                 }
 
                 const referredBy = localStorage.getItem("habesha_referred_by") || "";
