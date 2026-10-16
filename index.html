@@ -62,18 +62,37 @@
         </div>
     </div>
 
+    <!-- Custom Delete Message Confirm Box -->
+    <div id="delete-msg-confirm" class="hidden fixed inset-0 z-[130] flex items-center justify-center bg-black bg-opacity-50 px-4 transition-opacity">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
+            <h3 class="text-xl font-bold mb-2 text-red-500">Delete Message</h3>
+            <p class="text-gray-600 mb-6">Are you sure you want to delete this message?</p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteMsgConfirm()" class="w-1/2 p-3 bg-gray-200 text-gray-700 rounded-xl font-bold">Cancel</button>
+                <button onclick="executeDeleteMsg()" class="w-1/2 p-3 bg-red-500 text-white rounded-xl font-bold">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Verification Modal -->
-    <div id="verify-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-50 px-4 transition-opacity">
+    <div id="verify-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-60 px-4 transition-opacity">
         <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-2 bg-verify"></div>
-            <i class="ph-fill ph-seal-check text-6xl text-verify mb-2 mt-4 inline-block"></i>
-            <h3 class="text-2xl font-bold mb-2">Get Verified</h3>
-            <p class="text-gray-600 mb-6 text-sm">Earn the blue checkmark so others know your profile is real! We use standard verification checks to ensure authenticity.</p>
+            <i class="ph-fill ph-seal-check text-5xl text-verify mb-1 mt-2 inline-block"></i>
+            <h3 class="text-2xl font-bold mb-1">Selfie Verification</h3>
+            <p class="text-gray-600 mb-4 text-xs">Take a quick selfie holding up a <b>Peace Sign (✌️)</b> so our team can verify you match your profile photo!</p>
+
+            <!-- Selfie Camera Upload Box -->
+            <div onclick="document.getElementById('verify-selfie-input').click()" class="w-36 h-36 mx-auto mb-4 rounded-2xl border-2 border-dashed border-verify bg-blue-50 flex flex-col items-center justify-center cursor-pointer overflow-hidden bg-cover bg-center relative shadow-inner" id="verify-selfie-preview">
+                <span class="text-3xl mb-1" id="verify-pose-emoji">✌️</span>
+                <span class="text-xs font-bold text-verify px-2" id="verify-selfie-text">Tap to Take Selfie</span>
+            </div>
+            <input id="verify-selfie-input" type="file" accept="image/*" capture="user" class="hidden" onchange="handleVerifySelfieSelect(event)">
             
-            <button onclick="submitVerification()" id="btn-verify-submit" class="w-full p-4 bg-verify text-white rounded-xl font-bold mb-3 shadow-md hover:bg-opacity-90 transition">
-                Verify My Profile Now
+            <button onclick="submitVerification()" id="btn-verify-submit" class="w-full p-4 bg-verify text-white rounded-xl font-bold mb-2.5 shadow-md hover:bg-opacity-90 transition text-sm">
+                Submit Selfie for Review
             </button>
-            <button onclick="closeVerifyModal()" class="w-full p-3 bg-gray-100 text-gray-600 rounded-xl font-bold">Maybe Later</button>
+            <button onclick="closeVerifyModal()" class="w-full p-2.5 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm">Cancel</button>
         </div>
     </div>
 
@@ -556,6 +575,7 @@
 
         let selectedPhotoUrl = DEFAULT_AVATAR;
         let selectedPhotoFile = null;
+        let selectedVerifySelfieFile = null;
         let isEditing = false;
         let allProfiles = []; 
         let showingNewOnly = false;
@@ -909,30 +929,64 @@
             document.getElementById('verify-modal').classList.add('hidden');
         }
 
-        async function submitVerification() {
-            const btn = document.getElementById('btn-verify-submit');
-            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Processing...`;
-            btn.disabled = true;
-            try {
-                await fetch(`${BACKEND_URL}/api/verify-user`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegram_id: cleanTelegramId })
-                });
-                if (window.myProfileData) window.myProfileData.is_verified = true;
-                closeVerifyModal();
-                showAlert("Success! Your profile is now Verified.");
-                refreshProfileStats();
-            } catch (e) {
-                showAlert("Verification failed. Please try again.");
+        function handleVerifySelfieSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedVerifySelfieFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('verify-selfie-preview');
+                    preview.style.backgroundImage = `url(${e.target.result})`;
+                    preview.classList.remove('border-dashed');
+                    document.getElementById('verify-pose-emoji').classList.add('hidden');
+                    document.getElementById('verify-selfie-text').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
             }
-            btn.innerHTML = `Verify My Profile Now`;
-            btn.disabled = false;
         }
 
-        function openPremiumModal() {
+        async function submitVerification() {
+            if (!selectedVerifySelfieFile) {
+                return showAlert("Please tap the camera box to take your Peace Sign (✌️) selfie first!");
+            }
+
+            const btn = document.getElementById('btn-verify-submit');
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Uploading Selfie...`;
+            btn.disabled = true;
+            try {
+                const fd = new FormData();
+                fd.append('file', selectedVerifySelfieFile);
+                fd.append('telegram_id', cleanTelegramId);
+
+                const res = await fetch(`${BACKEND_URL}/api/submit-verification`, {
+                    method: 'POST',
+                    body: fd
+                });
+                if (!res.ok) throw new Error("Upload failed");
+
+                if (window.myProfileData) window.myProfileData.verification_status = "pending";
+                closeVerifyModal();
+                showAlert("🤳 Selfie submitted! Our team will review your photo and activate your Blue Checkmark shortly.");
+                refreshProfileStats();
+            } catch (e) {
+                showAlert("Verification upload failed. Please try again.");
+            } finally {
+                btn.innerHTML = `Submit Selfie for Review`;
+                btn.disabled = false;
+            }
+        }
+
+        async function openPremiumModal() {
             document.getElementById('premium-modal').classList.remove('hidden');
-            loadPaymentConfig();
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/payment-info`);
+                const info = await res.json();
+                if (info.telebirr_phone) document.getElementById('telebirr-merchant-phone').innerText = info.telebirr_phone;
+                if (info.telebirr_name) document.getElementById('telebirr-merchant-name').innerText = info.telebirr_name;
+                if (info.price_etb) document.getElementById('prem-price-label').innerText = `${info.price_etb} ETB`;
+            } catch (e) {
+                console.error("Failed to fetch payment info", e);
+            }
         }
 
         function closePremiumModal() {
@@ -940,51 +994,40 @@
         }
 
         function switchPaymentTab(tab) {
-            const telebirrTab = document.getElementById('tab-pay-telebirr');
-            const chapaTab = document.getElementById('tab-pay-chapa');
-            const telebirrSec = document.getElementById('pay-section-telebirr');
-            const chapaSec = document.getElementById('pay-section-chapa');
+            const btnTelebirr = document.getElementById('tab-pay-telebirr');
+            const btnChapa = document.getElementById('tab-pay-chapa');
+            const secTelebirr = document.getElementById('pay-section-telebirr');
+            const secChapa = document.getElementById('pay-section-chapa');
 
             if (tab === 'telebirr') {
-                telebirrTab.className = "w-1/2 py-2 rounded-lg bg-white text-buna shadow-sm transition";
-                chapaTab.className = "w-1/2 py-2 rounded-lg text-gray-500 transition";
-                telebirrSec.classList.remove('hidden');
-                chapaSec.classList.add('hidden');
+                btnTelebirr.className = "w-1/2 py-2 rounded-lg bg-white text-buna shadow-sm transition";
+                btnChapa.className = "w-1/2 py-2 rounded-lg text-gray-500 transition";
+                secTelebirr.classList.remove('hidden');
+                secChapa.classList.add('hidden');
             } else {
-                chapaTab.className = "w-1/2 py-2 rounded-lg bg-white text-buna shadow-sm transition";
-                telebirrTab.className = "w-1/2 py-2 rounded-lg text-gray-500 transition";
-                chapaSec.classList.remove('hidden');
-                telebirrSec.classList.add('hidden');
+                btnChapa.className = "w-1/2 py-2 rounded-lg bg-white text-buna shadow-sm transition";
+                btnTelebirr.className = "w-1/2 py-2 rounded-lg text-gray-500 transition";
+                secChapa.classList.remove('hidden');
+                secTelebirr.classList.add('hidden');
             }
-        }
-
-        async function loadPaymentConfig() {
-            try {
-                const res = await fetch(`${BACKEND_URL}/api/payment-info`);
-                const info = await res.json();
-                if (info.telebirr_phone) {
-                    document.getElementById('telebirr-merchant-phone').innerText = info.telebirr_phone;
-                }
-                if (info.telebirr_name) {
-                    document.getElementById('telebirr-merchant-name').innerText = info.telebirr_name;
-                }
-                if (info.price_etb) {
-                    document.getElementById('prem-price-label').innerText = `${info.price_etb} ETB`;
-                }
-            } catch (e) {}
         }
 
         function copyTelebirrPhone() {
             const phone = document.getElementById('telebirr-merchant-phone').innerText;
-            navigator.clipboard.writeText(phone);
-            showAlert(`Copied Telebirr number: ${phone}`);
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(phone);
+                showAlert(`Copied Telebirr number: ${phone}`);
+            } else {
+                showAlert(`Telebirr Number: ${phone}`);
+            }
         }
 
         async function submitManualTelebirr() {
-            const txRef = document.getElementById('telebirr-tx-ref').value.trim();
             const senderPhone = document.getElementById('telebirr-sender-phone').value.trim();
+            const txRef = document.getElementById('telebirr-tx-ref').value.trim();
+
             if (!txRef || txRef.length < 5) {
-                return showAlert("Please enter a valid Telebirr Transaction ID from your SMS receipt.");
+                return showAlert("Please enter a valid Telebirr Transaction Reference ID from your SMS receipt.");
             }
 
             const btn = document.getElementById('btn-telebirr-submit');
@@ -1003,12 +1046,11 @@
                 });
                 if (!res.ok) throw new Error("Failed to submit");
 
-                if (window.myProfileData) window.myProfileData.premium_status = "pending_manual";
                 closePremiumModal();
-                showAlert("✅ Receipt submitted! Our admin will verify your Telebirr transfer shortly and you'll get a notification on Telegram.");
+                showAlert("✅ Payment Reference Submitted! Our team is verifying your Telebirr transfer and will unlock your Premium status shortly.");
                 refreshProfileStats();
             } catch (e) {
-                showAlert("Could not submit transaction ID. Please try again.");
+                showAlert("Could not submit payment reference. Please try again.");
             } finally {
                 btn.innerHTML = `Verify Telebirr Payment`;
                 btn.disabled = false;
@@ -1017,8 +1059,9 @@
 
         async function startChapaCheckout() {
             const btn = document.getElementById('btn-chapa-submit');
-            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Opening Chapa...`;
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Initializing Chapa...`;
             btn.disabled = true;
+
             try {
                 const res = await fetch(`${BACKEND_URL}/api/payment/chapa-initialize`, {
                     method: 'POST',
@@ -1027,13 +1070,14 @@
                 });
                 const data = await res.json();
                 if (!res.ok) {
-                    throw new Error(data.detail || "Chapa initialization failed");
+                    throw new Error(data.detail || "Chapa is not enabled yet. Please use the Direct Telebirr tab.");
                 }
                 if (data.checkout_url) {
                     window.location.href = data.checkout_url;
                 }
             } catch (e) {
-                showAlert(e.message || "Chapa is not enabled yet. Please use the Direct Telebirr tab!");
+                showAlert(e.message);
+                switchPaymentTab('telebirr');
             } finally {
                 btn.innerHTML = `<i class="ph-bold ph-shield-check text-lg"></i> Pay 100 ETB with Chapa`;
                 btn.disabled = false;
@@ -1044,7 +1088,7 @@
             const profile = profiles[currentCardIndex];
             if(!profile) return;
             const joinDate = profile.created_at ? profile.created_at.split('T')[0] : "Unknown";
-            const verifyBadge = profile.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1"></i>` : '';
+            const verifyBadge = profile.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1 text-2xl"></i>` : '';
 
             document.getElementById('profile-details-content').innerHTML = `
                 <h3 class="text-3xl font-bold text-buna mb-2 flex items-center">${profile.name}, ${profile.age} ${verifyBadge}</h3>
@@ -1091,7 +1135,7 @@
             userToReport = reportedId; 
             document.getElementById('report-modal').classList.remove('hidden'); 
         }
-        
+
         function closeReportModal() { 
             userToReport = null; 
             document.getElementById('report-modal').classList.add('hidden'); 
@@ -1133,25 +1177,16 @@
                     window.myProfileData = data.profile; 
                     const mp = data.profile;
                     
+                    const profilePhoto = document.getElementById('my-profile-photo');
+                    if (profilePhoto) profilePhoto.style.backgroundImage = `url('${mp.photo_url || DEFAULT_AVATAR}')`;
+
                     const profileLikes = document.getElementById('my-profile-likes');
                     if (profileLikes) profileLikes.innerText = `❤️ ${mp.total_likes || 0} Likes`;
                     
-                    const verifyBadge = mp.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1"></i>` : '';
                     const profileName = document.getElementById('my-profile-name');
-                    if (profileName) profileName.innerHTML = `${mp.name || 'User'}, ${mp.age || '?'} ${verifyBadge}`;
+                    const crownHtml = mp.is_premium ? `<i class="ph-fill ph-crown text-premium ml-1"></i>` : '';
+                    if (profileName) profileName.innerHTML = `${mp.name || 'User'}, ${mp.age || '?'} ${crownHtml}`;
 
-                    if (mp.is_premium) {
-                        const premBtn = document.getElementById('btn-profile-premium');
-                        if (premBtn) {
-                            premBtn.innerHTML = `<div class="flex items-center gap-3"><i class="ph-fill ph-crown text-xl"></i> Premium Active</div><i class="ph-bold ph-check text-green-500"></i>`;
-                            premBtn.onclick = null;
-                        }
-                    } else if (mp.premium_status === 'pending_manual') {
-                        const premBtn = document.getElementById('btn-profile-premium');
-                        if (premBtn) {
-                            premBtn.innerHTML = `<div class="flex items-center gap-3"><i class="ph-bold ph-clock text-xl"></i> Payment Under Review</div><span class="text-xs bg-purple-100 px-2 py-0.5 rounded-full">Pending</span>`;
-                        }
-                    }
                     if (mp.is_verified) {
                         const verBtn = document.getElementById('btn-profile-verify');
                         if (verBtn) {
@@ -1160,6 +1195,24 @@
                         }
                         const verBadge = document.getElementById('my-verified-badge');
                         if (verBadge) verBadge.classList.remove('hidden');
+                    } else if (mp.verification_status === 'pending') {
+                        const verBtn = document.getElementById('btn-profile-verify');
+                        if (verBtn) {
+                            verBtn.innerHTML = `<div class="flex items-center gap-3"><i class="ph-bold ph-clock text-xl"></i> Selfie Under Review</div><span class="text-xs bg-blue-100 px-2 py-0.5 rounded-full">Pending</span>`;
+                        }
+                    }
+
+                    if (mp.is_premium) {
+                        const premBtn = document.getElementById('btn-profile-premium');
+                        if (premBtn) {
+                            premBtn.innerHTML = `<div class="flex items-center gap-3"><i class="ph-fill ph-crown text-xl"></i> Habesha Premium Active</div><i class="ph-bold ph-check text-green-500"></i>`;
+                            premBtn.onclick = null;
+                        }
+                    } else if (mp.premium_status === 'pending_manual') {
+                        const premBtn = document.getElementById('btn-profile-premium');
+                        if (premBtn) {
+                            premBtn.innerHTML = `<div class="flex items-center gap-3"><i class="ph-bold ph-clock text-xl"></i> Payment Under Review</div><span class="text-xs bg-purple-100 px-2 py-0.5 rounded-full">Pending</span>`;
+                        }
                     }
                 }
             } catch (error) {
@@ -1191,18 +1244,7 @@
                 loadAdminConversations();
             } else if (tab === 'profile') {
                 document.getElementById('tab-profile').classList.replace('text-gray-400', 'text-botOrange');
-                
-                if (window.myProfileData) {
-                    const mp = window.myProfileData;
-                    document.getElementById('my-profile-photo').style.backgroundImage = `url('${mp.photo_url || DEFAULT_AVATAR}')`;
-                    const verifyBadge = mp.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1"></i>` : '';
-                    document.getElementById('my-profile-name').innerHTML = `${mp.name || 'User'}, ${mp.age || '?'} ${verifyBadge}`;
-                    document.getElementById('my-profile-likes').innerText = `❤️ ${mp.total_likes || 0} Likes`;
-                }
-                
-                if (typeof refreshProfileStats === "function") {
-                    refreshProfileStats();
-                }
+                refreshProfileStats();
             }
         }
         
@@ -1225,8 +1267,9 @@
             const container = document.getElementById('matches-container');
             container.innerHTML = `<div class="flex justify-center mt-10"><i class="ph ph-spinner animate-spin text-3xl text-botOrange"></i></div>`;
             
-            // Render the Premium "Who Liked You" section
-            renderPremiumLikesSection();
+            // Refresh user profile to get fresh "Who Liked You" pending_likes
+            await refreshProfileStats();
+            renderPendingLikes();
 
             try {
                 const response = await fetch(`${BACKEND_URL}/api/matches-list/${cleanTelegramId}`);
@@ -1250,21 +1293,76 @@
             }
         }
 
+        function renderPendingLikes() {
+            const likesContainer = document.getElementById('premium-likes-container');
+            const likesList = document.getElementById('premium-likes-list');
+            const likesCount = document.getElementById('premium-likes-count');
+            const upsellMsg = document.getElementById('premium-upsell-msg');
+
+            const pending = (window.myProfileData && window.myProfileData.pending_likes) ? window.myProfileData.pending_likes : [];
+            const isPrem = window.myProfileData && window.myProfileData.is_premium;
+
+            if (pending.length === 0) {
+                likesContainer.classList.add('hidden');
+                return;
+            }
+
+            likesContainer.classList.remove('hidden');
+            likesCount.innerText = pending.length;
+
+            if (isPrem) {
+                upsellMsg.classList.add('hidden');
+                likesList.innerHTML = pending.map(u => `
+                    <div onclick="instantMatchFromPremium('${u.telegram_id}', '${u.name.replace(/'/g, "\\'")}')" class="flex flex-col items-center shrink-0 cursor-pointer group">
+                        <div class="w-16 h-16 rounded-2xl bg-cover bg-center border-2 border-premium shadow-sm mb-1" style="background-image: url('${u.photo_url || DEFAULT_AVATAR}')"></div>
+                        <span class="text-xs font-bold text-buna truncate w-16 text-center">${u.name}</span>
+                    </div>
+                `).join('');
+            } else {
+                upsellMsg.classList.remove('hidden');
+                likesList.innerHTML = pending.map(u => `
+                    <div onclick="openPremiumModal()" class="flex flex-col items-center shrink-0 cursor-pointer">
+                        <div class="w-16 h-16 rounded-2xl bg-cover bg-center border border-gray-200 mb-1 blur-premium" style="background-image: url('${u.photo_url || DEFAULT_AVATAR}')"></div>
+                        <span class="text-xs font-bold text-gray-400">Someone</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function instantMatchFromPremium(targetId, targetName) {
+            try {
+                await fetch(`${BACKEND_URL}/api/swipe`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        swiper_id: cleanTelegramId, 
+                        swiped_id: targetId, 
+                        is_like: true,
+                        is_super: false
+                    })
+                });
+                showAlert(`You matched with ${targetName}! ❤️`);
+                loadMatchesList();
+            } catch (e) {
+                showAlert("Failed to match.");
+            }
+        }
+
         function updateMatchListBadges() {
             if (!window.currentMatches) return;
             const container = document.getElementById('matches-container');
             
             container.innerHTML = window.currentMatches.map(match => {
-                const unreadCount = unreadData.senders[match.telegram_id] || 0;
+                const unreadCount = (unreadData && unreadData.senders && unreadData.senders[match.telegram_id]) ? unreadData.senders[match.telegram_id] : 0;
+                const verifyBadge = match.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1 text-base"></i>` : '';
+                
                 const badgeHtml = unreadCount > 0 
                     ? `<div class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-sm flex-shrink-0 animate-bounce">${unreadCount}</div>`
                     : `<div class="w-10 h-10 bg-orange-50 text-botOrange rounded-full flex items-center justify-center flex-shrink-0"><i class="ph-fill ph-chat-teardrop-text text-xl"></i></div>`;
 
-                const verifyBadge = match.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1 text-sm"></i>` : '';
-
                 return `
                     <div onclick="openChat('${match.telegram_id}', '${match.name.replace(/'/g, "\\'")}', '${match.photo_url || DEFAULT_AVATAR}')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition active:scale-95">
-                        <div class="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0 bg-cover bg-center relative" style="background-image: url('${match.photo_url || DEFAULT_AVATAR}')"></div>
+                        <div class="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0 bg-cover bg-center" style="background-image: url('${match.photo_url || DEFAULT_AVATAR}')"></div>
                         <div class="flex-1 overflow-hidden">
                             <h4 class="font-bold text-lg text-buna truncate flex items-center">${match.name} ${verifyBadge}</h4>
                             <p class="text-sm text-gray-500 truncate">${match.bio || "Say hi!"}</p>
@@ -1273,36 +1371,6 @@
                     </div>
                 `;
             }).join('');
-        }
-
-        function renderPremiumLikesSection() {
-            const pContainer = document.getElementById('premium-likes-container');
-            const pList = document.getElementById('premium-likes-list');
-            const pCount = document.getElementById('premium-likes-count');
-            const upsellMsg = document.getElementById('premium-upsell-msg');
-
-            if (!window.myProfileData || !window.myProfileData.pending_likes || window.myProfileData.pending_likes.length === 0) {
-                if (pContainer) pContainer.classList.add('hidden');
-                return;
-            }
-            
-            const likes = window.myProfileData.pending_likes;
-            pContainer.classList.remove('hidden');
-            pCount.innerText = likes.length;
-
-            if (window.myProfileData.is_premium) {
-                upsellMsg.classList.add('hidden');
-                pList.innerHTML = likes.map(l => `
-                    <div onclick="switchTab('swipe')" class="w-16 h-16 rounded-full flex-shrink-0 bg-cover bg-center border-2 border-premium relative cursor-pointer" style="background-image: url('${l.photo_url || DEFAULT_AVATAR}')" title="${l.name}"></div>
-                `).join('');
-            } else {
-                upsellMsg.classList.remove('hidden');
-                pList.innerHTML = likes.map(l => `
-                    <div onclick="openPremiumModal()" class="w-16 h-16 rounded-full bg-gray-300 flex-shrink-0 flex items-center justify-center blur-premium border-2 border-premium cursor-pointer overflow-hidden">
-                        <img src="${l.photo_url || DEFAULT_AVATAR}" class="w-full h-full object-cover">
-                    </div>
-                `).join('');
-            }
         }
 
         function startChatPolling(matchId, matchName) {
@@ -1329,6 +1397,7 @@
             messagesContainer.innerHTML = `<div class="flex justify-center mt-4"><i class="ph ph-spinner animate-spin text-botOrange text-3xl"></i></div>`;
             
             await loadChatHistory(matchId, matchName);
+            pollUnreadBadges();
             startChatPolling(matchId, matchName);
         }
 
@@ -1337,7 +1406,6 @@
             try {
                 if (!isPolling) {
                     await fetch(`${BACKEND_URL}/api/mark-messages-read/${cleanTelegramId}/${matchId}`, { method: 'POST' });
-                    pollUnreadBadges();
                 }
 
                 const response = await fetch(`${BACKEND_URL}/api/get-messages/${cleanTelegramId}/${matchId}`);
@@ -1400,7 +1468,6 @@
                 if (isAtBottom || !isPolling) messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 if (isPolling && data.messages.some(m => m.sender_id === matchId && !m.is_read)) {
                     await fetch(`${BACKEND_URL}/api/mark-messages-read/${cleanTelegramId}/${matchId}`, { method: 'POST' });
-                    pollUnreadBadges();
                 }
             } catch (err) { 
                 console.error("Chat history error", err); 
@@ -1438,7 +1505,11 @@
                 await fetch(`${BACKEND_URL}/api/send-message`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sender_id: cleanTelegramId, receiver_id: activeChatId, message: messageText })
+                    body: JSON.stringify({ 
+                        sender_id: cleanTelegramId, 
+                        receiver_id: activeChatId, 
+                        message: messageText 
+                    })
                 });
                 loadChatHistory(activeChatId, document.getElementById('chat-header-name').innerText, true);
             } catch (err) { 
@@ -1453,7 +1524,7 @@
             
             document.getElementById('inline-edit-box').classList.add('hidden');
             document.getElementById('inline-edit-box').classList.remove('flex');
-
+            
             document.getElementById('btn-delete-msg').style.display = 'flex';
             document.getElementById('btn-delete-msg').onclick = () => triggerDelete();
 
@@ -1492,7 +1563,17 @@
             } catch(e) {}
         }
 
-        async function triggerDelete() {
+        function triggerDelete() {
+            if (!selectedMsgId) return;
+            document.getElementById('delete-msg-confirm').classList.remove('hidden');
+        }
+
+        function closeDeleteMsgConfirm() {
+            document.getElementById('delete-msg-confirm').classList.add('hidden');
+        }
+
+        async function executeDeleteMsg() {
+            closeDeleteMsgConfirm();
             if (!selectedMsgId) return;
             const id = selectedMsgId; 
             closeMsgMenu();
@@ -1530,7 +1611,7 @@
         function confirmUnmatch() { 
             document.getElementById('custom-confirm').classList.remove('hidden'); 
         }
-        
+
         function closeConfirm() { 
             document.getElementById('custom-confirm').classList.add('hidden'); 
         }
@@ -1621,7 +1702,9 @@
             document.getElementById('page-3').classList.add('hidden');
             document.getElementById('page-' + step).classList.remove('hidden');
             
-            const titles = isEditing ? ["Edit Profile: Basics", "Edit Profile: Details", "Edit Profile: Bio"] : ["Step 1: Basics", "Step 2: Details", "Step 3: Bio"];
+            const titles = isEditing 
+                ? ["Edit Profile: Basics", "Edit Profile: Details", "Edit Profile: Bio"] 
+                : ["Step 1: Basics", "Step 2: Details", "Step 3: Bio"];
             document.getElementById('reg-title').innerText = titles[step - 1];
             document.getElementById('progress-bar').style.width = ["33.3%", "66.6%", "100%"][step - 1];
         }
