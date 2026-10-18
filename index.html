@@ -101,59 +101,144 @@
         </div>
     </div>
 
-    <!-- Search Filters Modal -->
+    <!-- Enhanced Search Filters Modal -->
     <div id="filter-modal" class="hidden fixed inset-0 z-[130] flex items-end sm:items-center justify-center bg-black bg-opacity-50 px-0 sm:px-4 transition-opacity">
-        <div class="bg-white rounded-t-3xl sm:rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-3.5 max-h-[88vh] overflow-y-auto no-scrollbar">
             <div class="flex justify-between items-center border-b border-gray-100 pb-3">
                 <h3 class="text-xl font-bold text-buna flex items-center gap-2"><i class="ph-bold ph-sliders-horizontal text-botOrange"></i> <span data-i18n="filter_title">Discovery Filters</span></h3>
                 <button onclick="closeFilterModal()" class="p-1.5 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><i class="ph-bold ph-x"></i></button>
             </div>
 
-            <!-- City Filter -->
+            <!-- Gender & Looking For (2-Column Grid) -->
+            <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1" data-i18n="gender_label">Show Gender</label>
+                    <select id="filter-gender" class="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-bold focus:outline-none focus:border-botOrange">
+                        <option value="">Everyone (All)</option>
+                        <option value="Woman">Women (ሴቶች)</option>
+                        <option value="Man">Men (ወንዶች)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1" data-i18n="intention_label">Looking For</label>
+                    <select id="filter-intention" class="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-bold focus:outline-none focus:border-botOrange">
+                        <option value="">Any Goal</option>
+                        <option value="Marriage">Marriage (ትዳር)</option>
+                        <option value="Serious Relationship">Serious (ቁም ነገር)</option>
+                        <option value="Casual Dating">Casual (ጓደኝነት)</option>
+                        <option value="Friendship">Friendship</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- City / Diaspora Filter (Expanded) -->
             <div>
-                <label class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1.5" data-i18n="city_label">City / Location</label>
-                <select id="filter-city" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium focus:outline-none focus:border-botOrange">
-                    <option value="">All Cities (Everywhere)</option>
-                    <option value="Addis Ababa">Addis Ababa (አዲስ አበባ)</option>
-                    <option value="Bahir Dar">Bahir Dar (ባሕር ዳር)</option>
-                    <option value="Hawassa">Hawassa (ሐዋሳ)</option>
-                    <option value="Adama">Adama (አዳማ)</option>
-                    <option value="Diaspora">Diaspora (ዲያስፖራ)</option>
+                <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1" data-i18n="city_label">City / Diaspora Location</label>
+                <select id="filter-city" class="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-medium focus:outline-none focus:border-botOrange">
+                    <option value="">🌍 All Cities & Diaspora (Everywhere)</option>
+                    <option value="ALL_ETHIOPIA">🇪🇹 All Ethiopia Cities Only</option>
+                    <option value="ALL_DIASPORA">✈️ All Diaspora Only</option>
+                    <optgroup label="🇪🇹 Major Cities in Ethiopia">
+                        <option value="Addis Ababa">Addis Ababa (አዲስ አበባ)</option>
+                        <option value="Adama">Adama / Nazret (አዳማ)</option>
+                        <option value="Hawassa">Hawassa (ሐዋሳ)</option>
+                        <option value="Bahir Dar">Bahir Dar (ባሕር ዳር)</option>
+                        <option value="Dire Dawa">Dire Dawa (ድሬዳዋ)</option>
+                        <option value="Mekelle">Mekelle (መቐለ)</option>
+                        <option value="Gondar">Gondar (ጎንደር)</option>
+                        <option value="Jimma">Jimma (ጅማ)</option>
+                        <option value="Dessie">Dessie (ደሴ)</option>
+                        <option value="Bishoftu">Bishoftu / Debre Zeit (ቢሾፍቱ)</option>
+                        <option value="Jijiga">Jijiga (ጅጅጋ)</option>
+                        <option value="Shashamane">Shashamane (ሻሸመኔ)</option>
+                        <option value="Harar">Harar (ሐረር)</option>
+                        <option value="Arba Minch">Arba Minch (አርባ ምንጭ)</option>
+                        <option value="Debre Birhan">Debre Birhan (ደብረ ብርሃን)</option>
+                        <option value="Debre Markos">Debre Markos (ደብረ ማርቆስ)</option>
+                        <option value="Asella">Asella (አሰላ)</option>
+                        <option value="Nekemte">Nekemte (ነቀምቴ)</option>
+                        <option value="Wolaita Sodo">Wolaita Sodo (ወላይታ ሶዶ)</option>
+                        <option value="Hosaena">Hosaena (ሆሳዕና)</option>
+                        <option value="Kombolcha">Kombolcha (ኮምቦልቻ)</option>
+                        <option value="Woldia">Woldia (ወልዲያ)</option>
+                        <option value="Axum">Axum (አክሱም)</option>
+                        <option value="Adigrat">Adigrat (ዓዲግራት)</option>
+                        <option value="Shire">Shire (ሽሬ)</option>
+                        <option value="Gambela">Gambela (ጋምቤላ)</option>
+                        <option value="Assosa">Assosa (አሶሳ)</option>
+                        <option value="Semera">Semera (ሰመራ)</option>
+                        <option value="Dilla">Dilla (ዲላ)</option>
+                        <option value="Ambo">Ambo (አምቦ)</option>
+                        <option value="Bale Robe">Bale Robe (ባሌ ሮቤ)</option>
+                    </optgroup>
+                    <optgroup label="✈️ Habesha Diaspora">
+                        <option value="Diaspora">Diaspora (All / General)</option>
+                        <option value="Diaspora - USA (DC / DMV)">🇺🇸 USA (Washington DC / DMV)</option>
+                        <option value="Diaspora - USA (Other)">🇺🇸 USA (Atlanta, Dallas, Seattle, LA...)</option>
+                        <option value="Diaspora - Canada">🇨🇦 Canada (Toronto, Calgary, Ottawa...)</option>
+                        <option value="Diaspora - UK (London)">🇬🇧 UK (London, Manchester...)</option>
+                        <option value="Diaspora - Europe">🇪🇺 Europe (Germany, Sweden, Norway, Italy...)</option>
+                        <option value="Diaspora - UAE (Dubai)">🇦🇪 UAE (Dubai / Abu Dhabi)</option>
+                        <option value="Diaspora - Middle East">🇸🇦 Middle East (Saudi, Qatar, Kuwait...)</option>
+                        <option value="Diaspora - Africa">🌍 Rest of Africa (Kenya, South Africa, Uganda...)</option>
+                        <option value="Diaspora - Australia">🇦🇺 Australia / New Zealand</option>
+                    </optgroup>
                 </select>
             </div>
 
-            <!-- Religion Filter -->
-            <div>
-                <label class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1.5" data-i18n="religion_label">Religion</label>
-                <select id="filter-religion" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium focus:outline-none focus:border-botOrange">
-                    <option value="">All Religions</option>
-                    <option value="Orthodox">Orthodox</option>
-                    <option value="Muslim">Muslim</option>
-                    <option value="Protestant">Protestant</option>
-                    <option value="Catholic">Catholic</option>
-                    <option value="Other">Other</option>
-                </select>
+            <!-- Religion & Education (2-Column Grid) -->
+            <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1" data-i18n="religion_label">Religion</label>
+                    <select id="filter-religion" class="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-medium focus:outline-none focus:border-botOrange">
+                        <option value="">All Religions</option>
+                        <option value="Orthodox">Orthodox</option>
+                        <option value="Muslim">Muslim</option>
+                        <option value="Protestant">Protestant</option>
+                        <option value="Catholic">Catholic</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1" data-i18n="education_label">Education</label>
+                    <select id="filter-education" class="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-medium focus:outline-none focus:border-botOrange">
+                        <option value="">All Levels</option>
+                        <option value="High School">High School</option>
+                        <option value="Vocational / Diploma">Diploma / TVET</option>
+                        <option value="Bachelor's">Bachelor's</option>
+                        <option value="Master's">Master's</option>
+                        <option value="PhD / Doctorate">PhD / Doctorate</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Age Range Filter -->
             <div>
-                <label class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1.5" data-i18n="age_range_label">Age Range</label>
+                <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1" data-i18n="age_range_label">Age Range</label>
                 <div class="flex items-center gap-2">
-                    <input id="filter-min-age" type="number" min="18" max="80" value="18" class="w-1/2 p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-bold text-center focus:outline-none focus:border-botOrange" placeholder="Min (18)">
-                    <span class="text-gray-400 font-bold">to</span>
-                    <input id="filter-max-age" type="number" min="18" max="80" value="60" class="w-1/2 p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-bold text-center focus:outline-none focus:border-botOrange" placeholder="Max (60)">
+                    <input id="filter-min-age" type="number" min="18" max="80" value="18" class="w-1/2 p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-bold text-center focus:outline-none focus:border-botOrange" placeholder="Min (18)">
+                    <span class="text-gray-400 font-bold text-xs">to</span>
+                    <input id="filter-max-age" type="number" min="18" max="80" value="60" class="w-1/2 p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-bold text-center focus:outline-none focus:border-botOrange" placeholder="Max (60)">
                 </div>
             </div>
 
-            <!-- Toggles -->
-            <div class="space-y-2 pt-1">
-                <label class="flex items-center justify-between p-3 bg-green-50 border border-green-100 rounded-xl cursor-pointer">
-                    <span class="text-sm font-bold text-green-800 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span> <span data-i18n="online_only">Online Now Only</span></span>
-                    <input id="filter-online-only" type="checkbox" class="w-5 h-5 accent-green-600 rounded">
+            <!-- Quick Filter Toggles (2x2 Grid) -->
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <label class="flex items-center justify-between p-2.5 bg-green-50 border border-green-100 rounded-xl cursor-pointer">
+                    <span class="text-xs font-bold text-green-800 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> <span data-i18n="online_only">Online</span></span>
+                    <input id="filter-online-only" type="checkbox" class="w-4 h-4 accent-green-600 rounded">
                 </label>
-                <label class="flex items-center justify-between p-3 bg-orange-50 border border-orange-100 rounded-xl cursor-pointer">
-                    <span class="text-sm font-bold text-buna flex items-center gap-2">✨ <span data-i18n="new_users_only">New Users (Joined This Week)</span></span>
-                    <input id="filter-new-only" type="checkbox" class="w-5 h-5 accent-botOrange rounded">
+                <label class="flex items-center justify-between p-2.5 bg-blue-50 border border-blue-100 rounded-xl cursor-pointer">
+                    <span class="text-xs font-bold text-verify flex items-center gap-1"><i class="ph-fill ph-seal-check"></i> <span data-i18n="verified_only">Verified</span></span>
+                    <input id="filter-verified-only" type="checkbox" class="w-4 h-4 accent-blue-600 rounded">
+                </label>
+                <label class="flex items-center justify-between p-2.5 bg-orange-50 border border-orange-100 rounded-xl cursor-pointer">
+                    <span class="text-xs font-bold text-buna flex items-center gap-1"><i class="ph-fill ph-microphone text-botOrange"></i> <span data-i18n="voice_only">Voice Bio</span></span>
+                    <input id="filter-voice-only" type="checkbox" class="w-4 h-4 accent-botOrange rounded">
+                </label>
+                <label class="flex items-center justify-between p-2.5 bg-amber-50 border border-amber-100 rounded-xl cursor-pointer">
+                    <span class="text-xs font-bold text-buna flex items-center gap-1">✨ <span data-i18n="new_users_only">New Users</span></span>
+                    <input id="filter-new-only" type="checkbox" class="w-4 h-4 accent-botOrange rounded">
                 </label>
             </div>
 
@@ -368,17 +453,60 @@
                     <option value="Friendship">Friendship (ምርጥ ጓደኛ)</option>
                 </select>
                 
+                <!-- Expanded Ethiopian Cities + Diaspora Options -->
                 <select id="reg-location" onchange="toggleOtherLocation()" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
-                    <option value="">Living City / ከተማ</option>
-                    <option value="Addis Ababa">Addis Ababa (አዲስ አበባ)</option>
-                    <option value="Bahir Dar">Bahir Dar (ባሕር ዳር)</option>
-                    <option value="Hawassa">Hawassa (ሐዋሳ)</option>
-                    <option value="Adama">Adama (አዳማ)</option>
-                    <option value="Diaspora">Diaspora (ዲያስፖራ)</option>
-                    <option value="Other">Other (ሌላ)</option>
+                    <option value="">Living City or Diaspora / ከተማ</option>
+                    <optgroup label="🇪🇹 Major Cities in Ethiopia">
+                        <option value="Addis Ababa">Addis Ababa (አዲስ አበባ)</option>
+                        <option value="Adama">Adama / Nazret (አዳማ)</option>
+                        <option value="Hawassa">Hawassa (ሐዋሳ)</option>
+                        <option value="Bahir Dar">Bahir Dar (ባሕር ዳር)</option>
+                        <option value="Dire Dawa">Dire Dawa (ድሬዳዋ)</option>
+                        <option value="Mekelle">Mekelle (መቐለ)</option>
+                        <option value="Gondar">Gondar (ጎንደር)</option>
+                        <option value="Jimma">Jimma (ጅማ)</option>
+                        <option value="Dessie">Dessie (ደሴ)</option>
+                        <option value="Bishoftu">Bishoftu / Debre Zeit (ቢሾፍቱ)</option>
+                        <option value="Jijiga">Jijiga (ጅጅጋ)</option>
+                        <option value="Shashamane">Shashamane (ሻሸመኔ)</option>
+                        <option value="Harar">Harar (ሐረር)</option>
+                        <option value="Arba Minch">Arba Minch (አርባ ምንጭ)</option>
+                        <option value="Debre Birhan">Debre Birhan (ደብረ ብርሃን)</option>
+                        <option value="Debre Markos">Debre Markos (ደብረ ማርቆስ)</option>
+                        <option value="Asella">Asella (አሰላ)</option>
+                        <option value="Nekemte">Nekemte (ነቀምቴ)</option>
+                        <option value="Wolaita Sodo">Wolaita Sodo (ወላይታ ሶዶ)</option>
+                        <option value="Hosaena">Hosaena (ሆሳዕና)</option>
+                        <option value="Kombolcha">Kombolcha (ኮምቦልቻ)</option>
+                        <option value="Woldia">Woldia (ወልዲያ)</option>
+                        <option value="Axum">Axum (አክሱም)</option>
+                        <option value="Adigrat">Adigrat (ዓዲግራት)</option>
+                        <option value="Shire">Shire (ሽሬ)</option>
+                        <option value="Gambela">Gambela (ጋምቤላ)</option>
+                        <option value="Assosa">Assosa (አሶሳ)</option>
+                        <option value="Semera">Semera (ሰመራ)</option>
+                        <option value="Dilla">Dilla (ዲላ)</option>
+                        <option value="Ambo">Ambo (አምቦ)</option>
+                        <option value="Bale Robe">Bale Robe (ባሌ ሮቤ)</option>
+                    </optgroup>
+                    <optgroup label="✈️ Habesha Diaspora (ውጭ ሀገር)">
+                        <option value="Diaspora - USA (DC / DMV)">🇺🇸 USA - Washington DC / DMV</option>
+                        <option value="Diaspora - USA (Other)">🇺🇸 USA - Atlanta, Dallas, Seattle, LA...</option>
+                        <option value="Diaspora - Canada">🇨🇦 Canada - Toronto, Calgary, Ottawa...</option>
+                        <option value="Diaspora - UK (London)">🇬🇧 UK - London, Manchester, Birmingham...</option>
+                        <option value="Diaspora - Europe">🇪🇺 Europe - Germany, Sweden, Norway, Italy...</option>
+                        <option value="Diaspora - UAE (Dubai)">🇦🇪 UAE - Dubai / Abu Dhabi</option>
+                        <option value="Diaspora - Middle East">🇸🇦 Middle East - Saudi Arabia, Qatar, Kuwait...</option>
+                        <option value="Diaspora - Africa">🌍 Africa - Kenya, South Africa, Uganda...</option>
+                        <option value="Diaspora - Australia">🇦🇺 Australia / New Zealand</option>
+                        <option value="Diaspora">✈️ Diaspora (General / Other)</option>
+                    </optgroup>
+                    <optgroup label="📍 Other">
+                        <option value="Other">Other City (ሌላ ከተማ ይጻፉ)</option>
+                    </optgroup>
                 </select>
                 
-                <input id="reg-location-other" type="text" placeholder="Please type your city" class="hidden w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
+                <input id="reg-location-other" type="text" placeholder="Please type your city or country / ከተማዎን ይጻፉ" class="hidden w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange focus:ring-1 focus:ring-botOrange">
                 
                 <button onclick="validateAndNext(1)" class="w-full p-4 bg-botOrange text-white rounded-xl font-bold hover:bg-opacity-90 transition shadow-md" data-i18n="next_btn">Next</button>
             </div>
@@ -396,31 +524,33 @@
                 </select>
                 <select id="reg-education" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                     <option value="">Education / ትምህርት</option>
-                    <option value="Uneducated">Uneducated</option>
-                    <option value="High School">High School</option>
+                    <option value="High School">High School (ሁለተኛ ደረጃ)</option>
+                    <option value="Vocational / Diploma">Vocational / Diploma (ዲፕሎማ / TVET)</option>
                     <option value="Bachelor's">Bachelor's (ዲግሪ)</option>
                     <option value="Master's">Master's (ማስተርስ)</option>
+                    <option value="PhD / Doctorate">PhD / Doctorate (ዶክትሬት)</option>
+                    <option value="Uneducated">Prefer not to say / Other</option>
                 </select>
-                <input id="reg-occupation" type="text" placeholder="Occupation / ሥራ" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
+                <input id="reg-occupation" type="text" placeholder="Occupation / ሥራ (e.g. Engineer, Nurse, Business)" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                 <select id="reg-kids" class="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
                     <option value="">Kids / ልጆች</option>
-                    <option value="Don't have kids">Don't have kids</option>
-                    <option value="Have kids">Have kids</option>
-                    <option value="Want someday">Want someday</option>
-                    <option value="Don't want kids">Don't want kids</option>
+                    <option value="Don't have kids">Don't have kids (ልጅ የለኝም)</option>
+                    <option value="Have kids">Have kids (ልጅ አለኝ)</option>
+                    <option value="Want someday">Want someday (ወደፊት እፈልጋለሁ)</option>
+                    <option value="Don't want kids">Don't want kids (አልፈልግም)</option>
                 </select>
                 <div class="flex gap-2">
                     <select id="reg-drinking" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
-                        <option value="">Drinking</option>
-                        <option value="No">No</option>
-                        <option value="Socially">Socially</option>
-                        <option value="Yes">Yes</option>
+                        <option value="">Drinking / መጠጥ</option>
+                        <option value="No">No (አልጠጣም)</option>
+                        <option value="Socially">Socially (በበዓል/ከጓደኛ)</option>
+                        <option value="Yes">Yes (እጠጣለሁ)</option>
                     </select>
                     <select id="reg-smoking" class="w-1/2 p-4 border rounded-xl bg-gray-50 focus:outline-none focus:border-botOrange">
-                        <option value="">Smoking</option>
-                        <option value="No">No</option>
-                        <option value="Occasionally">Occasionally</option>
-                        <option value="Yes">Yes</option>
+                        <option value="">Smoking / ሲጋራ</option>
+                        <option value="No">No (አላጨስም)</option>
+                        <option value="Occasionally">Occasionally (አልፎ አልፎ)</option>
+                        <option value="Yes">Yes (አጨሳለሁ)</option>
                     </select>
                 </div>
                 <div class="flex gap-2">
@@ -431,7 +561,7 @@
 
             <!-- Page 3: Bio, Icebreaker & Universal Voice Bio -->
             <div id="page-3" class="hidden space-y-4 transition-all">
-                <textarea id="reg-bio" placeholder="Tell us about yourself... / ስለ ራስዎ በአጭሩ ይጻፉ..." class="w-full p-4 border rounded-xl bg-gray-50 h-28 focus:outline-none focus:border-botOrange resize-none"></textarea>
+                <textarea id="reg-bio" placeholder="Tell us about yourself, your hobbies, or what you're looking for... / ስለ ራስዎ በአጭሩ ይጻፉ..." class="w-full p-4 border rounded-xl bg-gray-50 h-28 focus:outline-none focus:border-botOrange resize-none"></textarea>
 
                 <!-- Icebreaker Prompt -->
                 <div>
@@ -443,6 +573,7 @@
                         <option value="🎵 Teddy Afro, Rophnan, or Aster Aweke?">🎵 Teddy Afro, Rophnan, or Aster Aweke?</option>
                         <option value="✈️ Dream trip: Lalibela, Hawassa, or Dubai?">✈️ Dream trip: Lalibela, Hawassa, or Dubai?</option>
                         <option value="🎬 Perfect Sunday: Netflix indoors or Shiro Meda walk?">🎬 Perfect Sunday: Netflix indoors or Shiro Meda walk?</option>
+                        <option value="🌍 Diaspora life or Addis Ababa vibe?">🌍 Diaspora life or Addis Ababa vibe?</option>
                     </select>
                 </div>
 
@@ -513,7 +644,7 @@
             <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md shadow-sm border border-red-100">
                 🔥 <span id="matched-num">0</span> <span data-i18n="matched_banner">users matched!</span>
             </p>
-            <span id="active-filter-pill" onclick="resetDiscoveryFilters()" class="hidden text-[10px] font-bold bg-botOrange text-white px-2 py-0.5 rounded-full cursor-pointer">
+            <span id="active-filter-pill" onclick="resetDiscoveryFilters()" class="hidden text-[10px] font-bold bg-botOrange text-white px-2.5 py-0.5 rounded-full cursor-pointer shadow-sm">
                 Filters Active ✕
             </span>
         </div>
@@ -833,6 +964,17 @@
         const urlRefParam = urlParams.get('ref') || (tg.initDataUnsafe?.start_param && tg.initDataUnsafe.start_param.startsWith('ref_') ? tg.initDataUnsafe.start_param.replace('ref_', '') : '');
         if (urlRefParam) localStorage.setItem("habesha_referred_by", urlRefParam);
 
+        // Known Preset Locations for Registration & Edit Profile
+        const KNOWN_LOCATIONS = [
+            "Addis Ababa", "Adama", "Hawassa", "Bahir Dar", "Dire Dawa", "Mekelle", "Gondar", "Jimma",
+            "Dessie", "Bishoftu", "Jijiga", "Shashamane", "Harar", "Arba Minch", "Debre Birhan",
+            "Debre Markos", "Asella", "Nekemte", "Wolaita Sodo", "Hosaena", "Kombolcha", "Woldia",
+            "Axum", "Adigrat", "Shire", "Gambela", "Assosa", "Semera", "Dilla", "Ambo", "Bale Robe",
+            "Diaspora", "Diaspora - USA (DC / DMV)", "Diaspora - USA (Other)", "Diaspora - Canada",
+            "Diaspora - UK (London)", "Diaspora - Europe", "Diaspora - UAE (Dubai)",
+            "Diaspora - Middle East", "Diaspora - Africa", "Diaspora - Australia"
+        ];
+
         // Phase 3: Instant Amharic / English Translation Dictionary
         let currentLang = localStorage.getItem("habesha_lang") || "en";
         const I18N = {
@@ -859,11 +1001,16 @@
                 get_mobile_app_btn: "Get Mobile App",
                 logout_btn: "Log Out",
                 filter_title: "Discovery Filters",
-                city_label: "City / Location",
+                gender_label: "Show Gender",
+                intention_label: "Looking For",
+                city_label: "City / Diaspora Location",
                 religion_label: "Religion",
+                education_label: "Education",
                 age_range_label: "Age Range",
-                online_only: "Online Now Only",
-                new_users_only: "New Users (Joined This Week)",
+                online_only: "Online",
+                verified_only: "Verified",
+                voice_only: "Voice Bio",
+                new_users_only: "New Users",
                 reset_btn: "Reset",
                 apply_filters_btn: "Apply Filters",
                 selfie_verify_title: "Selfie Verification",
@@ -897,11 +1044,16 @@
                 get_mobile_app_btn: "የሞባይል አፕ ያውርዱ",
                 logout_btn: "ውጣ (Log Out)",
                 filter_title: "የፍለጋ ማጣሪያ",
-                city_label: "ከተማ / አድራሻ",
+                gender_label: "ፆታ ይምረጡ",
+                intention_label: "ዓላማ / ፍላጎት",
+                city_label: "ከተማ / ዲያስፖራ",
                 religion_label: "ሃይማኖት",
+                education_label: "ትምህርት",
                 age_range_label: "የዕድሜ ክልል",
-                online_only: "አሁን መስመር ላይ ያሉ ብቻ (Online)",
-                new_users_only: "አዲስ ተጠቃሚዎች ብቻ",
+                online_only: "ኦንላይን ብቻ",
+                verified_only: "የተረጋገጡ (✓)",
+                voice_only: "ድምፅ ያላቸው",
+                new_users_only: "አዲስ አባላት",
                 reset_btn: "ሁሉንም አጽዳ",
                 apply_filters_btn: "ማጣሪያውን ተግብር",
                 selfie_verify_title: "የፎቶ ማረጋገጫ",
@@ -936,6 +1088,25 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ telegram_id: cleanTelegramId, language: currentLang })
                 }).catch(() => {});
+            }
+        }
+
+        // Helper: Compact Gender Tag ("F" or "M") right next to Age (e.g. 25F / 27M)
+        function formatAgeGender(age, gender) {
+            const a = age || '?';
+            if (!gender) return `${a}`;
+            const g = String(gender).trim().toLowerCase();
+            if (g === 'woman' || g === 'female' || g === 'f') return `${a}F`;
+            if (g === 'man' || g === 'male' || g === 'm') return `${a}M`;
+            return `${a}`;
+        }
+
+        // Helper: Open Official Telegram Bot or Channel
+        function openTelegramTarget(url) {
+            if (tg && tg.openTelegramLink) {
+                tg.openTelegramLink(url);
+            } else {
+                window.open(url, "_blank");
             }
         }
 
@@ -977,13 +1148,18 @@
         let userToReport = null;
         let selectedMsgId = null;
 
-        // Discovery Filter State
+        // Enhanced Discovery Filter State
         let activeFilters = {
+            gender: "",
+            intention: "",
             city: "",
             religion: "",
+            education: "",
             minAge: 18,
             maxAge: 60,
             onlineOnly: false,
+            verifiedOnly: false,
+            voiceOnly: false,
             newOnly: false
         };
 
@@ -1020,7 +1196,7 @@
         }
 
         function showDownloadInstructions() {
-            tg.openTelegramLink("https://t.me/ethiopia_date_bot?start=app");
+            openTelegramTarget("https://t.me/ethiopia_date_bot?start=app");
         }
 
         async function loadAppStats() {
@@ -1168,7 +1344,7 @@
             }
         }
 
-        // --- SEARCH FILTERS ---
+        // --- ENHANCED SEARCH FILTERS ---
         function openFilterModal() {
             document.getElementById('filter-modal').classList.remove('hidden');
         }
@@ -1178,11 +1354,16 @@
         }
 
         function applyDiscoveryFilters() {
+            activeFilters.gender = document.getElementById('filter-gender').value;
+            activeFilters.intention = document.getElementById('filter-intention').value;
             activeFilters.city = document.getElementById('filter-city').value;
             activeFilters.religion = document.getElementById('filter-religion').value;
+            activeFilters.education = document.getElementById('filter-education').value;
             activeFilters.minAge = parseInt(document.getElementById('filter-min-age').value) || 18;
             activeFilters.maxAge = parseInt(document.getElementById('filter-max-age').value) || 80;
             activeFilters.onlineOnly = document.getElementById('filter-online-only').checked;
+            activeFilters.verifiedOnly = document.getElementById('filter-verified-only').checked;
+            activeFilters.voiceOnly = document.getElementById('filter-voice-only').checked;
             activeFilters.newOnly = document.getElementById('filter-new-only').checked;
 
             closeFilterModal();
@@ -1190,32 +1371,97 @@
         }
 
         function resetDiscoveryFilters() {
+            document.getElementById('filter-gender').value = "";
+            document.getElementById('filter-intention').value = "";
             document.getElementById('filter-city').value = "";
             document.getElementById('filter-religion').value = "";
+            document.getElementById('filter-education').value = "";
             document.getElementById('filter-min-age').value = 18;
             document.getElementById('filter-max-age').value = 60;
             document.getElementById('filter-online-only').checked = false;
+            document.getElementById('filter-verified-only').checked = false;
+            document.getElementById('filter-voice-only').checked = false;
             document.getElementById('filter-new-only').checked = false;
 
-            activeFilters = { city: "", religion: "", minAge: 18, maxAge: 60, onlineOnly: false, newOnly: false };
+            activeFilters = {
+                gender: "",
+                intention: "",
+                city: "",
+                religion: "",
+                education: "",
+                minAge: 18,
+                maxAge: 60,
+                onlineOnly: false,
+                verifiedOnly: false,
+                voiceOnly: false,
+                newOnly: false
+            };
             closeFilterModal();
             applyAllFilters();
         }
 
         function applyAllFilters() {
-            const hasFilter = activeFilters.city || activeFilters.religion || activeFilters.onlineOnly || activeFilters.newOnly || activeFilters.minAge > 18 || activeFilters.maxAge < 60;
+            let activeCount = 0;
+            if (activeFilters.gender) activeCount++;
+            if (activeFilters.intention) activeCount++;
+            if (activeFilters.city) activeCount++;
+            if (activeFilters.religion) activeCount++;
+            if (activeFilters.education) activeCount++;
+            if (activeFilters.onlineOnly) activeCount++;
+            if (activeFilters.verifiedOnly) activeCount++;
+            if (activeFilters.voiceOnly) activeCount++;
+            if (activeFilters.newOnly) activeCount++;
+            if (activeFilters.minAge > 18 || activeFilters.maxAge < 60) activeCount++;
+
             const pill = document.getElementById('active-filter-pill');
             if (pill) {
-                if (hasFilter) pill.classList.remove('hidden');
-                else pill.classList.add('hidden');
+                if (activeCount > 0) {
+                    pill.innerText = `${activeCount} Filter${activeCount > 1 ? 's' : ''} Active ✕`;
+                    pill.classList.remove('hidden');
+                } else {
+                    pill.classList.add('hidden');
+                }
             }
 
             profiles = allProfiles.filter(p => {
-                if (activeFilters.city && p.location !== activeFilters.city) return false;
+                // Gender Filter
+                if (activeFilters.gender && p.gender !== activeFilters.gender) return false;
+
+                // Looking For / Intention Filter
+                if (activeFilters.intention && p.intention !== activeFilters.intention) return false;
+
+                // City & Diaspora Smart Filter
+                if (activeFilters.city) {
+                    const userLoc = String(p.location || "");
+                    if (activeFilters.city === "ALL_DIASPORA" || activeFilters.city === "Diaspora") {
+                        if (!userLoc.toLowerCase().includes("diaspora")) return false;
+                    } else if (activeFilters.city === "ALL_ETHIOPIA") {
+                        if (userLoc.toLowerCase().includes("diaspora") || !userLoc) return false;
+                    } else {
+                        if (userLoc !== activeFilters.city) return false;
+                    }
+                }
+
+                // Religion Filter
                 if (activeFilters.religion && p.religion !== activeFilters.religion) return false;
+
+                // Education Filter
+                if (activeFilters.education && p.education !== activeFilters.education) return false;
+
+                // Age Range Filter
                 const age = parseInt(p.age) || 25;
                 if (age < activeFilters.minAge || age > activeFilters.maxAge) return false;
+
+                // Online Now Filter
                 if (activeFilters.onlineOnly && !p.is_online) return false;
+
+                // Verified Only Filter
+                if (activeFilters.verifiedOnly && !p.is_verified) return false;
+
+                // Voice Bio Only Filter
+                if (activeFilters.voiceOnly && (!p.voice_bio_url || p.voice_bio_url.trim() === "")) return false;
+
+                // New Users Filter
                 if (activeFilters.newOnly) {
                     if (!p.created_at) return false;
                     const daysOld = (new Date() - new Date(p.created_at)) / (1000 * 60 * 60 * 24);
@@ -1280,17 +1526,30 @@
             const topLikesBadge = document.getElementById('top-card-likes');
             const topLikesCount = document.getElementById('top-card-likes-count');
             const dict = I18N[currentLang] || I18N.en;
+
+            // Community Bot & Channel Footer Bar (placed right under the action/scroll buttons)
+            const communityFooterHtml = `
+                <div class="w-full bg-gray-50 border-t border-gray-100 px-3 py-1.5 flex items-center justify-center gap-4 text-[10px] font-bold text-gray-500 shrink-0">
+                    <button type="button" onclick="openTelegramTarget('https://t.me/ethiopia_date_bot')" class="flex items-center gap-1 hover:text-botOrange active:scale-95 transition">
+                        <i class="ph-fill ph-robot text-botOrange text-xs"></i> <span>@ethiopia_date_bot</span>
+                    </button>
+                    <span class="text-gray-300">•</span>
+                    <button type="button" onclick="openTelegramTarget('https://t.me/habeshadate1')" class="flex items-center gap-1 hover:text-verify active:scale-95 transition">
+                        <i class="ph-fill ph-telegram-logo text-verify text-xs"></i> <span>@habeshadate1</span>
+                    </button>
+                </div>
+            `;
             
             if (currentCardIndex >= profiles.length || profiles.length === 0) {
                 if(topLikesBadge) { topLikesBadge.classList.remove('flex'); topLikesBadge.classList.add('hidden'); }
                 
                 let backBtnHtml = profiles.length > 0 ? `
-                    <div class="mt-auto w-full flex justify-center items-center gap-3 pt-4 pb-6 bg-white border-t border-gray-50 px-4">
-                        <button onclick="rewindLastSwipe()" class="w-12 h-12 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center text-amber-600 shadow-sm active:scale-95 transition-transform" title="Rewind Last Swipe">
-                            <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i>
+                    <div class="mt-auto w-full flex justify-center items-center gap-3 pt-3 pb-3 bg-white border-t border-gray-50 px-4">
+                        <button onclick="rewindLastSwipe()" class="w-11 h-11 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center text-amber-600 shadow-sm active:scale-95 transition-transform" title="Rewind Last Swipe">
+                            <i class="ph-bold ph-arrow-counter-clockwise text-lg"></i>
                         </button>
-                        <button onclick="prevCard()" class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
-                            <i class="ph-bold ph-caret-up text-2xl"></i>
+                        <button onclick="prevCard()" class="w-11 h-11 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
+                            <i class="ph-bold ph-caret-up text-xl"></i>
                         </button>
                     </div>` : '';
 
@@ -1303,6 +1562,7 @@
                             <button onclick="resetDiscoveryFilters()" class="px-4 py-2 bg-orange-50 text-botOrange rounded-xl text-xs font-bold">Reset Filters</button>
                         </div>
                         ${backBtnHtml}
+                        ${communityFooterHtml}
                     </div>`;
                 return;
             }
@@ -1337,6 +1597,12 @@
 
             const verifyBadge = profile.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1 text-xl"></i>` : '';
 
+            // Compact Age + Gender (e.g. "25F" or "27M") + Location Pill
+            const ageGenderLabel = formatAgeGender(profile.age, profile.gender);
+            const locationBadge = profile.location 
+                ? `<span class="text-[11px] font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-lg flex items-center gap-0.5"><i class="ph-fill ph-map-pin text-botOrange text-xs"></i> ${profile.location}</span>` 
+                : '';
+
             // Multi-Photo Carousel Indicators
             const dotsHtml = photos.length > 1 ? `
                 <div class="absolute top-2.5 left-3 right-3 flex gap-1.5 z-20">
@@ -1355,7 +1621,7 @@
 
             // Icebreaker Tag
             const icebreakerHtml = profile.icebreaker ? `
-                <div class="mt-2 bg-orange-50 border border-orange-100 rounded-xl px-3 py-1.5 text-[11px] font-medium text-buna flex items-center gap-1.5">
+                <div class="mt-1.5 bg-orange-50 border border-orange-100 rounded-xl px-2.5 py-1 text-[11px] font-medium text-buna flex items-center gap-1.5">
                     <i class="ph-fill ph-chat-circle-dots text-botOrange"></i> <span class="truncate">${profile.icebreaker}</span>
                 </div>
             ` : '';
@@ -1363,7 +1629,7 @@
             container.innerHTML = `
                 <div class="w-full h-full flex flex-col overflow-y-auto no-scrollbar relative bg-white">
                     
-                    <div class="w-full min-h-[320px] flex-1 bg-gray-200 bg-cover bg-center relative shrink-0" style="background-image: url('${photoToUse}')">
+                    <div class="w-full min-h-[290px] flex-1 bg-gray-200 bg-cover bg-center relative shrink-0" style="background-image: url('${photoToUse}')">
                         ${dotsHtml}
                         ${voicePillHtml}
                         <button onclick="showProfileDetails()" class="absolute bottom-3 left-1/2 transform -translate-x-1/2 px-5 py-2 bg-black bg-opacity-60 text-white rounded-full flex items-center gap-2 backdrop-blur-md active:scale-95 shadow-lg border border-white border-opacity-20 z-20">
@@ -1372,10 +1638,10 @@
                         </button>
                     </div>
                     
-                    <div class="p-3.5 shrink-0 bg-white">
-                        <div class="flex items-center flex-wrap gap-1.5 mb-1">
-                            <h3 class="text-xl font-bold text-buna flex items-center">${profile.name}, ${profile.age || '?'} ${verifyBadge}</h3>
-                            <span class="text-xs font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-lg">${profile.location || profile.gender || ''}</span>
+                    <div class="p-3 shrink-0 bg-white">
+                        <div class="flex items-center flex-wrap gap-1.5 mb-0.5">
+                            <h3 class="text-xl font-bold text-buna flex items-center">${profile.name}, ${ageGenderLabel} ${verifyBadge}</h3>
+                            ${locationBadge}
                             ${onlineBadge}
                             ${boostedBadge}
                             ${newBadge}
@@ -1384,30 +1650,34 @@
                         ${icebreakerHtml}
                     </div>
                     
-                    <div class="w-full flex justify-around items-center p-3 pb-6 bg-white shrink-0 mt-auto border-t border-gray-50">
-                        <button onclick="handleSwipe(false)" class="w-13 h-13 p-3.5 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform hover:bg-red-50">
+                    <!-- Swipe & Scroll Action Buttons -->
+                    <div class="w-full flex justify-around items-center px-3 py-2 bg-white shrink-0 mt-auto border-t border-gray-50">
+                        <button onclick="handleSwipe(false)" class="w-12 h-12 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform hover:bg-red-50">
                             <i class="ph-bold ph-x text-2xl"></i>
                         </button>
                         
                         <div class="flex gap-1.5">
-                            <button onclick="rewindLastSwipe()" class="w-10 h-10 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center text-amber-600 shadow-sm active:scale-95 transition-transform hover:bg-amber-100" title="Rewind Last Swipe (VIP)">
-                                <i class="ph-bold ph-arrow-counter-clockwise text-lg"></i>
+                            <button onclick="rewindLastSwipe()" class="w-9 h-9 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center text-amber-600 shadow-sm active:scale-95 transition-transform hover:bg-amber-100" title="Rewind Last Swipe (VIP)">
+                                <i class="ph-bold ph-arrow-counter-clockwise text-base"></i>
                             </button>
-                            <button onclick="prevCard()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
-                                <i class="ph-bold ph-caret-up text-lg"></i>
+                            <button onclick="prevCard()" class="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
+                                <i class="ph-bold ph-caret-up text-base"></i>
                             </button>
-                            <button onclick="handleSwipe(true, true)" class="w-10 h-10 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center text-blue-500 shadow-sm active:scale-95 transition-transform hover:bg-blue-100" title="Super Like (VIP)">
-                                <i class="ph-fill ph-star text-lg"></i>
+                            <button onclick="handleSwipe(true, true)" class="w-9 h-9 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center text-blue-500 shadow-sm active:scale-95 transition-transform hover:bg-blue-100" title="Super Like (VIP)">
+                                <i class="ph-fill ph-star text-base"></i>
                             </button>
-                            <button onclick="scrollNext()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
-                                <i class="ph-bold ph-caret-down text-lg"></i>
+                            <button onclick="scrollNext()" class="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
+                                <i class="ph-bold ph-caret-down text-base"></i>
                             </button>
                         </div>
 
-                        <button onclick="handleSwipe(true)" class="w-13 h-13 p-3.5 bg-gradient-to-tr from-botOrange to-orange-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-95 transition-transform">
+                        <button onclick="handleSwipe(true)" class="w-12 h-12 bg-gradient-to-tr from-botOrange to-orange-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-95 transition-transform">
                             <i class="ph-fill ph-heart text-2xl"></i>
                         </button>
                     </div>
+
+                    <!-- Compact Bot & Channel Links Bar Directly Under Action Buttons -->
+                    ${communityFooterHtml}
                 </div>
             `;
         }
@@ -1568,11 +1838,7 @@
             const link = getMyReferralLink();
             const text = encodeURIComponent("🇪🇹 Join me on Habesha Date! Find your match and chat with Habesha singles near you ❤️");
             const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${text}`;
-            if (tg.openTelegramLink) {
-                tg.openTelegramLink(shareUrl);
-            } else {
-                window.open(shareUrl, "_blank");
-            }
+            openTelegramTarget(shareUrl);
         }
 
         function copyReferralLink() {
@@ -1754,6 +2020,7 @@
             if(!profile) return;
             const joinDate = profile.created_at ? profile.created_at.split('T')[0] : "Unknown";
             const verifyBadge = profile.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1 text-2xl"></i>` : '';
+            const ageGenderLabel = formatAgeGender(profile.age, profile.gender);
 
             const voiceButtonHtml = profile.voice_bio_url ? `
                 <button onclick="playProfileVoiceBio('${profile.voice_bio_url}', event)" class="mb-4 px-4 py-2.5 bg-orange-50 text-botOrange border border-orange-200 rounded-xl font-bold text-xs flex items-center gap-2">
@@ -1769,7 +2036,7 @@
             ` : '';
 
             document.getElementById('profile-details-content').innerHTML = `
-                <h3 class="text-3xl font-bold text-buna mb-2 flex items-center">${profile.name}, ${profile.age} ${verifyBadge}</h3>
+                <h3 class="text-3xl font-bold text-buna mb-2 flex items-center">${profile.name}, ${ageGenderLabel} ${verifyBadge}</h3>
                 <div class="flex items-center gap-4 mb-4">
                     <p class="text-xs text-gray-400 font-medium"><i class="ph-fill ph-calendar-blank"></i> Joined: ${joinDate}</p>
                     <p class="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-fill ph-heart"></i> ${profile.total_likes || 0} Likes</p>
@@ -1866,7 +2133,8 @@
                     
                     const profileName = document.getElementById('my-profile-name');
                     const crownHtml = mp.is_premium ? `<i class="ph-fill ph-crown text-premium ml-1"></i>` : '';
-                    if (profileName) profileName.innerHTML = `${mp.name || 'User'}, ${mp.age || '?'} ${crownHtml}`;
+                    const myAgeGender = formatAgeGender(mp.age, mp.gender);
+                    if (profileName) profileName.innerHTML = `${mp.name || 'User'}, ${myAgeGender} ${crownHtml}`;
 
                     // Update Referral Progress UI
                     const refCount = parseInt(mp.referral_count || 0);
@@ -2050,6 +2318,7 @@
                 const unreadCount = (unreadData && unreadData.senders && unreadData.senders[match.telegram_id]) ? unreadData.senders[match.telegram_id] : 0;
                 const verifyBadge = match.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1 text-base"></i>` : '';
                 const onlineDot = match.is_online ? `<span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>` : '';
+                const matchAgeGender = formatAgeGender(match.age, match.gender);
                 
                 const badgeHtml = unreadCount > 0 
                     ? `<div class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-sm flex-shrink-0 animate-bounce">${unreadCount}</div>`
@@ -2061,7 +2330,7 @@
                     <div onclick="openChat('${match.telegram_id}', '${match.name.replace(/'/g, "\\'")}', '${match.photo_url || DEFAULT_AVATAR}', '${safeIcebreaker}', ${Boolean(match.is_online)})" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition active:scale-95">
                         <div class="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0 bg-cover bg-center relative" style="background-image: url('${match.photo_url || DEFAULT_AVATAR}')">${onlineDot}</div>
                         <div class="flex-1 overflow-hidden">
-                            <h4 class="font-bold text-lg text-buna truncate flex items-center">${match.name} ${verifyBadge}</h4>
+                            <h4 class="font-bold text-lg text-buna truncate flex items-center">${match.name}, ${matchAgeGender} ${verifyBadge}</h4>
                             <p class="text-sm text-gray-500 truncate">${match.icebreaker || match.bio || "Say hi!"}</p>
                         </div>
                         ${badgeHtml}
@@ -2762,8 +3031,7 @@
                 document.getElementById('reg-interest').value = mp.interested_in || '';
                 document.getElementById('reg-intention').value = mp.intention || '';
                 
-                const knownCities = ["Addis Ababa", "Bahir Dar", "Hawassa", "Adama", "Diaspora"];
-                if (mp.location && !knownCities.includes(mp.location)) {
+                if (mp.location && !KNOWN_LOCATIONS.includes(mp.location)) {
                     document.getElementById('reg-location').value = 'Other';
                     document.getElementById('reg-location-other').classList.remove('hidden');
                     document.getElementById('reg-location-other').value = mp.location;
