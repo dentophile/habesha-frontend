@@ -612,11 +612,11 @@
         </div>
     </div>
 
-    <!-- Swipe View -->
-    <div id="view-swipe" class="hidden w-full h-[100dvh] pt-3 pb-[80px] px-4 flex-col bg-gray-100 overflow-hidden relative">
+    <!-- Swipe View (Flexbox Adaptive Height for both Android APK & Telegram Mini App) -->
+    <div id="view-swipe" class="hidden w-full h-[100dvh] pt-2.5 pb-[76px] px-3 flex flex-col bg-gray-100 overflow-hidden relative">
         
         <!-- Streamlined Top Action Row -->
-        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1.5 shrink-0 gap-1">
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1 shrink-0 gap-1">
             <!-- Discover Title & Dynamic Like Badge -->
             <div class="flex items-center gap-1.5 shrink-0">
                 <h2 class="font-bold text-2xl text-buna tracking-tight" data-i18n="nav_discover">Discover</h2>
@@ -640,7 +640,7 @@
         </div>
         
         <!-- Total Matched Users & Active Filter Indicator -->
-        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-2 shrink-0">
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1.5 shrink-0">
             <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md shadow-sm border border-red-100">
                 🔥 <span id="matched-num">0</span> <span data-i18n="matched_banner">users matched!</span>
             </p>
@@ -649,8 +649,8 @@
             </span>
         </div>
 
-        <!-- The Fixed Card Container -->
-        <div id="card-container" class="w-full max-w-sm mx-auto flex-1 min-h-0 bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200 relative mb-3">
+        <!-- The Adaptive Card Container (Fills remaining vertical space cleanly) -->
+        <div id="card-container" class="w-full max-w-sm mx-auto flex-1 min-h-0 flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200 relative mb-1">
             <p class="text-gray-400 font-medium flex h-full items-center justify-center">Loading profiles...</p>
         </div>
         
@@ -930,7 +930,7 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <div id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 pb-6 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+    <div id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 pb-5 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <button onclick="switchTab('swipe')" id="tab-swipe" class="flex flex-col items-center text-botOrange transition-colors">
             <i class="ph-bold ph-cards text-2xl mb-1"></i>
             <span class="text-xs font-bold" data-i18n="nav_discover">Discover</span>
@@ -1291,6 +1291,7 @@
                     
                     document.getElementById('view-loading').classList.add('hidden');
                     document.getElementById('view-swipe').classList.remove('hidden');
+                    document.getElementById('view-swipe').classList.add('flex');
                     document.getElementById('bottom-nav').classList.remove('hidden');
                     
                     if(data.is_admin) {
@@ -1544,7 +1545,7 @@
                 if(topLikesBadge) { topLikesBadge.classList.remove('flex'); topLikesBadge.classList.add('hidden'); }
                 
                 let backBtnHtml = profiles.length > 0 ? `
-                    <div class="mt-auto w-full flex justify-center items-center gap-3 pt-3 pb-3 bg-white border-t border-gray-50 px-4">
+                    <div class="mt-auto w-full flex justify-center items-center gap-3 pt-2.5 pb-2.5 bg-white border-t border-gray-50 px-4 shrink-0">
                         <button onclick="rewindLastSwipe()" class="w-11 h-11 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center text-amber-600 shadow-sm active:scale-95 transition-transform" title="Rewind Last Swipe">
                             <i class="ph-bold ph-arrow-counter-clockwise text-lg"></i>
                         </button>
@@ -1554,7 +1555,7 @@
                     </div>` : '';
 
                 container.innerHTML = `
-                    <div class="w-full flex-1 flex flex-col relative bg-white h-full">
+                    <div class="w-full flex-1 flex flex-col relative bg-white h-full overflow-hidden">
                         <div class="flex-1 flex flex-col items-center justify-center p-6 text-center">
                             <i class="ph-duotone ph-sparkle text-6xl text-gray-300 mb-2"></i>
                             <p class="text-gray-400 font-medium">No more profiles match your view.</p>
@@ -1621,15 +1622,16 @@
 
             // Icebreaker Tag
             const icebreakerHtml = profile.icebreaker ? `
-                <div class="mt-1.5 bg-orange-50 border border-orange-100 rounded-xl px-2.5 py-1 text-[11px] font-medium text-buna flex items-center gap-1.5">
+                <div class="mt-1 bg-orange-50 border border-orange-100 rounded-xl px-2.5 py-1 text-[11px] font-medium text-buna flex items-center gap-1.5">
                     <i class="ph-fill ph-chat-circle-dots text-botOrange"></i> <span class="truncate">${profile.icebreaker}</span>
                 </div>
             ` : '';
 
             container.innerHTML = `
-                <div class="w-full h-full flex flex-col overflow-y-auto no-scrollbar relative bg-white">
+                <div class="w-full h-full flex flex-col overflow-hidden relative bg-white">
                     
-                    <div class="w-full min-h-[290px] flex-1 bg-gray-200 bg-cover bg-center relative shrink-0" style="background-image: url('${photoToUse}')">
+                    <!-- Adaptive Photo Area: expands on tall Android screens, shrinks gracefully on shorter Telegram screens -->
+                    <div class="w-full flex-1 min-h-[160px] bg-gray-200 bg-cover bg-center relative" style="background-image: url('${photoToUse}')">
                         ${dotsHtml}
                         ${voicePillHtml}
                         <button onclick="showProfileDetails()" class="absolute bottom-3 left-1/2 transform -translate-x-1/2 px-5 py-2 bg-black bg-opacity-60 text-white rounded-full flex items-center gap-2 backdrop-blur-md active:scale-95 shadow-lg border border-white border-opacity-20 z-20">
@@ -1638,22 +1640,23 @@
                         </button>
                     </div>
                     
-                    <div class="p-3 shrink-0 bg-white">
+                    <!-- Profile Name, Age/Gender, Bio & Icebreaker -->
+                    <div class="px-3.5 py-2.5 shrink-0 bg-white">
                         <div class="flex items-center flex-wrap gap-1.5 mb-0.5">
-                            <h3 class="text-xl font-bold text-buna flex items-center">${profile.name}, ${ageGenderLabel} ${verifyBadge}</h3>
+                            <h3 class="text-lg font-bold text-buna flex items-center">${profile.name}, ${ageGenderLabel} ${verifyBadge}</h3>
                             ${locationBadge}
                             ${onlineBadge}
                             ${boostedBadge}
                             ${newBadge}
                         </div>
-                        <p class="text-gray-500 text-xs mt-0.5 line-clamp-2">${profile.bio || 'Ready to mingle!'}</p>
+                        <p class="text-gray-500 text-xs line-clamp-1">${profile.bio || 'Ready to mingle!'}</p>
                         ${icebreakerHtml}
                     </div>
                     
                     <!-- Swipe & Scroll Action Buttons -->
-                    <div class="w-full flex justify-around items-center px-3 py-2 bg-white shrink-0 mt-auto border-t border-gray-50">
-                        <button onclick="handleSwipe(false)" class="w-12 h-12 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform hover:bg-red-50">
-                            <i class="ph-bold ph-x text-2xl"></i>
+                    <div class="w-full flex justify-around items-center px-3 py-2 bg-white shrink-0 border-t border-gray-50">
+                        <button onclick="handleSwipe(false)" class="w-11 h-11 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform hover:bg-red-50">
+                            <i class="ph-bold ph-x text-xl"></i>
                         </button>
                         
                         <div class="flex gap-1.5">
@@ -1671,8 +1674,8 @@
                             </button>
                         </div>
 
-                        <button onclick="handleSwipe(true)" class="w-12 h-12 bg-gradient-to-tr from-botOrange to-orange-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-95 transition-transform">
-                            <i class="ph-fill ph-heart text-2xl"></i>
+                        <button onclick="handleSwipe(true)" class="w-11 h-11 bg-gradient-to-tr from-botOrange to-orange-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-95 transition-transform">
+                            <i class="ph-fill ph-heart text-xl"></i>
                         </button>
                     </div>
 
@@ -2186,7 +2189,10 @@
         function switchTab(tab) {
             ['swipe', 'matches', 'admin', 'profile'].forEach(t => {
                 const view = document.getElementById(`view-${t}`);
-                if (view) view.classList.add('hidden');
+                if (view) {
+                    view.classList.add('hidden');
+                    view.classList.remove('flex');
+                }
                 
                 const tabEl = document.getElementById(`tab-${t}`);
                 if (tabEl) {
@@ -2195,7 +2201,9 @@
                 }
             });
             
-            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            const targetView = document.getElementById(`view-${tab}`);
+            targetView.classList.remove('hidden');
+            targetView.classList.add('flex');
             
             if (tab === 'swipe') {
                 document.getElementById('tab-swipe').classList.replace('text-gray-400', 'text-botOrange');
@@ -3011,7 +3019,10 @@
             
             ['view-swipe', 'view-matches', 'view-profile', 'view-admin', 'bottom-nav'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.classList.add('hidden');
+                if (el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }
             });
 
             document.getElementById('view-registration').classList.remove('hidden');
@@ -3156,6 +3167,7 @@
                 document.getElementById('stats-banner').style.display = 'none';
                 document.getElementById('view-registration').classList.add('hidden');
                 document.getElementById('view-swipe').classList.remove('hidden');
+                document.getElementById('view-swipe').classList.add('flex');
                 document.getElementById('bottom-nav').classList.remove('hidden');
                 
                 try {
