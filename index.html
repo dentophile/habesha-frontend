@@ -930,7 +930,7 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <div id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 pb-5 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+    <div id="bottom-nav" class="hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex flex-row justify-around items-center p-3 pb-5 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <button onclick="switchTab('swipe')" id="tab-swipe" class="flex flex-col items-center text-botOrange transition-colors">
             <i class="ph-bold ph-cards text-2xl mb-1"></i>
             <span class="text-xs font-bold" data-i18n="nav_discover">Discover</span>
@@ -1292,7 +1292,9 @@
                     document.getElementById('view-loading').classList.add('hidden');
                     document.getElementById('view-swipe').classList.remove('hidden');
                     document.getElementById('view-swipe').classList.add('flex');
-                    document.getElementById('bottom-nav').classList.remove('hidden');
+                    const bottomNav = document.getElementById('bottom-nav');
+                    bottomNav.classList.remove('hidden');
+                    bottomNav.classList.add('flex');
                     
                     if(data.is_admin) {
                         document.getElementById('tab-admin').classList.remove('hidden');
@@ -2998,7 +3000,10 @@
             document.getElementById('view-registration').classList.add('hidden');
             const statsBanner = document.getElementById('stats-banner');
             if(statsBanner) statsBanner.style.display = 'none';
-            document.getElementById('bottom-nav').classList.remove('hidden');
+            
+            const bottomNav = document.getElementById('bottom-nav');
+            bottomNav.classList.remove('hidden');
+            bottomNav.classList.add('flex');
             
             switchTab('profile'); 
         }
@@ -3017,13 +3022,19 @@
         function openEditProfile() {
             isEditing = true;
             
-            ['view-swipe', 'view-matches', 'view-profile', 'view-admin', 'bottom-nav'].forEach(id => {
+            ['view-swipe', 'view-matches', 'view-profile', 'view-admin'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.classList.add('hidden');
                     el.classList.remove('flex');
                 }
             });
+
+            const bottomNav = document.getElementById('bottom-nav');
+            if (bottomNav) {
+                bottomNav.classList.add('hidden');
+                bottomNav.classList.remove('flex');
+            }
 
             document.getElementById('view-registration').classList.remove('hidden');
             
@@ -3166,9 +3177,12 @@
                 
                 document.getElementById('stats-banner').style.display = 'none';
                 document.getElementById('view-registration').classList.add('hidden');
-                document.getElementById('view-swipe').classList.remove('hidden');
-                document.getElementById('view-swipe').classList.add('flex');
-                document.getElementById('bottom-nav').classList.remove('hidden');
+                
+                const bottomNav = document.getElementById('bottom-nav');
+                bottomNav.classList.remove('hidden');
+                bottomNav.classList.add('flex');
+                
+                switchTab('swipe');
                 
                 try {
                     const chk = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
