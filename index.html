@@ -724,6 +724,12 @@
         <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1 shrink-0 gap-1">
             <!-- Discover Title & Dynamic Like Badge -->
             <div class="flex items-center gap-1.5 shrink-0">
+                <h2 class="font-extrabold text-xl text-buna tracking-tight" data-i18n="nav_discover">Discover</h2>
+                <div id="top-card-likes" class="hidden items-center gap-1 bg-red-50 border border-red-100 text-red-500 text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    <i class="ph-fill ph-heart"></i> <span id="top-card-likes-count">0</span>
+                </div>
+            </div>
+
             <!-- Right Controls: Language Toggle, Spin Wheel, Remaining Swipes & Filter Button -->
             <div class="flex items-center gap-1">
                 <button onclick="toggleLanguage()" class="bg-white text-buna border border-gray-200 text-[11px] font-bold px-2 py-1 rounded-full shadow-sm active:scale-95 lang-toggle-btn">
