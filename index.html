@@ -94,10 +94,101 @@
             <button onclick="closeSwipeLimitModal(); openPremiumModal();" class="w-full p-3.5 bg-gradient-to-r from-premium to-fuchsia-500 text-white rounded-xl font-bold mb-2.5 shadow-lg hover:opacity-90 transition text-sm flex items-center justify-center gap-2">
                 <i class="ph-fill ph-crown text-lg"></i> Upgrade to Premium (100 ETB)
             </button>
+            <button onclick="closeSwipeLimitModal(); openSpinWheelModal();" class="w-full p-3.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl font-bold mb-2.5 hover:bg-amber-100 transition text-sm flex items-center justify-center gap-2">
+                <i class="ph-fill ph-spinner-ball text-lg text-botOrange"></i> Spin Daily Wheel for Free Likes
+            </button>
             <button onclick="closeSwipeLimitModal(); shareReferralOnTelegram();" class="w-full p-3.5 bg-orange-50 text-botOrange border border-orange-200 rounded-xl font-bold mb-2.5 hover:bg-orange-100 transition text-sm flex items-center justify-center gap-2">
                 <i class="ph-bold ph-gift text-lg"></i> Invite 3 Friends = 7 Days Free VIP
             </button>
             <button onclick="closeSwipeLimitModal()" class="w-full p-2 text-gray-400 rounded-xl font-bold text-xs">Wait Until Tomorrow</button>
+        </div>
+    </div>
+
+    <!-- Feature 5: Daily Spin-the-Wheel Modal -->
+    <div id="spin-wheel-modal" class="hidden fixed inset-0 z-[145] flex items-center justify-center bg-black bg-opacity-60 px-4 transition-opacity">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center relative overflow-hidden border-2 border-botOrange">
+            <button onclick="closeSpinWheelModal()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200">
+                <i class="ph-bold ph-x"></i>
+            </button>
+            <div id="spin-wheel-graphic" class="w-24 h-24 mx-auto bg-gradient-to-tr from-botOrange via-amber-400 to-pink-500 text-white rounded-full flex items-center justify-center mb-3 shadow-lg border-4 border-orange-100 transition-transform duration-1000">
+                <i class="ph-fill ph-gift text-5xl"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-buna mb-1">Daily Habesha Spin 🎡</h3>
+            <p class="text-xs text-gray-500 mb-4">Spin once every 24 hours to win <b>Free Bonus Likes</b>, a <b>2-Hour VIP Boost</b>, or <b>24h Free Habesha VIP</b>!</p>
+            
+            <div class="grid grid-cols-2 gap-2 text-[11px] font-bold mb-4 text-left">
+                <div class="bg-orange-50 border border-orange-100 p-2.5 rounded-xl text-buna flex items-center gap-1.5">🔥 +5 Bonus Likes</div>
+                <div class="bg-pink-50 border border-pink-100 p-2.5 rounded-xl text-pink-700 flex items-center gap-1.5">💖 +10 Bonus Likes</div>
+                <div class="bg-amber-50 border border-amber-100 p-2.5 rounded-xl text-amber-800 flex items-center gap-1.5">⚡ 2-Hour Boost</div>
+                <div class="bg-purple-50 border border-purple-100 p-2.5 rounded-xl text-premium flex items-center gap-1.5">👑 24h Free VIP</div>
+            </div>
+
+            <div id="spin-result-banner" class="hidden mb-4 p-3 bg-green-50 border border-green-200 rounded-2xl text-green-800 font-extrabold text-sm"></div>
+
+            <button id="btn-spin-now" onclick="executeDailySpin()" class="w-full p-4 bg-gradient-to-r from-botOrange to-amber-500 text-white rounded-xl font-extrabold shadow-lg hover:opacity-95 active:scale-95 transition text-sm flex items-center justify-center gap-2">
+                <i class="ph-fill ph-sparkle text-lg"></i> Spin the Wheel Now!
+            </button>
+        </div>
+    </div>
+
+    <!-- Feature 7: Upload 24-Hour Habesha Story Modal -->
+    <div id="story-upload-modal" class="hidden fixed inset-0 z-[145] flex items-center justify-center bg-black bg-opacity-60 px-4 transition-opacity">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center relative overflow-hidden">
+            <button onclick="closeStoryUploadModal()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
+                <i class="ph-bold ph-x"></i>
+            </button>
+            <h3 class="text-xl font-extrabold text-buna mb-1">📸 Post a 24h Moment</h3>
+            <p class="text-xs text-gray-500 mb-4">Share your coffee spot, outfit, or today's vibe! Disappears automatically after 24 hours.</p>
+
+            <div onclick="document.getElementById('story-file-input').click()" id="story-upload-preview" class="w-full h-48 mx-auto mb-3 rounded-2xl border-2 border-dashed border-botOrange bg-orange-50 flex flex-col items-center justify-center cursor-pointer bg-cover bg-center relative overflow-hidden">
+                <i id="story-upload-icon" class="ph-fill ph-camera-plus text-4xl text-botOrange mb-1"></i>
+                <span id="story-upload-label" class="text-xs font-bold text-botOrange">Tap to Choose Photo</span>
+            </div>
+            <input id="story-file-input" type="file" accept="image/*" class="hidden" onchange="handleStoryFileSelect(event)">
+
+            <input id="story-caption-input" type="text" maxlength="80" placeholder="Add a short caption (e.g. Macchiato time in Bole ☕)..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-xs mb-4 focus:outline-none focus:border-botOrange">
+
+            <button id="btn-post-story" onclick="submitStoryUpload()" class="w-full p-3.5 bg-botOrange text-white rounded-xl font-bold text-sm shadow-md mb-2">
+                Share 24h Story
+            </button>
+            <button id="btn-delete-my-story" onclick="deleteMyActiveStory()" class="hidden w-full p-2.5 bg-red-50 text-red-500 rounded-xl font-bold text-xs">
+                Delete Current Story
+            </button>
+        </div>
+    </div>
+
+    <!-- Feature 7: Fullscreen 24-Hour Story Viewer Modal -->
+    <div id="story-viewer-modal" class="hidden fixed inset-0 z-[175] bg-black bg-opacity-95 flex flex-col justify-between p-4">
+        <div class="w-full max-w-sm mx-auto">
+            <div class="w-full bg-white/20 h-1 rounded-full overflow-hidden mb-3">
+                <div class="bg-botOrange h-full w-full"></div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div id="story-view-avatar" class="w-10 h-10 rounded-full bg-cover bg-center border-2 border-botOrange"></div>
+                    <div>
+                        <p id="story-view-name" class="text-white font-bold text-sm flex items-center gap-1"></p>
+                        <p id="story-view-location" class="text-gray-300 text-[11px]"></p>
+                    </div>
+                </div>
+                <button onclick="closeStoryViewer()" class="w-9 h-9 bg-white/20 text-white rounded-full flex items-center justify-center text-lg">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 flex flex-col items-center justify-center my-2 overflow-hidden relative">
+            <img id="story-view-img" src="" alt="Story" class="max-h-[68vh] max-w-full rounded-2xl object-contain shadow-2xl">
+            <div id="story-view-caption" class="hidden mt-3 bg-black/70 text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-md text-center max-w-xs"></div>
+        </div>
+
+        <div id="story-view-actions" class="w-full max-w-sm mx-auto flex gap-2 pb-2">
+            <button onclick="likeFromStory(false)" class="flex-1 py-3 bg-botOrange text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg active:scale-95">
+                <i class="ph-fill ph-heart text-base"></i> Send Like
+            </button>
+            <button onclick="likeFromStory(true)" class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg active:scale-95">
+                <i class="ph-fill ph-star text-base"></i> Super Like
+            </button>
         </div>
     </div>
 
@@ -577,6 +668,20 @@
                     </select>
                 </div>
 
+                <!-- Feature 8: Diaspora Passport / Travel Banner -->
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1.5">✈️ Travel / Diaspora Banner (Optional)</label>
+                    <select id="reg-travel-banner" class="w-full p-3.5 border rounded-xl bg-gray-50 text-sm focus:outline-none focus:border-botOrange">
+                        <option value="">No Travel Banner</option>
+                        <option value="✈️ Visiting Addis Ababa Soon">✈️ Visiting Addis Ababa Soon</option>
+                        <option value="✈️ In Ethiopia for Holidays / Vacation">✈️ In Ethiopia for Holidays / Vacation</option>
+                        <option value="🌍 Diaspora Open to Long-Distance">🌍 Diaspora Open to Long-Distance</option>
+                        <option value="🏡 Moving Back to Ethiopia Soon">🏡 Moving Back to Ethiopia Soon</option>
+                        <option value="✈️ Planning a Trip to Hawassa / Bahir Dar">✈️ Planning a Trip to Hawassa / Bahir Dar</option>
+                        <option value="✈️ Visiting Dubai / US / Europe Soon">✈️ Visiting Dubai / US / Europe Soon</option>
+                    </select>
+                </div>
+
                 <!-- Universal Voice Bio Recorder + Native File Fallback -->
                 <div class="bg-orange-50 border border-orange-100 rounded-2xl p-4 text-center space-y-2.5">
                     <p class="text-xs font-bold text-buna flex items-center justify-center gap-1">
@@ -619,16 +724,13 @@
         <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1 shrink-0 gap-1">
             <!-- Discover Title & Dynamic Like Badge -->
             <div class="flex items-center gap-1.5 shrink-0">
-                <h2 class="font-bold text-2xl text-buna tracking-tight" data-i18n="nav_discover">Discover</h2>
-                <span id="top-card-likes" class="hidden items-center gap-1 bg-red-50 text-red-500 px-2 py-0.5 rounded-md text-[11px] font-bold border border-red-100 shadow-sm transition-all">
-                    <i class="ph-fill ph-heart"></i> <span id="top-card-likes-count">0</span>
-                </span>
-            </div>
-            
-            <!-- Right Controls: Language Toggle, Remaining Swipes & Filter Button -->
+            <!-- Right Controls: Language Toggle, Spin Wheel, Remaining Swipes & Filter Button -->
             <div class="flex items-center gap-1">
                 <button onclick="toggleLanguage()" class="bg-white text-buna border border-gray-200 text-[11px] font-bold px-2 py-1 rounded-full shadow-sm active:scale-95 lang-toggle-btn">
                     🇪🇹 አማ
+                </button>
+                <button onclick="openSpinWheelModal()" id="btn-top-spin" class="bg-gradient-to-r from-amber-400 to-botOrange text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95">
+                    🎡 <span>Spin</span>
                 </button>
                 <button onclick="openPremiumModal()" id="swipes-remaining-badge" class="bg-orange-50 text-botOrange border border-orange-200 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95">
                     <i class="ph-fill ph-fire"></i> <span id="swipes-remaining-text">25</span>
@@ -640,7 +742,7 @@
         </div>
         
         <!-- Total Matched Users & Active Filter Indicator -->
-        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1.5 shrink-0">
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1 shrink-0">
             <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md shadow-sm border border-red-100">
                 🔥 <span id="matched-num">0</span> <span data-i18n="matched_banner">users matched!</span>
             </p>
@@ -648,6 +750,9 @@
                 Filters Active ✕
             </span>
         </div>
+
+        <!-- Feature 7: 24-Hour Habesha Moments / Stories Bar -->
+        <div id="stories-bar" class="w-full max-w-sm mx-auto flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1 mb-1 shrink-0"></div>
 
         <!-- The Adaptive Card Container (Fills remaining vertical space cleanly) -->
         <div id="card-container" class="w-full max-w-sm mx-auto flex-1 min-h-0 flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200 relative mb-1">
@@ -807,22 +912,53 @@
 
         <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col scroll-smooth"></div>
 
-        <!-- Phase 3 Rich Chat Input Bar (Photo, Voice Note, Text) -->
-        <div class="bg-white border-t border-gray-200 p-2.5 flex gap-1.5 items-center shrink-0">
-            <button onclick="document.getElementById('chat-photo-input').click()" id="btn-chat-photo" class="w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-orange-50 hover:text-botOrange active:scale-95 transition shrink-0" title="Send Photo">
-                <i class="ph-bold ph-image text-xl"></i>
+        <!-- Feature 3: AI Habesha Wingman Suggestions Tray -->
+        <div id="ai-wingman-tray" class="hidden bg-gradient-to-r from-purple-50 to-orange-50 border-t border-purple-100 px-3 py-2.5 shrink-0 space-y-1.5">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold text-premium flex items-center gap-1"><i class="ph-fill ph-sparkle"></i> AI Habesha Wingman (Tap to Send)</span>
+                <button onclick="document.getElementById('ai-wingman-tray').classList.add('hidden')" class="text-xs text-gray-400 hover:text-gray-600"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <div id="ai-wingman-list" class="space-y-1.5"></div>
+        </div>
+
+        <!-- Feature 4: Virtual Buna Date & Cultural Gift Stickers Tray -->
+        <div id="buna-gifts-tray" class="hidden bg-amber-50 border-t border-amber-100 px-3 py-2 shrink-0">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-extrabold text-buna uppercase tracking-wider">☕ Send a Habesha Invite or Gift</span>
+                <button onclick="toggleBunaGiftsTray()" class="text-xs text-gray-400"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                <button onclick="sendCulturalSticker('☕ Let\'s grab Jebena Buna together!')" class="shrink-0 bg-white border border-amber-200 px-3 py-1.5 rounded-full text-xs font-bold text-buna shadow-sm active:scale-95">☕ Jebena Buna</button>
+                <button onclick="sendCulturalSticker('🥂 Macchiato date this week?')" class="shrink-0 bg-white border border-amber-200 px-3 py-1.5 rounded-full text-xs font-bold text-buna shadow-sm active:scale-95">🥂 Macchiato Date</button>
+                <button onclick="sendCulturalSticker('🌹 Sending you a special Habesha Rose!')" class="shrink-0 bg-white border border-pink-200 px-3 py-1.5 rounded-full text-xs font-bold text-pink-600 shadow-sm active:scale-95">🌹 Habesha Rose</button>
+                <button onclick="sendCulturalSticker('🍲 Doro Wat or Kitfo dinner date?')" class="shrink-0 bg-white border border-orange-200 px-3 py-1.5 rounded-full text-xs font-bold text-botOrange shadow-sm active:scale-95">🍲 Dinner Date</button>
+            </div>
+        </div>
+
+        <!-- Phase 3 + Phase 4 Rich Chat Input Bar (Photo, Voice Note, AI Wingman, Buna Gifts, Text) -->
+        <div class="bg-white border-t border-gray-200 p-2 flex gap-1 items-center shrink-0">
+            <button onclick="document.getElementById('chat-photo-input').click()" id="btn-chat-photo" class="w-9 h-9 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-orange-50 hover:text-botOrange active:scale-95 transition shrink-0" title="Send Photo">
+                <i class="ph-bold ph-image text-lg"></i>
             </button>
             <input id="chat-photo-input" type="file" accept="image/*" class="hidden" onchange="handleChatPhotoSelect(event)">
 
-            <button onclick="toggleChatVoiceNote()" id="btn-chat-voice" class="w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-orange-50 hover:text-botOrange active:scale-95 transition shrink-0" title="Send Voice Note">
-                <i class="ph-bold ph-microphone text-xl" id="chat-voice-icon"></i>
+            <button onclick="toggleChatVoiceNote()" id="btn-chat-voice" class="w-9 h-9 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-orange-50 hover:text-botOrange active:scale-95 transition shrink-0" title="Send Voice Note">
+                <i class="ph-bold ph-microphone text-lg" id="chat-voice-icon"></i>
             </button>
             <input id="chat-audio-fallback-input" type="file" accept="audio/*,video/mp4" class="hidden" onchange="handleChatAudioFallbackSelect(event)">
 
-            <input type="text" id="chat-input" placeholder="Type a message..." oninput="notifyChatTyping()" onkeypress="handleChatKeyPress(event)" class="flex-1 bg-gray-100 border-transparent focus:bg-white focus:border-botOrange focus:ring-1 focus:ring-botOrange rounded-full px-4 py-2.5 text-sm outline-none transition">
+            <button onclick="requestAiWingman()" id="btn-ai-wingman" class="w-9 h-9 bg-purple-50 text-premium border border-purple-100 rounded-full flex items-center justify-center hover:bg-purple-100 active:scale-95 transition shrink-0" title="AI Habesha Wingman">
+                <i class="ph-fill ph-sparkle text-lg"></i>
+            </button>
+
+            <button onclick="toggleBunaGiftsTray()" class="w-9 h-9 bg-amber-50 text-botOrange border border-amber-100 rounded-full flex items-center justify-center hover:bg-amber-100 active:scale-95 transition shrink-0" title="Send Buna Date or Rose">
+                <i class="ph-fill ph-coffee text-lg"></i>
+            </button>
+
+            <input type="text" id="chat-input" placeholder="Type a message..." oninput="notifyChatTyping()" onkeypress="handleChatKeyPress(event)" class="flex-1 min-w-0 bg-gray-100 border-transparent focus:bg-white focus:border-botOrange focus:ring-1 focus:ring-botOrange rounded-full px-3.5 py-2 text-sm outline-none transition">
             
-            <button onclick="sendMessage()" class="w-11 h-11 bg-botOrange text-white rounded-full flex items-center justify-center hover:bg-orange-500 active:scale-95 transition shadow-sm shrink-0">
-                <i class="ph-fill ph-paper-plane-right text-xl"></i>
+            <button onclick="sendMessage()" class="w-10 h-10 bg-botOrange text-white rounded-full flex items-center justify-center hover:bg-orange-500 active:scale-95 transition shadow-sm shrink-0">
+                <i class="ph-fill ph-paper-plane-right text-lg"></i>
             </button>
         </div>
     </div>
@@ -904,6 +1040,12 @@
                 <button id="btn-profile-boost" onclick="triggerProfileBoost()" class="w-full bg-amber-50 text-amber-700 font-bold p-4 rounded-xl flex items-center justify-between border border-amber-200 shadow-sm transition active:scale-95">
                     <div class="flex items-center gap-3"><i class="ph-fill ph-lightning text-xl text-amber-500"></i> <span data-i18n="boost_profile_btn">Boost Profile (24h Top Spot)</span></div>
                     <span class="text-[10px] font-extrabold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full uppercase">VIP</span>
+                </button>
+
+                <!-- Feature 6: VIP Incognito / Private Mode Button -->
+                <button id="btn-profile-incognito" onclick="toggleVipIncognito()" class="w-full bg-slate-100 text-slate-700 font-bold p-4 rounded-xl flex items-center justify-between border border-slate-200 shadow-sm transition active:scale-95">
+                    <div class="flex items-center gap-3"><i class="ph-fill ph-detective text-xl text-slate-700"></i> <span id="incognito-btn-label">VIP Incognito Mode: OFF</span></div>
+                    <span class="text-[10px] font-extrabold bg-purple-100 text-premium px-2 py-0.5 rounded-full uppercase">VIP</span>
                 </button>
                 
                 <button id="btn-profile-verify" onclick="openVerifyModal()" class="w-full bg-blue-50 text-verify font-bold p-4 rounded-xl flex items-center justify-between border border-blue-100 shadow-sm transition active:scale-95">
@@ -1136,6 +1278,11 @@
         // Phase 3: Rewind Last Swipe Stack
         let swipeHistoryStack = [];
 
+        // Phase 4 & 5: Stories State
+        let activeStoriesList = [];
+        let selectedStoryFile = null;
+        let currentViewingStoryUser = null;
+
         let selectedVerifySelfieFile = null;
         let isEditing = false;
         let allProfiles = []; 
@@ -1287,6 +1434,7 @@
                     updateSwipesRemainingUI();
 
                     await loadDiscoverProfiles(); 
+                    loadActiveStories();
                     loadAppStats();
                     
                     document.getElementById('view-loading').classList.add('hidden');
@@ -1600,6 +1748,29 @@
 
             const verifyBadge = profile.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1 text-xl"></i>` : '';
 
+            // Feature 1: Visual "Super Liked You!" Banner
+            const superLikedYouBanner = profile.super_liked_me ? `
+                <div class="absolute top-6 left-3 z-20 bg-gradient-to-r from-blue-600 to-indigo-500 text-white px-3 py-1 rounded-full text-[11px] font-extrabold flex items-center gap-1 shadow-lg border border-white/40 animate-pulse">
+                    <i class="ph-fill ph-star text-yellow-300"></i> Super Liked You!
+                </div>
+            ` : '';
+
+            // Feature 2: Match Compatibility Percentage Badge + Shared Traits Pills
+            const matchPercent = profile.match_percent || 85;
+            const matchCompatBadge = `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-0.5">🔥 ${matchPercent}% Match</span>`;
+            const sharedTraitsHtml = (profile.shared_traits && profile.shared_traits.length > 0) ? `
+                <div class="flex flex-wrap gap-1 mt-1">
+                    ${profile.shared_traits.map(t => `<span class="bg-emerald-50/80 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-100">✓ ${t}</span>`).join('')}
+                </div>
+            ` : '';
+
+            // Feature 8: Diaspora Travel / Passport Banner
+            const travelBannerHtml = profile.travel_banner ? `
+                <div class="mt-1 bg-blue-50 border border-blue-100 rounded-xl px-2.5 py-1 text-[11px] font-bold text-verify flex items-center gap-1.5">
+                    <span>${profile.travel_banner}</span>
+                </div>
+            ` : '';
+
             // Compact Age + Gender (e.g. "25F" or "27M") + Location Pill
             const ageGenderLabel = formatAgeGender(profile.age, profile.gender);
             const locationBadge = profile.location 
@@ -1629,12 +1800,15 @@
                 </div>
             ` : '';
 
+            const cardBorderClass = profile.super_liked_me ? 'ring-2 ring-blue-400' : '';
+
             container.innerHTML = `
-                <div class="w-full h-full flex flex-col overflow-hidden relative bg-white">
+                <div class="w-full h-full flex flex-col overflow-hidden relative bg-white ${cardBorderClass}">
                     
                     <!-- Adaptive Photo Area: expands on tall Android screens, shrinks gracefully on shorter Telegram screens -->
-                    <div class="w-full flex-1 min-h-[160px] bg-gray-200 bg-cover bg-center relative" style="background-image: url('${photoToUse}')">
+                    <div class="w-full flex-1 min-h-[150px] bg-gray-200 bg-cover bg-center relative" style="background-image: url('${photoToUse}')">
                         ${dotsHtml}
+                        ${superLikedYouBanner}
                         ${voicePillHtml}
                         <button onclick="showProfileDetails()" class="absolute bottom-3 left-1/2 transform -translate-x-1/2 px-5 py-2 bg-black bg-opacity-60 text-white rounded-full flex items-center gap-2 backdrop-blur-md active:scale-95 shadow-lg border border-white border-opacity-20 z-20">
                             <i class="ph-bold ph-info text-base"></i>
@@ -1642,16 +1816,19 @@
                         </button>
                     </div>
                     
-                    <!-- Profile Name, Age/Gender, Bio & Icebreaker -->
-                    <div class="px-3.5 py-2.5 shrink-0 bg-white">
-                        <div class="flex items-center flex-wrap gap-1.5 mb-0.5">
+                    <!-- Profile Name, Age/Gender, Compatibility %, Shared Traits, Bio & Icebreaker -->
+                    <div class="px-3.5 py-2 shrink-0 bg-white">
+                        <div class="flex items-center flex-wrap gap-1 mb-0.5">
                             <h3 class="text-lg font-bold text-buna flex items-center">${profile.name}, ${ageGenderLabel} ${verifyBadge}</h3>
+                            ${matchCompatBadge}
                             ${locationBadge}
                             ${onlineBadge}
                             ${boostedBadge}
                             ${newBadge}
                         </div>
                         <p class="text-gray-500 text-xs line-clamp-1">${profile.bio || 'Ready to mingle!'}</p>
+                        ${sharedTraitsHtml}
+                        ${travelBannerHtml}
                         ${icebreakerHtml}
                     </div>
                     
@@ -2040,13 +2217,21 @@
                 </div>
             ` : '';
 
+            const travelBox = profile.travel_banner ? `
+                <div class="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-2xl text-xs font-bold text-verify flex items-center gap-2">
+                    <span>${profile.travel_banner}</span>
+                </div>
+            ` : '';
+
             document.getElementById('profile-details-content').innerHTML = `
                 <h3 class="text-3xl font-bold text-buna mb-2 flex items-center">${profile.name}, ${ageGenderLabel} ${verifyBadge}</h3>
-                <div class="flex items-center gap-4 mb-4">
+                <div class="flex flex-wrap items-center gap-2 mb-4">
+                    <span class="text-xs font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-md">🔥 ${profile.match_percent || 85}% Match</span>
                     <p class="text-xs text-gray-400 font-medium"><i class="ph-fill ph-calendar-blank"></i> Joined: ${joinDate}</p>
                     <p class="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-fill ph-heart"></i> ${profile.total_likes || 0} Likes</p>
                 </div>
                 ${voiceButtonHtml}
+                ${travelBox}
                 <p class="text-gray-600 mb-5">${profile.bio || 'No bio provided.'}</p>
                 ${icebreakerBox}
                 
@@ -2153,6 +2338,12 @@
                     const boostBtn = document.getElementById('btn-profile-boost');
                     if (boostBtn && mp.is_boosted) {
                         boostBtn.innerHTML = `<div class="flex items-center gap-3"><i class="ph-fill ph-lightning text-xl text-purple-600"></i> <span>⚡ Profile Boost Active (24h)</span></div><i class="ph-bold ph-check text-green-600"></i>`;
+                    }
+
+                    // Feature 6: Update VIP Incognito Button Status
+                    const incogLabel = document.getElementById('incognito-btn-label');
+                    if (incogLabel) {
+                        incogLabel.innerText = mp.is_incognito ? "🕵️ VIP Incognito Mode: ON" : "VIP Incognito Mode: OFF";
                     }
 
                     if (mp.is_verified) {
@@ -2285,17 +2476,19 @@
             if (isPrem) {
                 upsellMsg.classList.add('hidden');
                 likesList.innerHTML = pending.map(u => `
-                    <div onclick="instantMatchFromPremium('${u.telegram_id}', '${u.name.replace(/'/g, "\\'")}')" class="flex flex-col items-center shrink-0 cursor-pointer group">
-                        <div class="w-16 h-16 rounded-2xl bg-cover bg-center border-2 border-premium shadow-sm mb-1" style="background-image: url('${u.photo_url || DEFAULT_AVATAR}')"></div>
+                    <div onclick="instantMatchFromPremium('${u.telegram_id}', '${u.name.replace(/'/g, "\\'")}')" class="flex flex-col items-center shrink-0 cursor-pointer group relative">
+                        ${u.is_super ? `<span class="absolute -top-1 -right-1 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow z-10">🌟</span>` : ''}
+                        <div class="w-16 h-16 rounded-2xl bg-cover bg-center border-2 ${u.is_super ? 'border-blue-500 ring-2 ring-blue-300' : 'border-premium'} shadow-sm mb-1" style="background-image: url('${u.photo_url || DEFAULT_AVATAR}')"></div>
                         <span class="text-xs font-bold text-buna truncate w-16 text-center">${u.name}</span>
                     </div>
                 `).join('');
             } else {
                 upsellMsg.classList.remove('hidden');
                 likesList.innerHTML = pending.map(u => `
-                    <div onclick="openPremiumModal()" class="flex flex-col items-center shrink-0 cursor-pointer">
+                    <div onclick="openPremiumModal()" class="flex flex-col items-center shrink-0 cursor-pointer relative">
+                        ${u.is_super ? `<span class="absolute -top-1 -right-1 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow z-10">🌟</span>` : ''}
                         <div class="w-16 h-16 rounded-2xl bg-cover bg-center border border-gray-200 mb-1 blur-premium" style="background-image: url('${u.photo_url || DEFAULT_AVATAR}')"></div>
-                        <span class="text-xs font-bold text-gray-400">Someone</span>
+                        <span class="text-xs font-bold text-gray-400">${u.is_super ? 'Super Liked!' : 'Someone'}</span>
                     </div>
                 `).join('');
             }
@@ -3072,6 +3265,7 @@
                 
                 document.getElementById('reg-bio').value = mp.bio || '';
                 document.getElementById('reg-icebreaker').value = mp.icebreaker || '';
+                document.getElementById('reg-travel-banner').value = mp.travel_banner || '';
                 
                 if (mp.photo_url) setPhotoSlotPreview(1, mp.photo_url);
                 if (mp.photo_url_2) setPhotoSlotPreview(2, mp.photo_url_2);
@@ -3153,6 +3347,7 @@
                     photo_url_3: selectedPhotoUrls[3] || "",
                     voice_bio_url: finalVoiceUrl || "",
                     icebreaker: document.getElementById('reg-icebreaker').value || "",
+                    travel_banner: document.getElementById('reg-travel-banner').value || "",
                     intention: document.getElementById('reg-intention').value,
                     kids: document.getElementById('reg-kids').value,
                     drinking: document.getElementById('reg-drinking').value,
@@ -3412,6 +3607,323 @@
             spyUser1 = null; 
             spyUser2 = null;
             document.getElementById('view-admin-chat').classList.replace('flex', 'hidden');
+        }
+
+        // ==========================================
+        // PHASE 4 & 5 NEW FRONTEND FUNCTIONS (ALL 8 FEATURES)
+        // ==========================================
+
+        // Feature 3: AI Habesha Wingman in Chat
+        async function requestAiWingman() {
+            if (!activeChatId) return;
+            const tray = document.getElementById('ai-wingman-tray');
+            const list = document.getElementById('ai-wingman-list');
+            tray.classList.remove('hidden');
+            list.innerHTML = `<p class="text-xs text-gray-500 animate-pulse py-1">✨ AI Wingman is crafting 3 opening lines...</p>`;
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/ai-wingman`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sender_id: cleanTelegramId,
+                        receiver_id: activeChatId,
+                        language: currentLang
+                    })
+                });
+                const data = await res.json();
+                const lines = data.suggestions || [];
+                list.innerHTML = lines.map(line => {
+                    const safeLine = line.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    return `<button onclick="useAiWingmanLine('${safeLine}')" class="w-full text-left text-xs bg-white hover:bg-orange-50 text-buna p-2 rounded-xl border border-purple-100 shadow-sm transition active:scale-95 block">${line}</button>`;
+                }).join('');
+            } catch (e) {
+                list.innerHTML = `<p class="text-xs text-red-500">Could not load AI suggestions right now.</p>`;
+            }
+        }
+
+        function useAiWingmanLine(text) {
+            const input = document.getElementById('chat-input');
+            input.value = text;
+            document.getElementById('ai-wingman-tray').classList.add('hidden');
+            sendMessage();
+        }
+
+        // Feature 4: Virtual Buna Date & Cultural Gift Stickers
+        function toggleBunaGiftsTray() {
+            const tray = document.getElementById('buna-gifts-tray');
+            tray.classList.toggle('hidden');
+        }
+
+        function sendCulturalSticker(text) {
+            const input = document.getElementById('chat-input');
+            input.value = text;
+            document.getElementById('buna-gifts-tray').classList.add('hidden');
+            sendMessage();
+        }
+
+        // Feature 5: Daily Spin-the-Wheel Rewards
+        function openSpinWheelModal() {
+            document.getElementById('spin-result-banner').classList.add('hidden');
+            document.getElementById('spin-wheel-modal').classList.remove('hidden');
+        }
+
+        function closeSpinWheelModal() {
+            document.getElementById('spin-wheel-modal').classList.add('hidden');
+        }
+
+        async function executeDailySpin() {
+            const btn = document.getElementById('btn-spin-now');
+            const wheel = document.getElementById('spin-wheel-graphic');
+            const banner = document.getElementById('spin-result-banner');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin text-lg"></i> Spinning...`;
+            wheel.style.transform = "rotate(1080deg)";
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/spin-wheel`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: cleanTelegramId })
+                });
+                const data = await res.json();
+
+                setTimeout(() => {
+                    if (!res.ok) {
+                        banner.className = "mb-4 p-3 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 font-bold text-xs";
+                        banner.innerText = data.detail || "You already spun the wheel today!";
+                        banner.classList.remove('hidden');
+                        btn.innerHTML = "Come Back Tomorrow 🎡";
+                        return;
+                    }
+
+                    banner.className = "mb-4 p-3 bg-green-50 border border-green-200 rounded-2xl text-green-800 font-extrabold text-sm";
+                    banner.innerText = `🎉 You Won: ${data.prize_label}`;
+                    banner.classList.remove('hidden');
+
+                    if (window.myProfileData) {
+                        window.myProfileData.swipes_remaining = data.swipes_remaining;
+                        window.myProfileData.is_premium = data.is_premium;
+                        updateSwipesRemainingUI();
+                    }
+                    btn.innerHTML = "Prize Claimed! ✅";
+                }, 900);
+            } catch (e) {
+                btn.disabled = false;
+                btn.innerHTML = "Spin the Wheel Now!";
+                showAlert("Could not spin the wheel right now.");
+            }
+        }
+
+        // Feature 6: VIP Incognito Mode Toggle
+        async function toggleVipIncognito() {
+            if (!window.myProfileData || !window.myProfileData.is_premium) {
+                openPremiumModal();
+                return;
+            }
+            const nextState = !Boolean(window.myProfileData.is_incognito);
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/toggle-incognito`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: cleanTelegramId,
+                        is_incognito: nextState
+                    })
+                });
+                if (!res.ok) throw new Error("Could not toggle Incognito mode.");
+                window.myProfileData.is_incognito = nextState;
+                document.getElementById('incognito-btn-label').innerText = nextState
+                    ? "🕵️ VIP Incognito Mode: ON"
+                    : "VIP Incognito Mode: OFF";
+                showAlert(nextState
+                    ? "🕵️ VIP Incognito Mode ON! Your profile is now hidden in Discover unless you like someone first."
+                    : "👀 VIP Incognito Mode OFF! Your profile is visible in Discover again.");
+            } catch (e) {
+                showAlert(e.message);
+            }
+        }
+
+        // Feature 7: 24-Hour Habesha Moments / Stories Bar
+        async function loadActiveStories() {
+            const bar = document.getElementById('stories-bar');
+            if (!bar || !cleanTelegramId) return;
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/stories/${cleanTelegramId}`);
+                const data = await res.json();
+                activeStoriesList = data.stories || [];
+                renderStoriesBar();
+            } catch (e) {
+                console.error("Failed to load stories", e);
+            }
+        }
+
+        function renderStoriesBar() {
+            const bar = document.getElementById('stories-bar');
+            if (!bar) return;
+            const myPhoto = (window.myProfileData && window.myProfileData.photo_url) ? window.myProfileData.photo_url : DEFAULT_AVATAR;
+            const myStory = activeStoriesList.find(s => String(s.telegram_id) === String(cleanTelegramId));
+
+            let html = `
+                <div onclick="openStoryUploadModal()" class="flex flex-col items-center shrink-0 cursor-pointer">
+                    <div class="w-12 h-12 rounded-full bg-cover bg-center border-2 border-dashed border-botOrange relative flex items-center justify-center shadow-sm" style="background-image:url('${myPhoto}')">
+                        <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-botOrange text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow">+</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-buna mt-0.5">${myStory ? 'My Story' : 'Add Story'}</span>
+                </div>
+            `;
+
+            html += activeStoriesList.map((st, idx) => `
+                <div onclick="openStoryViewer(${idx})" class="flex flex-col items-center shrink-0 cursor-pointer">
+                    <div class="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-botOrange via-pink-500 to-purple-600 shadow-sm">
+                        <div class="w-full h-full rounded-full bg-cover bg-center border-2 border-white" style="background-image:url('${st.story_photo_url || st.photo_url || DEFAULT_AVATAR}')"></div>
+                    </div>
+                    <span class="text-[10px] font-medium text-gray-700 truncate w-14 text-center mt-0.5">${st.is_mine ? 'You' : st.name}</span>
+                </div>
+            `).join('');
+
+            bar.innerHTML = html;
+        }
+
+        function openStoryUploadModal() {
+            const myStory = activeStoriesList.find(s => String(s.telegram_id) === String(cleanTelegramId));
+            const delBtn = document.getElementById('btn-delete-my-story');
+            if (myStory && delBtn) {
+                delBtn.classList.remove('hidden');
+            } else if (delBtn) {
+                delBtn.classList.add('hidden');
+            }
+            document.getElementById('story-upload-modal').classList.remove('hidden');
+        }
+
+        function closeStoryUploadModal() {
+            document.getElementById('story-upload-modal').classList.add('hidden');
+        }
+
+        function handleStoryFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            selectedStoryFile = file;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const prev = document.getElementById('story-upload-preview');
+                prev.style.backgroundImage = `url(${e.target.result})`;
+                prev.classList.remove('border-dashed');
+                document.getElementById('story-upload-icon').classList.add('hidden');
+                document.getElementById('story-upload-label').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function submitStoryUpload() {
+            if (!selectedStoryFile) return showAlert("Please choose a photo for your 24h Story first!");
+            const btn = document.getElementById('btn-post-story');
+            const caption = document.getElementById('story-caption-input').value.trim();
+            btn.disabled = true;
+            btn.innerText = "Posting Story...";
+
+            try {
+                const fd = new FormData();
+                fd.append('file', selectedStoryFile);
+                fd.append('telegram_id', cleanTelegramId);
+                fd.append('caption', caption);
+
+                const res = await fetch(`${BACKEND_URL}/api/upload-story`, { method: 'POST', body: fd });
+                if (!res.ok) throw new Error("Upload failed");
+
+                selectedStoryFile = null;
+                document.getElementById('story-caption-input').value = "";
+                closeStoryUploadModal();
+                await loadActiveStories();
+                showAlert("📸 Your 24-Hour Habesha Moment is now live at the top of Discover!");
+            } catch (e) {
+                showAlert("Could not post story. Please try again.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Share 24h Story";
+            }
+        }
+
+        async function deleteMyActiveStory() {
+            try {
+                await fetch(`${BACKEND_URL}/api/delete-story`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: cleanTelegramId })
+                });
+                closeStoryUploadModal();
+                await loadActiveStories();
+                showAlert("Story deleted.");
+            } catch (e) {}
+        }
+
+        function openStoryViewer(idx) {
+            const st = activeStoriesList[idx];
+            if (!st) return;
+            currentViewingStoryUser = st;
+
+            document.getElementById('story-view-avatar').style.backgroundImage = `url('${st.photo_url || DEFAULT_AVATAR}')`;
+            document.getElementById('story-view-name').innerText = `${st.name}, ${formatAgeGender(st.age, st.gender)}`;
+            document.getElementById('story-view-location').innerText = st.location || "Habesha Date";
+            document.getElementById('story-view-img').src = st.story_photo_url;
+
+            const capEl = document.getElementById('story-view-caption');
+            if (st.story_caption) {
+                capEl.innerText = st.story_caption;
+                capEl.classList.remove('hidden');
+            } else {
+                capEl.classList.add('hidden');
+            }
+
+            const actionsEl = document.getElementById('story-view-actions');
+            if (st.is_mine) {
+                actionsEl.classList.add('hidden');
+            } else {
+                actionsEl.classList.remove('hidden');
+            }
+
+            document.getElementById('story-viewer-modal').classList.remove('hidden');
+        }
+
+        function closeStoryViewer() {
+            currentViewingStoryUser = null;
+            document.getElementById('story-viewer-modal').classList.add('hidden');
+        }
+
+        async function likeFromStory(isSuper) {
+            if (!currentViewingStoryUser) return;
+            const targetId = currentViewingStoryUser.telegram_id;
+            const targetName = currentViewingStoryUser.name;
+
+            if (isSuper && (!window.myProfileData || !window.myProfileData.is_premium)) {
+                closeStoryViewer();
+                openPremiumModal();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/swipe`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        swiper_id: cleanTelegramId,
+                        swiped_id: targetId,
+                        is_like: true,
+                        is_super: isSuper
+                    })
+                });
+                const data = await res.json();
+                closeStoryViewer();
+
+                if (data.limit_reached) {
+                    document.getElementById('swipe-limit-modal').classList.remove('hidden');
+                    return;
+                }
+                showAlert(data.match ? `🎉 It's a Match with ${targetName}!` : (isSuper ? `🌟 Super Like sent to ${targetName}!` : `❤️ Liked ${targetName}'s Story!`));
+            } catch (e) {
+                showAlert("Could not send like.");
+            }
         }
 
         initApp();
