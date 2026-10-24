@@ -182,7 +182,7 @@
             <div id="story-view-caption" class="hidden mt-3 bg-black/70 text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-md text-center max-w-xs"></div>
         </div>
 
-        <div id="story-view-actions" class="w-full max-w-sm mx-auto flex gap-2 pb-2">
+            <div class="w-full max-w-sm mx-auto flex gap-2 pb-2" id="story-view-actions">
             <button onclick="likeFromStory(false)" class="flex-1 py-3 bg-botOrange text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg active:scale-95">
                 <i class="ph-fill ph-heart text-base"></i> Send Like
             </button>
@@ -718,50 +718,50 @@
     </div>
 
     <!-- Swipe View (Flexbox Adaptive Height for both Android APK & Telegram Mini App) -->
-    <div id="view-swipe" class="hidden w-full h-[100dvh] pt-2.5 pb-[76px] px-3 flex flex-col bg-gray-100 overflow-hidden relative">
+    <div id="view-swipe" class="hidden w-full h-[100dvh] pt-1.5 pb-[62px] px-2.5 flex flex-col bg-gray-100 overflow-hidden relative">
         
         <!-- Streamlined Top Action Row -->
-        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1 shrink-0 gap-1">
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-0.5 shrink-0 gap-1">
             <!-- Discover Title & Dynamic Like Badge -->
             <div class="flex items-center gap-1.5 shrink-0">
-                <h2 class="font-extrabold text-lg sm:text-xl text-buna tracking-tight whitespace-nowrap" data-i18n="nav_discover">Discover</h2>
-                <div id="top-card-likes" class="hidden items-center gap-1 bg-red-50 border border-red-100 text-red-500 text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap shrink-0">
+                <h2 class="font-extrabold text-base sm:text-lg text-buna tracking-tight whitespace-nowrap" data-i18n="nav_discover">Discover</h2>
+                <div id="top-card-likes" class="hidden items-center gap-1 bg-red-50 border border-red-100 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap shrink-0">
                     <i class="ph-fill ph-heart"></i> <span id="top-card-likes-count">0</span>
                 </div>
             </div>
 
             <!-- Right Controls: Language Toggle, Spin Wheel, Remaining Swipes & Filter Button -->
             <div class="flex items-center gap-1 shrink-0">
-                <button onclick="toggleLanguage()" class="bg-white text-buna border border-gray-200 text-[11px] font-bold px-2 py-1 rounded-full shadow-sm active:scale-95 whitespace-nowrap shrink-0 lang-toggle-btn">
+                <button onclick="toggleLanguage()" class="bg-white text-buna border border-gray-200 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm active:scale-95 whitespace-nowrap shrink-0 lang-toggle-btn">
                     🇪🇹 አማ
                 </button>
-                <button onclick="openSpinWheelModal()" id="btn-top-spin" class="bg-gradient-to-r from-amber-400 to-botOrange text-white text-[11px] font-extrabold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95 whitespace-nowrap shrink-0">
+                <button onclick="openSpinWheelModal()" id="btn-top-spin" class="bg-gradient-to-r from-amber-400 to-botOrange text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm active:scale-95 whitespace-nowrap shrink-0">
                     🎡 <span>Spin</span>
                 </button>
-                <button onclick="openPremiumModal()" id="swipes-remaining-badge" class="bg-orange-50 text-botOrange border border-orange-200 text-[11px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95 whitespace-nowrap shrink-0">
+                <button onclick="openPremiumModal()" id="swipes-remaining-badge" class="bg-orange-50 text-botOrange border border-orange-200 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm active:scale-95 whitespace-nowrap shrink-0">
                     <i class="ph-fill ph-fire"></i> <span id="swipes-remaining-text">25</span>
                 </button>
-                <button id="filter-modal-btn" onclick="openFilterModal()" class="bg-white text-buna border border-gray-200 text-[11px] font-bold px-2 py-1 rounded-full shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap shrink-0">
+                <button id="filter-modal-btn" onclick="openFilterModal()" class="bg-white text-buna border border-gray-200 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap shrink-0">
                     <i class="ph-bold ph-sliders-horizontal text-botOrange"></i> <span data-i18n="filter_btn">Filter</span>
                 </button>
             </div>
         </div>
         
-        <!-- Total Matched Users & Active Filter Indicator -->
-        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1 shrink-0">
-            <p id="total-matched-count" class="hidden text-[11px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md shadow-sm border border-red-100">
-                🔥 <span id="matched-num">0</span> <span data-i18n="matched_banner">users matched!</span>
-            </p>
-            <span id="active-filter-pill" onclick="resetDiscoveryFilters()" class="hidden text-[10px] font-bold bg-botOrange text-white px-2.5 py-0.5 rounded-full cursor-pointer shadow-sm">
-                Filters Active ✕
-            </span>
+        <!-- Combined Compact Row: 24h Stories + Matched Banner + Active Filter Pill -->
+        <div class="w-full max-w-sm mx-auto flex items-center justify-between gap-2 mb-1 shrink-0">
+            <div id="stories-bar" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 flex-1 min-w-0"></div>
+            <div class="flex flex-col items-end gap-0.5 shrink-0">
+                <p id="total-matched-count" class="hidden text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full shadow-sm border border-red-100 whitespace-nowrap">
+                    🔥 <span id="matched-num">0</span> <span data-i18n="matched_banner">users matched!</span>
+                </p>
+                <span id="active-filter-pill" onclick="resetDiscoveryFilters()" class="hidden text-[9px] font-bold bg-botOrange text-white px-2 py-0.5 rounded-full cursor-pointer shadow-sm whitespace-nowrap">
+                    Filters Active ✕
+                </span>
+            </div>
         </div>
 
-        <!-- Feature 7: 24-Hour Habesha Moments / Stories Bar -->
-        <div id="stories-bar" class="w-full max-w-sm mx-auto flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1 mb-1 shrink-0"></div>
-
         <!-- The Adaptive Card Container (Fills remaining vertical space cleanly) -->
-        <div id="card-container" class="w-full max-w-sm mx-auto flex-1 min-h-0 flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200 relative mb-1">
+        <div id="card-container" class="w-full max-w-sm mx-auto flex-1 min-h-0 flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200 relative mb-0.5">
             <p class="text-gray-400 font-medium flex h-full items-center justify-center">Loading profiles...</p>
         </div>
         
@@ -1078,23 +1078,23 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <div id="bottom-nav" class="hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex flex-row justify-around items-center p-3 pb-5 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+    <div id="bottom-nav" class="hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex flex-row justify-around items-center py-2 pb-3 px-3 z-50 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <button onclick="switchTab('swipe')" id="tab-swipe" class="flex flex-col items-center text-botOrange transition-colors">
-            <i class="ph-bold ph-cards text-2xl mb-1"></i>
-            <span class="text-xs font-bold" data-i18n="nav_discover">Discover</span>
+            <i class="ph-bold ph-cards text-xl mb-0.5"></i>
+            <span class="text-[11px] font-bold" data-i18n="nav_discover">Discover</span>
         </button>
         <button onclick="switchTab('matches')" id="tab-matches" class="relative flex flex-col items-center text-gray-400 hover:text-botOrange transition-colors">
-            <i class="ph-bold ph-chats-circle text-2xl mb-1"></i>
-            <span class="text-xs font-bold" data-i18n="nav_matches">Matches</span>
-            <span id="nav-badge-matches" class="hidden absolute top-0 right-4 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+            <i class="ph-bold ph-chats-circle text-xl mb-0.5"></i>
+            <span class="text-[11px] font-bold" data-i18n="nav_matches">Matches</span>
+            <span id="nav-badge-matches" class="hidden absolute top-0 right-4 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
         </button>
         <button onclick="switchTab('profile')" id="tab-profile" class="flex flex-col items-center text-gray-400 hover:text-botOrange transition-colors">
-            <i class="ph-bold ph-user text-2xl mb-1"></i>
-            <span class="text-xs font-bold" data-i18n="nav_profile">Profile</span>
+            <i class="ph-bold ph-user text-xl mb-0.5"></i>
+            <span class="text-[11px] font-bold" data-i18n="nav_profile">Profile</span>
         </button>
         <button onclick="switchTab('admin')" id="tab-admin" class="hidden flex-col items-center text-gray-400 hover:text-red-500 transition-colors">
-            <i class="ph-bold ph-shield-star text-2xl mb-1"></i>
-            <span class="text-xs font-bold">Admin</span>
+            <i class="ph-bold ph-shield-star text-xl mb-0.5"></i>
+            <span class="text-[11px] font-bold">Admin</span>
         </button>
     </div>
     
@@ -1756,36 +1756,36 @@
 
             // Feature 1: Visual "Super Liked You!" Banner
             const superLikedYouBanner = profile.super_liked_me ? `
-                <div class="absolute top-6 left-3 z-20 bg-gradient-to-r from-blue-600 to-indigo-500 text-white px-3 py-1 rounded-full text-[11px] font-extrabold flex items-center gap-1 shadow-lg border border-white/40 animate-pulse">
+                <div class="absolute top-5 left-3 z-20 bg-gradient-to-r from-blue-600 to-indigo-500 text-white px-2.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1 shadow-lg border border-white/40 animate-pulse">
                     <i class="ph-fill ph-star text-yellow-300"></i> Super Liked You!
                 </div>
             ` : '';
 
             // Feature 2: Match Compatibility Percentage Badge + Shared Traits Pills
             const matchPercent = profile.match_percent || 85;
-            const matchCompatBadge = `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-0.5">🔥 ${matchPercent}% Match</span>`;
+            const matchCompatBadge = `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-0.5 whitespace-nowrap shrink-0">🔥 ${matchPercent}% Match</span>`;
             const sharedTraitsHtml = (profile.shared_traits && profile.shared_traits.length > 0) ? `
-                <div class="flex flex-wrap gap-1 mt-1">
-                    ${profile.shared_traits.map(t => `<span class="bg-emerald-50/80 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-100">✓ ${t}</span>`).join('')}
+                <div class="flex items-center gap-1 mt-0.5 overflow-x-auto no-scrollbar whitespace-nowrap">
+                    ${profile.shared_traits.map(t => `<span class="bg-emerald-50/80 text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded border border-emerald-100 shrink-0">✓ ${t}</span>`).join('')}
                 </div>
             ` : '';
 
             // Feature 8: Diaspora Travel / Passport Banner
             const travelBannerHtml = profile.travel_banner ? `
-                <div class="mt-1 bg-blue-50 border border-blue-100 rounded-xl px-2.5 py-1 text-[11px] font-bold text-verify flex items-center gap-1.5">
-                    <span>${profile.travel_banner}</span>
+                <div class="mt-0.5 bg-blue-50 border border-blue-100 rounded-lg px-2 py-0.5 text-[10px] font-bold text-verify flex items-center gap-1 truncate">
+                    <span class="truncate">${profile.travel_banner}</span>
                 </div>
             ` : '';
 
             // Compact Age + Gender (e.g. "25F" or "27M") + Location Pill
             const ageGenderLabel = formatAgeGender(profile.age, profile.gender);
             const locationBadge = profile.location 
-                ? `<span class="text-[11px] font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-lg flex items-center gap-0.5"><i class="ph-fill ph-map-pin text-botOrange text-xs"></i> ${profile.location}</span>` 
+                ? `<span class="text-[10px] font-medium text-gray-500 px-1.5 py-0.5 bg-gray-100 rounded-md flex items-center gap-0.5 whitespace-nowrap shrink-0"><i class="ph-fill ph-map-pin text-botOrange text-[10px]"></i> ${profile.location}</span>` 
                 : '';
 
             // Multi-Photo Carousel Indicators
             const dotsHtml = photos.length > 1 ? `
-                <div class="absolute top-2.5 left-3 right-3 flex gap-1.5 z-20">
+                <div class="absolute top-2 left-3 right-3 flex gap-1.5 z-20">
                     ${photos.map((_, idx) => `<div class="h-1 flex-1 rounded-full transition-all ${idx === currentPhotoSlideIndex ? 'bg-white shadow' : 'bg-white/40'}"></div>`).join('')}
                 </div>
                 <div onclick="cycleCardPhoto(-1, event)" class="absolute inset-y-0 left-0 w-1/3 z-10 cursor-pointer"></div>
@@ -1794,15 +1794,15 @@
 
             // Voice Bio Floating Pill
             const voicePillHtml = profile.voice_bio_url ? `
-                <button onclick="playProfileVoiceBio('${profile.voice_bio_url}', event)" class="absolute top-6 right-3 z-20 bg-botOrange text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg active:scale-95 animate-bounce">
+                <button onclick="playProfileVoiceBio('${profile.voice_bio_url}', event)" class="absolute top-5 right-3 z-20 bg-botOrange text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-lg active:scale-95 animate-bounce">
                     <i class="ph-fill ph-speaker-high"></i> Voice Bio
                 </button>
             ` : '';
 
             // Icebreaker Tag
             const icebreakerHtml = profile.icebreaker ? `
-                <div class="mt-1 bg-orange-50 border border-orange-100 rounded-xl px-2.5 py-1 text-[11px] font-medium text-buna flex items-center gap-1.5">
-                    <i class="ph-fill ph-chat-circle-dots text-botOrange"></i> <span class="truncate">${profile.icebreaker}</span>
+                <div class="mt-0.5 bg-orange-50 border border-orange-100 rounded-lg px-2 py-0.5 text-[10px] font-medium text-buna flex items-center gap-1">
+                    <i class="ph-fill ph-chat-circle-dots text-botOrange shrink-0"></i> <span class="truncate">${profile.icebreaker}</span>
                 </div>
             ` : '';
 
@@ -1811,56 +1811,56 @@
             container.innerHTML = `
                 <div class="w-full h-full flex flex-col overflow-hidden relative bg-white ${cardBorderClass}">
                     
-                    <!-- Adaptive Photo Area: expands on tall Android screens, shrinks gracefully on shorter Telegram screens -->
-                    <div class="w-full flex-1 min-h-[150px] bg-gray-200 bg-cover bg-center relative" style="background-image: url('${photoToUse}')">
+                    <!-- Adaptive Photo Area: Uses top-biased framing (bg-[center_20%]) and maximized vertical flex space -->
+                    <div onclick="openImageLightbox('${photoToUse}')" class="w-full flex-1 min-h-[190px] bg-neutral-900 bg-cover bg-[center_20%] bg-no-repeat relative cursor-pointer" style="background-image: url('${photoToUse}')">
                         ${dotsHtml}
                         ${superLikedYouBanner}
                         ${voicePillHtml}
-                        <button onclick="showProfileDetails()" class="absolute bottom-3 left-1/2 transform -translate-x-1/2 px-5 py-2 bg-black bg-opacity-60 text-white rounded-full flex items-center gap-2 backdrop-blur-md active:scale-95 shadow-lg border border-white border-opacity-20 z-20">
-                            <i class="ph-bold ph-info text-base"></i>
-                            <span class="font-bold text-xs tracking-wide">${dict.view_full_profile}</span>
+                        <button onclick="event.stopPropagation(); showProfileDetails()" class="absolute bottom-2.5 left-1/2 transform -translate-x-1/2 px-4 py-1.5 bg-black bg-opacity-60 text-white rounded-full flex items-center gap-1.5 backdrop-blur-md active:scale-95 shadow-lg border border-white border-opacity-20 z-20 whitespace-nowrap">
+                            <i class="ph-bold ph-info text-sm"></i>
+                            <span class="font-bold text-[11px] tracking-wide">${dict.view_full_profile}</span>
                         </button>
                     </div>
                     
-                    <!-- Profile Name, Age/Gender, Compatibility %, Shared Traits, Bio & Icebreaker -->
-                    <div class="px-3.5 py-2 shrink-0 bg-white">
-                        <div class="flex items-center flex-wrap gap-1 mb-0.5">
-                            <h3 class="text-lg font-bold text-buna flex items-center">${profile.name}, ${ageGenderLabel} ${verifyBadge}</h3>
+                    <!-- Compact Profile Name, Age/Gender, Compatibility %, Shared Traits, Bio & Icebreaker -->
+                    <div class="px-3 py-1.5 shrink-0 bg-white">
+                        <div class="flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap mb-0.5">
+                            <h3 class="text-base font-extrabold text-buna flex items-center shrink-0">${profile.name}, ${ageGenderLabel} ${verifyBadge}</h3>
                             ${matchCompatBadge}
                             ${locationBadge}
                             ${onlineBadge}
                             ${boostedBadge}
                             ${newBadge}
                         </div>
-                        <p class="text-gray-500 text-xs line-clamp-1">${profile.bio || 'Ready to mingle!'}</p>
+                        <p class="text-gray-500 text-[11px] line-clamp-1">${profile.bio || 'Ready to mingle!'}</p>
                         ${sharedTraitsHtml}
                         ${travelBannerHtml}
                         ${icebreakerHtml}
                     </div>
                     
-                    <!-- Swipe & Scroll Action Buttons -->
-                    <div class="w-full flex justify-around items-center px-3 py-2 bg-white shrink-0 border-t border-gray-50">
-                        <button onclick="handleSwipe(false)" class="w-11 h-11 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform hover:bg-red-50">
-                            <i class="ph-bold ph-x text-xl"></i>
+                    <!-- Compact Swipe & Scroll Action Buttons -->
+                    <div class="w-full flex justify-around items-center px-3 py-1.5 bg-white shrink-0 border-t border-gray-50">
+                        <button onclick="handleSwipe(false)" class="w-10 h-10 bg-white border-2 border-red-100 rounded-full flex items-center justify-center text-red-500 shadow-md active:scale-95 transition-transform hover:bg-red-50">
+                            <i class="ph-bold ph-x text-lg"></i>
                         </button>
                         
                         <div class="flex gap-1.5">
-                            <button onclick="rewindLastSwipe()" class="w-9 h-9 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center text-amber-600 shadow-sm active:scale-95 transition-transform hover:bg-amber-100" title="Rewind Last Swipe (VIP)">
-                                <i class="ph-bold ph-arrow-counter-clockwise text-base"></i>
+                            <button onclick="rewindLastSwipe()" class="w-8 h-8 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center text-amber-600 shadow-sm active:scale-95 transition-transform hover:bg-amber-100" title="Rewind Last Swipe (VIP)">
+                                <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
                             </button>
-                            <button onclick="prevCard()" class="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
-                                <i class="ph-bold ph-caret-up text-base"></i>
+                            <button onclick="prevCard()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
+                                <i class="ph-bold ph-caret-up text-sm"></i>
                             </button>
-                            <button onclick="handleSwipe(true, true)" class="w-9 h-9 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center text-blue-500 shadow-sm active:scale-95 transition-transform hover:bg-blue-100" title="Super Like (VIP)">
-                                <i class="ph-fill ph-star text-base"></i>
+                            <button onclick="handleSwipe(true, true)" class="w-8 h-8 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center text-blue-500 shadow-sm active:scale-95 transition-transform hover:bg-blue-100" title="Super Like (VIP)">
+                                <i class="ph-fill ph-star text-sm"></i>
                             </button>
-                            <button onclick="scrollNext()" class="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
-                                <i class="ph-bold ph-caret-down text-base"></i>
+                            <button onclick="scrollNext()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
+                                <i class="ph-bold ph-caret-down text-sm"></i>
                             </button>
                         </div>
 
-                        <button onclick="handleSwipe(true)" class="w-11 h-11 bg-gradient-to-tr from-botOrange to-orange-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-95 transition-transform">
-                            <i class="ph-fill ph-heart text-xl"></i>
+                        <button onclick="handleSwipe(true)" class="w-10 h-10 bg-gradient-to-tr from-botOrange to-orange-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-95 transition-transform">
+                            <i class="ph-fill ph-heart text-lg"></i>
                         </button>
                     </div>
 
@@ -3773,19 +3773,19 @@
 
             let html = `
                 <div onclick="openStoryUploadModal()" class="flex flex-col items-center shrink-0 cursor-pointer">
-                    <div class="w-12 h-12 rounded-full bg-cover bg-center border-2 border-dashed border-botOrange relative flex items-center justify-center shadow-sm" style="background-image:url('${myPhoto}')">
-                        <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-botOrange text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow">+</span>
+                    <div class="w-10 h-10 rounded-full bg-cover bg-center border-2 border-dashed border-botOrange relative flex items-center justify-center shadow-sm" style="background-image:url('${myPhoto}')">
+                        <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-botOrange text-white rounded-full flex items-center justify-center text-[9px] font-bold shadow">+</span>
                     </div>
-                    <span class="text-[10px] font-bold text-buna mt-0.5">${myStory ? 'My Story' : 'Add Story'}</span>
+                    <span class="text-[9px] font-bold text-buna mt-0.5 leading-none">${myStory ? 'My Story' : 'Add Story'}</span>
                 </div>
             `;
 
             html += activeStoriesList.map((st, idx) => `
                 <div onclick="openStoryViewer(${idx})" class="flex flex-col items-center shrink-0 cursor-pointer">
-                    <div class="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-botOrange via-pink-500 to-purple-600 shadow-sm">
-                        <div class="w-full h-full rounded-full bg-cover bg-center border-2 border-white" style="background-image:url('${st.story_photo_url || st.photo_url || DEFAULT_AVATAR}')"></div>
+                    <div class="w-10 h-10 rounded-full p-0.5 bg-gradient-to-tr from-botOrange via-pink-500 to-purple-600 shadow-sm">
+                        <div class="w-full h-full rounded-full bg-cover bg-center border border-white" style="background-image:url('${st.story_photo_url || st.photo_url || DEFAULT_AVATAR}')"></div>
                     </div>
-                    <span class="text-[10px] font-medium text-gray-700 truncate w-14 text-center mt-0.5">${st.is_mine ? 'You' : st.name}</span>
+                    <span class="text-[9px] font-medium text-gray-700 truncate w-12 text-center mt-0.5 leading-none">${st.is_mine ? 'You' : st.name}</span>
                 </div>
             `).join('');
 
