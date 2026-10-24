@@ -724,24 +724,24 @@
         <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1 shrink-0 gap-1">
             <!-- Discover Title & Dynamic Like Badge -->
             <div class="flex items-center gap-1.5 shrink-0">
-                <h2 class="font-extrabold text-xl text-buna tracking-tight" data-i18n="nav_discover">Discover</h2>
-                <div id="top-card-likes" class="hidden items-center gap-1 bg-red-50 border border-red-100 text-red-500 text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                <h2 class="font-extrabold text-lg sm:text-xl text-buna tracking-tight whitespace-nowrap" data-i18n="nav_discover">Discover</h2>
+                <div id="top-card-likes" class="hidden items-center gap-1 bg-red-50 border border-red-100 text-red-500 text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap shrink-0">
                     <i class="ph-fill ph-heart"></i> <span id="top-card-likes-count">0</span>
                 </div>
             </div>
 
             <!-- Right Controls: Language Toggle, Spin Wheel, Remaining Swipes & Filter Button -->
-            <div class="flex items-center gap-1">
-                <button onclick="toggleLanguage()" class="bg-white text-buna border border-gray-200 text-[11px] font-bold px-2 py-1 rounded-full shadow-sm active:scale-95 lang-toggle-btn">
+            <div class="flex items-center gap-1 shrink-0">
+                <button onclick="toggleLanguage()" class="bg-white text-buna border border-gray-200 text-[11px] font-bold px-2 py-1 rounded-full shadow-sm active:scale-95 whitespace-nowrap shrink-0 lang-toggle-btn">
                     🇪🇹 አማ
                 </button>
-                <button onclick="openSpinWheelModal()" id="btn-top-spin" class="bg-gradient-to-r from-amber-400 to-botOrange text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95">
+                <button onclick="openSpinWheelModal()" id="btn-top-spin" class="bg-gradient-to-r from-amber-400 to-botOrange text-white text-[11px] font-extrabold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95 whitespace-nowrap shrink-0">
                     🎡 <span>Spin</span>
                 </button>
-                <button onclick="openPremiumModal()" id="swipes-remaining-badge" class="bg-orange-50 text-botOrange border border-orange-200 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95">
+                <button onclick="openPremiumModal()" id="swipes-remaining-badge" class="bg-orange-50 text-botOrange border border-orange-200 text-[11px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95 whitespace-nowrap shrink-0">
                     <i class="ph-fill ph-fire"></i> <span id="swipes-remaining-text">25</span>
                 </button>
-                <button id="filter-modal-btn" onclick="openFilterModal()" class="bg-white text-buna border border-gray-200 text-xs font-bold px-2.5 py-1 rounded-full shadow-sm transition active:scale-95 flex items-center gap-1">
+                <button id="filter-modal-btn" onclick="openFilterModal()" class="bg-white text-buna border border-gray-200 text-[11px] font-bold px-2 py-1 rounded-full shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap shrink-0">
                     <i class="ph-bold ph-sliders-horizontal text-botOrange"></i> <span data-i18n="filter_btn">Filter</span>
                 </button>
             </div>
