@@ -70,6 +70,59 @@
         </div>
     </div>
 
+    <!-- Smart Delete / 24h Snooze Profile Modal (5 Referrals or VIP Gate) -->
+    <div id="delete-account-modal" class="hidden fixed inset-0 z-[155] flex items-center justify-center bg-black bg-opacity-60 px-4 transition-opacity">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center relative overflow-hidden border-2 border-red-100">
+            <button onclick="closeDeleteAccountModal()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200">
+                <i class="ph-bold ph-x"></i>
+            </button>
+            <div class="w-14 h-14 mx-auto bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-3">
+                <i class="ph-fill ph-trash text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-extrabold text-buna mb-1">Delete or 24h Snooze</h3>
+            <p id="delete-modal-desc" class="text-xs text-gray-600 mb-4 leading-relaxed">
+                To permanently delete or reset your account, invite <b>5 friends</b> (or unlock with <b>Habesha VIP</b>). Need a quick break? You can <b>Snooze your profile for 24 hours</b> for free!
+            </p>
+
+            <!-- Referral Progress Box for Deletion -->
+            <div id="delete-referral-box" class="bg-orange-50 border border-orange-200 rounded-2xl p-3.5 mb-4 text-left">
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-[11px] font-extrabold text-botOrange uppercase">Invite Unlock Progress</span>
+                    <span id="delete-ref-badge" class="text-xs font-extrabold bg-white text-buna px-2 py-0.5 rounded-full border border-orange-100">0 / 5 Friends</span>
+                </div>
+                <div class="w-full bg-white h-2 rounded-full overflow-hidden border border-orange-100">
+                    <div id="delete-ref-bar" class="bg-botOrange h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- Action Buttons when Locked (< 5 Referrals & Not VIP) -->
+            <div id="delete-locked-actions" class="space-y-2.5">
+                <button onclick="closeDeleteAccountModal(); shareReferralOnTelegram();" class="w-full p-3.5 bg-botOrange text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+                    <i class="ph-bold ph-paper-plane-tilt text-base"></i> Invite Friends on Telegram (Unlock Delete)
+                </button>
+                <button onclick="closeDeleteAccountModal(); togglePauseMyProfile();" class="w-full p-3.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-xl font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+                    <i class="ph-fill ph-clock-countdown text-base"></i> Snooze Profile for 24 Hours (Free)
+                </button>
+                <button onclick="closeDeleteAccountModal(); openPremiumModal();" class="w-full p-3 bg-purple-50 text-premium border border-purple-100 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
+                    <i class="ph-fill ph-crown text-base"></i> Instant Unlock with Habesha VIP
+                </button>
+            </div>
+
+            <!-- Action Buttons when Unlocked (>= 5 Referrals or VIP) -->
+            <div id="delete-unlocked-actions" class="hidden space-y-2.5">
+                <div class="p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600 font-medium mb-2">
+                    ⚠️ Warning: Permanently deleting your profile will erase all your matches, likes, and chat history.
+                </div>
+                <button id="btn-confirm-permanent-delete" onclick="executePermanentDeleteAccount()" class="w-full p-3.5 bg-red-600 text-white rounded-xl font-extrabold text-sm shadow-lg active:scale-95 transition">
+                    Yes, Permanently Delete My Account
+                </button>
+                <button onclick="closeDeleteAccountModal(); togglePauseMyProfile();" class="w-full p-3 bg-gray-100 text-gray-700 rounded-xl font-bold text-xs">
+                    Just Snooze for 24 Hours Instead
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom Delete Message Confirm Box -->
     <div id="delete-msg-confirm" class="hidden fixed inset-0 z-[150] flex items-center justify-center bg-black bg-opacity-50 px-4 transition-opacity">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
@@ -182,7 +235,7 @@
             <div id="story-view-caption" class="hidden mt-3 bg-black/70 text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-md text-center max-w-xs"></div>
         </div>
 
-            <div class="w-full max-w-sm mx-auto flex gap-2 pb-2" id="story-view-actions">
+        <div class="w-full max-w-sm mx-auto flex gap-2 pb-2" id="story-view-actions">
             <button onclick="likeFromStory(false)" class="flex-1 py-3 bg-botOrange text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg active:scale-95">
                 <i class="ph-fill ph-heart text-base"></i> Send Like
             </button>
@@ -1068,10 +1121,21 @@
                     <div class="flex items-center gap-3"><i class="ph-bold ph-android-logo text-xl"></i> <span data-i18n="get_mobile_app_btn">Get Mobile App</span></div>
                     <i class="ph-bold ph-caret-right"></i>
                 </button>
+
+                <!-- Free 24-Hour Temporary Snooze Profile Button -->
+                <button id="btn-profile-pause" onclick="togglePauseMyProfile()" class="w-full bg-amber-50 text-amber-800 font-bold p-4 rounded-xl flex items-center justify-between hover:bg-amber-100 transition active:scale-95 border border-amber-200">
+                    <div class="flex items-center gap-3"><i class="ph-fill ph-clock-countdown text-xl text-amber-600"></i> <span id="pause-btn-label" data-i18n="snooze_24h_btn">24h Snooze Profile: OFF</span></div>
+                    <span class="text-[10px] font-extrabold bg-white text-amber-800 px-2 py-0.5 rounded-full border border-amber-200 uppercase">24h Free</span>
+                </button>
                 
                 <button onclick="logoutUser()" class="w-full bg-red-50 text-red-500 font-bold p-4 rounded-xl flex items-center justify-between hover:bg-red-100 transition active:scale-95 border border-red-100">
                     <div class="flex items-center gap-3"><i class="ph-bold ph-sign-out text-xl"></i> <span data-i18n="logout_btn">Log Out</span></div>
                     <i class="ph-bold ph-caret-right"></i>
+                </button>
+
+                <!-- Delete Profile Button (5 Referrals or VIP Gate) -->
+                <button onclick="openDeleteAccountModal()" class="w-full bg-white text-gray-400 hover:text-red-600 font-bold p-3.5 rounded-xl flex items-center justify-center gap-2 transition active:scale-95 border border-dashed border-gray-200 text-xs mt-2">
+                    <i class="ph-bold ph-trash text-sm"></i> <span data-i18n="delete_account_btn">Delete Account (5 Invites / VIP)</span>
                 </button>
             </div>
         </div>
@@ -1147,6 +1211,8 @@
                 get_verified_btn: "Get Verified",
                 edit_profile_btn: "Edit Profile & Photos",
                 get_mobile_app_btn: "Get Mobile App",
+                snooze_24h_btn: "24h Snooze Profile: OFF",
+                delete_account_btn: "Delete Account (5 Invites / VIP)",
                 logout_btn: "Log Out",
                 filter_title: "Discovery Filters",
                 gender_label: "Show Gender",
@@ -1190,6 +1256,8 @@
                 get_verified_btn: "ፕሮፋይል ያረጋግጡ (Verified)",
                 edit_profile_btn: "ፕሮፋይል እና ፎቶ ያስተካክሉ",
                 get_mobile_app_btn: "የሞባይል አፕ ያውርዱ",
+                snooze_24h_btn: "ለ24 ሰዓት ፕሮፋይል ደብቅ: OFF",
+                delete_account_btn: "አካውንት ሰርዝ (5 ግብዣ / VIP)",
                 logout_btn: "ውጣ (Log Out)",
                 filter_title: "የፍለጋ ማጣሪያ",
                 gender_label: "ፆታ ይምረጡ",
@@ -1247,6 +1315,23 @@
             if (g === 'woman' || g === 'female' || g === 'f') return `${a}F`;
             if (g === 'man' || g === 'male' || g === 'm') return `${a}M`;
             return `${a}`;
+        }
+
+        // Helper: Format Remaining 24h Snooze Hours
+        function formatPauseRemainingLabel(isPaused, pausedUntil) {
+            if (!isPaused) {
+                return currentLang === "am" ? "ለ24 ሰዓት ፕሮፋይል ደብቅ: OFF" : "24h Snooze Profile: OFF";
+            }
+            if (pausedUntil) {
+                const diffMs = new Date(pausedUntil) - new Date();
+                if (diffMs > 0) {
+                    const hrs = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60)));
+                    return currentLang === "am"
+                        ? `⏳ ለ${hrs} ሰዓት ተደብቋል (ነካ አድርገው ይመልሱ)`
+                        : `⏳ Snoozed (${hrs}h left — Tap to Resume)`;
+                }
+            }
+            return currentLang === "am" ? "⏳ ለ24 ሰዓት ተደብቋል" : "⏳ Snoozed for 24h (Tap to Resume)";
         }
 
         // Helper: Open Official Telegram Bot or Channel
@@ -2352,6 +2437,12 @@
                         incogLabel.innerText = mp.is_incognito ? "🕵️ VIP Incognito Mode: ON" : "VIP Incognito Mode: OFF";
                     }
 
+                    // Update 24h Temporary Snooze / Pause Profile Button Status
+                    const pauseLabel = document.getElementById('pause-btn-label');
+                    if (pauseLabel) {
+                        pauseLabel.innerText = formatPauseRemainingLabel(Boolean(mp.is_paused), mp.paused_until);
+                    }
+
                     if (mp.is_verified) {
                         const verBtn = document.getElementById('btn-profile-verify');
                         if (verBtn) {
@@ -2431,6 +2522,97 @@
             localStorage.removeItem("habesha_user_id");
             cleanTelegramId = null;
             window.location.reload();
+        }
+
+        // --- 24-HOUR TEMPORARY SNOOZE PROFILE & 5-REFERRAL / VIP DELETE ACCOUNT SYSTEM ---
+        async function togglePauseMyProfile() {
+            const curPaused = Boolean(window.myProfileData && window.myProfileData.is_paused);
+            const nextPaused = !curPaused;
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/toggle-pause-profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: cleanTelegramId,
+                        is_paused: nextPaused
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error("Could not update profile snooze status.");
+
+                if (window.myProfileData) {
+                    window.myProfileData.is_paused = nextPaused;
+                    window.myProfileData.paused_until = data.paused_until || null;
+                }
+                const pauseLabel = document.getElementById('pause-btn-label');
+                if (pauseLabel) {
+                    pauseLabel.innerText = formatPauseRemainingLabel(nextPaused, data.paused_until);
+                }
+                showAlert(nextPaused
+                    ? "⏳ Your profile is now Snoozed for 24 hours! It will automatically become visible in Discover again after 24 hours (or tap anytime to unpause early)."
+                    : "▶️ Welcome back! Your profile is now live in Discover again.");
+            } catch (e) {
+                showAlert(e.message);
+            }
+        }
+
+        function openDeleteAccountModal() {
+            const mp = window.myProfileData || {};
+            const refCount = parseInt(mp.referral_count || 0);
+            const isVip = Boolean(mp.is_premium);
+            const isUnlocked = refCount >= 5 || isVip;
+
+            const badge = document.getElementById('delete-ref-badge');
+            const bar = document.getElementById('delete-ref-bar');
+            const lockedActions = document.getElementById('delete-locked-actions');
+            const unlockedActions = document.getElementById('delete-unlocked-actions');
+
+            if (badge) badge.innerText = `${Math.min(5, refCount)} / 5 Friends (${refCount} Total)`;
+            if (bar) bar.style.width = `${Math.min(100, (refCount / 5) * 100)}%`;
+
+            if (isUnlocked) {
+                lockedActions.classList.add('hidden');
+                unlockedActions.classList.remove('hidden');
+            } else {
+                lockedActions.classList.remove('hidden');
+                unlockedActions.classList.add('hidden');
+            }
+
+            document.getElementById('delete-account-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteAccountModal() {
+            document.getElementById('delete-account-modal').classList.add('hidden');
+        }
+
+        async function executePermanentDeleteAccount() {
+            const btn = document.getElementById('btn-confirm-permanent-delete');
+            btn.disabled = true;
+            btn.innerText = "Deleting Account...";
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/delete-account`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: cleanTelegramId })
+                });
+                const data = await res.json();
+                if (data.locked) {
+                    showAlert(data.message);
+                    closeDeleteAccountModal();
+                    return;
+                }
+                if (!res.ok) throw new Error(data.detail || "Failed to delete account.");
+
+                closeDeleteAccountModal();
+                localStorage.removeItem("habesha_user_id");
+                showAlert("Your account has been permanently deleted.");
+                setTimeout(() => window.location.reload(), 1200);
+            } catch (e) {
+                showAlert(e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Yes, Permanently Delete My Account";
+            }
         }
         
         async function loadMatchesList() {
