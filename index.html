@@ -1478,8 +1478,7 @@
     </div>
 
     <!-- END OF PART 1: PASTE PART 2 (<script> ... </body></html>) DIRECTLY BELOW THIS LINE -->
-                    
-<!-- MAIN JAVASCRIPT ENGINE (PART 2 OF 2 — PASTE DIRECTLY BELOW PART 1) -->
+                    <!-- MAIN JAVASCRIPT ENGINE (PART 2 OF 2 — PASTE DIRECTLY BELOW PART 1) -->
     <script>
         // Initialize Telegram Mini App SDK safely across all clients and WebViews
         const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
@@ -2897,6 +2896,53 @@
             } catch (e) {
                 console.error("Swipe error", e);
             }
+            closeProfileDetails();
+            currentCardIndex++;
+            currentPhotoSlideIndex = 0;
+            renderCards();
+        }
+
+        // Viral Referral & Telegram Story Crush Link Share Functions
+        function getMyReferralLink() {
+            return (window.myProfileData && window.myProfileData.referral_link)
+                ? window.myProfileData.referral_link
+                : `https://t.me/ethiopia_date_bot?start=ref_${cleanTelegramId}`;
+        }
+
+        function getMyCrushLink() {
+            return (window.myProfileData && window.myProfileData.crush_link)
+                ? window.myProfileData.crush_link
+                : `https://t.me/ethiopia_date_bot?start=crush_${cleanTelegramId}`;
+        }
+
+        function shareReferralOnTelegram() {
+            if (isGuestMode) return openGuestSignupModal();
+            const link = getMyReferralLink();
+            const text = encodeURIComponent("🇪🇹 Join me on Habesha Date (ሀበሻ ቀጠሮ ❤️)! Find your match and chat privately with Habesha singles near you ✨");
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${text}`;
+            openTelegramTarget(shareUrl);
+        }
+
+        function copyReferralLink() {
+            if (isGuestMode) return openGuestSignupModal();
+            const link = getMyReferralLink();
+            copyTextSafe(link, "🎁 Referral link copied! Send it to 3 friends to unlock 7 Days of Free Habesha Premium.");
+        }
+
+        function shareCrushLinkOnTelegram() {
+            if (isGuestMode) return openGuestSignupModal();
+            const link = getMyCrushLink();
+            const text = encodeURIComponent("💘 Check out my Habesha Date card & see our Match %! 👇🇪🇹");
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${text}`;
+            openTelegramTarget(shareUrl);
+        }
+
+        function copyCrushLink() {
+            if (isGuestMode) return openGuestSignupModal();
+            const link = getMyCrushLink();
+            copyTextSafe(link, "💘 Crush Link copied! Paste it on your Telegram Story or Bio — anyone who joins through it sees your card #1 AND counts toward your Free VIP referrals!");
+        }
+
         // Selfie Verification (Randomized Anti-Catfish Pose) and Premium Modals
         function renderVerifyPoseUI(pose) {
             if (!pose) return;
