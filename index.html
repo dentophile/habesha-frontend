@@ -170,6 +170,27 @@
             100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         .modal-pop { animation: modalPop 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+        /* Feature 1: Modest / Private Frosted Blur Until Match */
+        .blur-modest {
+            filter: blur(18px) saturate(1.15);
+            transform: scale(1.08);
+        }
+
+        /* Feature 3 & 4: Audio Call & Speed-Mixer Pulse Rings */
+        @keyframes pulseRing {
+            0% { transform: scale(0.92); opacity: 0.85; }
+            70% { transform: scale(1.32); opacity: 0; }
+            100% { transform: scale(1.35); opacity: 0; }
+        }
+        .call-ring-anim::before {
+            content: "";
+            position: absolute;
+            inset: -8px;
+            border-radius: 9999px;
+            border: 3px solid #10B981;
+            animation: pulseRing 1.8s infinite;
+        }
     </style>
 </head>
 <body class="bg-habesha-mesh font-sans text-buna">
@@ -293,6 +314,184 @@
                     <i class="ph-fill ph-sparkle"></i> <span>Singles With Your Exact Buna Vibe (Tap to View!):</span>
                 </p>
                 <div id="buna-same-vibe-list" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature 3: Masked 3-Minute "Buna Voice Call" Modal (WebRTC — No Phone Number Shared) -->
+    <div id="webrtc-call-modal" class="hidden fixed inset-0 z-[238] flex items-center justify-center bg-black/90 backdrop-blur-lg px-5">
+        <div class="w-full max-w-sm rounded-[2.2rem] p-7 text-center relative overflow-hidden bg-gradient-to-b from-[#261610] via-[#180E0A] to-[#0F0907] border border-white/15 shadow-2xl modal-pop text-white">
+            <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-[10px] font-extrabold uppercase tracking-wider mb-5">
+                <i class="ph-fill ph-lock-key"></i> <span>Masked Buna Voice Call • Number Hidden</span>
+            </div>
+
+            <div class="relative w-28 h-28 mx-auto mb-4 flex items-center justify-center call-ring-anim">
+                <div id="call-partner-avatar" class="w-28 h-28 rounded-full bg-cover bg-center border-4 border-emerald-400 shadow-2xl bg-gray-800"></div>
+            </div>
+
+            <h3 id="call-partner-name" class="text-2xl font-extrabold tracking-tight mb-1">Match</h3>
+            <p id="call-status-label" class="text-xs font-bold text-amber-300 mb-2 animate-pulse">Calling privately...</p>
+            <div id="call-timer-pill" class="hidden mx-auto w-fit px-4 py-1 rounded-full bg-white/10 border border-white/15 text-sm font-mono font-extrabold text-emerald-300 mb-5">
+                03:00
+            </div>
+
+            <audio id="webrtc-remote-audio" autoplay playsinline class="hidden"></audio>
+
+            <!-- Incoming Call Controls -->
+            <div id="call-incoming-actions" class="hidden items-center justify-center gap-6 mt-6">
+                <button onclick="endMaskedVoiceCall(true)" class="w-16 h-16 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg shadow-red-900/50 active:scale-90 transition">
+                    <i class="ph-fill ph-phone-disconnect text-3xl"></i>
+                </button>
+                <button onclick="acceptIncomingVoiceCall()" class="w-16 h-16 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-900/50 animate-bounce active:scale-90 transition">
+                    <i class="ph-fill ph-phone-call text-3xl"></i>
+                </button>
+            </div>
+
+            <!-- Active / Outgoing Call Controls -->
+            <div id="call-active-actions" class="flex items-center justify-center gap-5 mt-6">
+                <button id="btn-call-mute" onclick="toggleCallMute()" class="w-13 h-13 p-3.5 rounded-full bg-white/15 text-white border border-white/20 flex items-center justify-center active:scale-90 transition">
+                    <i id="icon-call-mute" class="ph-fill ph-microphone text-xl"></i>
+                </button>
+                <button onclick="endMaskedVoiceCall(true)" class="w-16 h-16 rounded-full bg-red-600 text-white flex items-center justify-center shadow-xl shadow-red-900/50 active:scale-90 transition">
+                    <i class="ph-fill ph-phone-disconnect text-3xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature 4: "Live Buna Hour" 3-Minute Blind Speed-Matching Mixer Modal -->
+    <div id="buna-mixer-modal" class="hidden fixed inset-0 z-[210] flex items-center justify-center bg-black/75 backdrop-blur-md px-4">
+        <div class="bg-white rounded-[2rem] p-5 w-full max-w-sm shadow-2xl relative overflow-hidden border border-amber-200 modal-pop flex flex-col max-h-[88vh]">
+            <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
+            <div class="flex items-center justify-between pt-1 pb-2.5 border-b border-gray-100 shrink-0">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-lg">⏰</span>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-buna leading-tight">Live Buna Speed-Mixer</h3>
+                        <p class="text-[10px] text-amber-700 font-bold">3-Min Blind Chat • Photos Unblur at 0:30!</p>
+                    </div>
+                </div>
+                <button onclick="leaveBunaMixer()" class="px-2.5 py-1 bg-gray-100 hover:bg-red-50 hover:text-red-600 rounded-full text-[11px] font-extrabold text-gray-600 transition">
+                    Leave ✕
+                </button>
+            </div>
+
+            <!-- Waiting Lounge State -->
+            <div id="mixer-waiting-box" class="py-8 px-3 text-center space-y-3">
+                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-100 to-orange-100 text-botOrange flex items-center justify-center relative call-ring-anim">
+                    <i class="ph-fill ph-coffee text-4xl"></i>
+                </div>
+                <h4 class="text-lg font-extrabold text-buna">Finding Your Buna Partner...</h4>
+                <p id="mixer-waiting-status" class="text-xs text-gray-500 leading-relaxed">
+                    Matching you with an online single right now! Your photo stays frosted for the first 2m 30s so you connect on personality first.
+                </p>
+            </div>
+
+            <!-- Paired 3-Minute Speed-Date State -->
+            <div id="mixer-paired-box" class="hidden flex-col flex-1 min-h-0 pt-2.5">
+                <div class="flex items-center justify-between bg-gradient-to-r from-amber-50 to-orange-50 p-2.5 rounded-2xl border border-amber-200/80 mb-2 shrink-0">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-11 h-11 rounded-full overflow-hidden border-2 border-botOrange shrink-0 relative bg-gray-200">
+                            <div id="mixer-partner-photo" class="w-full h-full bg-cover bg-center blur-modest transition-all duration-700"></div>
+                        </div>
+                        <div class="min-w-0 text-left">
+                            <p id="mixer-partner-title" class="text-xs font-extrabold text-buna truncate">Mystery Match</p>
+                            <p id="mixer-unblur-hint" class="text-[10px] text-amber-700 font-bold">🔒 Photo unblurs at 0:30!</p>
+                        </div>
+                    </div>
+                    <span id="mixer-countdown" class="px-2.5 py-1 rounded-full bg-buna text-amber-300 font-mono text-xs font-extrabold shrink-0">03:00</span>
+                </div>
+
+                <div id="mixer-messages-box" class="flex-1 min-h-[170px] max-h-[240px] touch-scroll bg-gray-50 rounded-2xl p-3 space-y-2 border border-gray-100 mb-2.5 text-left"></div>
+
+                <div class="flex gap-1.5 mb-2.5 shrink-0">
+                    <input id="mixer-chat-input" type="text" maxlength="180" onkeypress="if(event.key==='Enter') sendBunaMixerMessage()" placeholder="Say Selam before time runs out..." class="flex-1 px-3.5 py-2 bg-gray-100 rounded-full text-xs focus:bg-white focus:outline-none border border-transparent focus:border-botOrange">
+                    <button onclick="sendBunaMixerMessage()" class="w-9 h-9 rounded-full bg-gradient-to-r from-botOrange to-habeshaCoral text-white flex items-center justify-center shrink-0 active:scale-90">
+                        <i class="ph-fill ph-paper-plane-right text-sm"></i>
+                    </button>
+                </div>
+
+                <button id="btn-mixer-keep" onclick="voteKeepMixerPartner()" class="btn-shimmer w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl font-extrabold text-xs shadow-md flex items-center justify-center gap-1.5 active:scale-95 transition shrink-0">
+                    <i class="ph-fill ph-heart text-sm"></i> <span>❤️ Keep Chatting & Unblur Match!</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature 5: Interactive 2-Player Chat Games Modal -->
+    <div id="chat-game-modal" class="hidden fixed inset-0 z-[205] flex items-center justify-center bg-black/65 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl relative overflow-hidden border border-purple-200 modal-pop">
+            <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
+            <button onclick="closeChatGameModal()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
+                <i class="ph-bold ph-x"></i>
+            </button>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-premium text-[10px] font-extrabold uppercase tracking-wider mb-2">
+                🎲 2-Player Chat Icebreaker
+            </div>
+            <h3 class="text-xl font-extrabold text-buna mb-1">Play Together in Chat!</h3>
+            <p class="text-xs text-gray-500 mb-4">Cure awkward small talk—both of you tap your answers right inside the chat bubble!</p>
+
+            <div class="flex bg-gray-100 p-1 rounded-2xl mb-4 text-xs font-extrabold">
+                <button id="tab-game-rapid" onclick="switchGameModalTab('rapid')" class="w-1/2 py-2 rounded-xl bg-white text-buna shadow-sm transition">⚡ Rapid-Fire</button>
+                <button id="tab-game-truths" onclick="switchGameModalTab('truths')" class="w-1/2 py-2 rounded-xl text-gray-500 transition">🤥 2 Truths & Lie</button>
+            </div>
+
+            <div id="game-panel-rapid" class="space-y-3 text-left">
+                <div class="bg-orange-50/80 border border-orange-200 rounded-2xl p-3.5 text-xs text-buna space-y-1">
+                    <p class="font-extrabold text-botOrange">🔥 Secret Simultaneous Vote</p>
+                    <p class="text-gray-600 leading-relaxed">Drops a random Ethiopian vibe question into chat. Both of you vote secretly, then it reveals if you're a 100% Vibe Match!</p>
+                </div>
+                <button onclick="launchRapidFireGame()" class="btn-shimmer w-full py-3.5 bg-gradient-to-r from-botOrange to-habeshaCoral text-white rounded-2xl font-extrabold text-xs shadow-lg flex items-center justify-center gap-2 active:scale-95 transition">
+                    <i class="ph-fill ph-lightning text-base"></i> <span>Drop Habesha Rapid-Fire Card!</span>
+                </button>
+            </div>
+
+            <div id="game-panel-truths" class="hidden space-y-2.5 text-left">
+                <p class="text-[11px] font-bold text-gray-500">Write 2 truths & 1 lie, and mark which one is the LIE:</p>
+                <div class="flex items-center gap-2">
+                    <input type="radio" name="truth-lie-idx" value="0" class="w-4 h-4 accent-habeshaCoral shrink-0">
+                    <input id="truth-stmt-0" type="text" maxlength="80" placeholder="Statement 1 (e.g. I make amazing Doro Wat)" class="flex-1 p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs">
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="radio" name="truth-lie-idx" value="1" class="w-4 h-4 accent-habeshaCoral shrink-0">
+                    <input id="truth-stmt-1" type="text" maxlength="80" placeholder="Statement 2 (e.g. I've visited Lalibela twice)" class="flex-1 p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs">
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="radio" name="truth-lie-idx" value="2" checked class="w-4 h-4 accent-habeshaCoral shrink-0">
+                    <input id="truth-stmt-2" type="text" maxlength="80" placeholder="Statement 3 — Mark the radio button of the LIE!" class="flex-1 p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs">
+                </div>
+                <button onclick="launchTwoTruthsGame()" class="btn-shimmer w-full py-3.5 bg-gradient-to-r from-premium to-pink-600 text-white rounded-2xl font-extrabold text-xs shadow-lg flex items-center justify-center gap-2 active:scale-95 transition mt-1">
+                    <span>🤥 Send 2 Truths & 1 Lie Challenge</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature 6: "Who Viewed My Profile" Vault Modal -->
+    <div id="profile-views-modal" class="hidden fixed inset-0 z-[205] flex items-center justify-center bg-black/65 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl relative overflow-hidden border border-purple-200 modal-pop max-h-[86vh] flex flex-col">
+            <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
+            <button onclick="closeProfileViewsModal()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
+                <i class="ph-bold ph-x"></i>
+            </button>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-premium text-[10px] font-extrabold uppercase tracking-wider mb-1.5 w-fit">
+                👀 Profile & Voice Bio Visitors (72h)
+            </div>
+            <h3 class="text-xl font-extrabold text-buna mb-1">Who Checked You Out</h3>
+            <p id="views-vault-subtitle" class="text-xs text-gray-500 mb-3">See everyone who opened your full profile or listened to your Voice Intro!</p>
+
+            <div id="views-vault-list" class="flex-1 min-h-0 touch-scroll space-y-2.5 pr-0.5 mb-3">
+                <p class="text-xs text-gray-400 text-center py-6">Loading visitors...</p>
+            </div>
+
+            <div id="views-vault-upsell" class="hidden space-y-2 pt-2 border-t border-gray-100 shrink-0">
+                <button onclick="unlockViewsWithRose()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+                    <span>🌹 Unlock Visitors for 24h (1 Golden Rose)</span>
+                </button>
+                <button onclick="closeProfileViewsModal(); openPremiumModal();" class="btn-shimmer w-full py-3 bg-gradient-to-r from-premium to-pink-600 text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+                    <i class="ph-fill ph-crown text-amber-300"></i> <span>Always Unlocked with Habesha VIP</span>
+                </button>
             </div>
         </div>
     </div>
@@ -679,6 +878,40 @@
                 </div>
             </div>
 
+            <!-- Feature 2: Ethiopian Language & Addis Sub-City / Campus Filters -->
+            <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1">🗣️ Language</label>
+                    <select id="filter-language-spoken" class="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-medium focus:outline-none focus:border-botOrange">
+                        <option value="">Any Language</option>
+                        <option value="Amharic">አማርኛ (Amharic)</option>
+                        <option value="Afaan Oromo">Afaan Oromo</option>
+                        <option value="Tigrinya">ትግርኛ (Tigrinya)</option>
+                        <option value="Somali">Af-Soomaali</option>
+                        <option value="Guragigna">Guragigna</option>
+                        <option value="Sidamu Afoo">Sidamu Afoo</option>
+                        <option value="English">English</option>
+                        <option value="Arabic">Arabic</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1">📍 Sub-City / Campus</label>
+                    <select id="filter-subcity" class="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-medium focus:outline-none focus:border-botOrange">
+                        <option value="">Any Area / Campus</option>
+                        <option value="Bole">Bole (ቦሌ)</option>
+                        <option value="CMC / Ayat">CMC / Ayat</option>
+                        <option value="Kazanchis / Piassa">Kazanchis / Piassa</option>
+                        <option value="Sarbet / Old Airport">Sarbet / Old Airport</option>
+                        <option value="Megenagna / Gerji">Megenagna / Gerji</option>
+                        <option value="Lebu / Jemo">Lebu / Jemo</option>
+                        <option value="AAU Campus">🎓 AAU (Addis Ababa Univ)</option>
+                        <option value="ASTU Campus">🎓 ASTU (Adama Univ)</option>
+                        <option value="HiLCoE / St. Mary's / Unity">🎓 HiLCoE / St. Mary's / Unity</option>
+                        <option value="Hawassa / Bahir Dar Univ">🎓 Hawassa / Bahir Dar Univ</option>
+                    </select>
+                </div>
+            </div>
+
             <div>
                 <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1" data-i18n="age_range_label">Age Range</label>
                 <div class="flex items-center gap-2">
@@ -1030,20 +1263,63 @@
                         <input id="reg-allow-spotlight" type="checkbox" checked class="w-4 h-4 accent-botOrange rounded shrink-0">
                     </label>
 
+                    <!-- Feature 1: Modest / Private Photo Blur Mode Until Match -->
+                    <label class="flex items-center justify-between p-3 bg-purple-50/70 border border-purple-200/80 rounded-2xl cursor-pointer">
+                        <span class="text-[11px] font-bold text-buna leading-snug pr-2">🔒 <b>Modest Mode:</b> Blur my photos on Discover until we both match!</span>
+                        <input id="reg-blur-photos" type="checkbox" class="w-4 h-4 accent-premium rounded shrink-0">
+                    </label>
+
                     <div id="express-signup-actions" class="space-y-2.5 pt-1">
                         <button id="express-submit-btn" onclick="submitExpressRegistration()" class="btn-shimmer w-full p-4 bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 text-white rounded-2xl font-extrabold text-sm shadow-lg shadow-emerald-200 flex items-center justify-center gap-2 active:scale-95 transition">
                             <i class="ph-fill ph-lightning text-lg text-yellow-300"></i> <span data-i18n="express_join_btn">Join & Start Matching Now!</span>
                         </button>
                         <button type="button" onclick="validateAndNext(1)" class="w-full p-3 bg-orange-50 text-botOrange border border-orange-200 rounded-2xl font-extrabold text-xs hover:bg-orange-100 transition">
-                            + Add Bio, Religion & Voice Intro (+20% Boost) →
+                            + Add Languages, Campus, Bio & Voice (+20% Boost) →
                         </button>
                     </div>
 
                     <button id="edit-step1-next-btn" onclick="validateAndNext(1)" class="hidden w-full p-4 bg-gradient-to-r from-botOrange to-habeshaCoral text-white rounded-2xl font-extrabold shadow-md" data-i18n="next_btn">Next</button>
                 </div>
 
-                <!-- Page 2: Lifestyle & Details -->
+                <!-- Page 2: Ethiopian Languages, Sub-City/Campus & Lifestyle Details -->
                 <div id="page-2" class="hidden space-y-3.5 transition-all">
+                    <!-- Feature 2: Ethiopian Languages Spoken Multi-Select Pills -->
+                    <div class="bg-orange-50/60 border border-orange-200/70 p-3 rounded-2xl">
+                        <label class="text-[11px] font-extrabold text-buna uppercase tracking-wider block mb-2">🗣️ Languages I Speak (Tap all that apply)</label>
+                        <div id="reg-languages-pills" class="flex flex-wrap gap-1.5">
+                            <button type="button" data-lang="Amharic" onclick="toggleSpokenLangPill(this)" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-gray-600 border border-gray-200 transition">አማርኛ Amharic</button>
+                            <button type="button" data-lang="Afaan Oromo" onclick="toggleSpokenLangPill(this)" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-gray-600 border border-gray-200 transition">Afaan Oromo</button>
+                            <button type="button" data-lang="Tigrinya" onclick="toggleSpokenLangPill(this)" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-gray-600 border border-gray-200 transition">ትግርኛ Tigrinya</button>
+                            <button type="button" data-lang="English" onclick="toggleSpokenLangPill(this)" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-gray-600 border border-gray-200 transition">English</button>
+                            <button type="button" data-lang="Somali" onclick="toggleSpokenLangPill(this)" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-gray-600 border border-gray-200 transition">Af-Soomaali</button>
+                            <button type="button" data-lang="Guragigna" onclick="toggleSpokenLangPill(this)" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-gray-600 border border-gray-200 transition">Guragigna</button>
+                            <button type="button" data-lang="Sidamu Afoo" onclick="toggleSpokenLangPill(this)" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-gray-600 border border-gray-200 transition">Sidamu Afoo</button>
+                            <button type="button" data-lang="Arabic" onclick="toggleSpokenLangPill(this)" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-gray-600 border border-gray-200 transition">Arabic</button>
+                        </div>
+                        <input id="reg-languages-spoken" type="hidden" value="">
+                    </div>
+
+                    <!-- Feature 2: Addis Sub-City or University Campus Tag -->
+                    <select id="reg-subcity-campus" class="w-full p-3.5 border border-gray-200 rounded-2xl bg-gray-50 text-sm font-medium focus:outline-none focus:border-botOrange">
+                        <option value="">📍 Neighborhood or Campus (Optional)</option>
+                        <optgroup label="🏙️ Addis Ababa Sub-Cities / Areas">
+                            <option value="Bole">Bole (ቦሌ)</option>
+                            <option value="CMC / Ayat">CMC / Ayat (ሲኤምሲ / አያት)</option>
+                            <option value="Kazanchis / Piassa">Kazanchis / Piassa (ካዛንቺስ / ፒያሳ)</option>
+                            <option value="Sarbet / Old Airport">Sarbet / Old Airport (ሳርቤት)</option>
+                            <option value="Megenagna / Gerji">Megenagna / Gerji (መገናኛ / ገርጂ)</option>
+                            <option value="Lebu / Jemo">Lebu / Jemo (ለቡ / ጀሞ)</option>
+                            <option value="4 Kilo / Sidist Kilo">4 Kilo / 6 Kilo</option>
+                        </optgroup>
+                        <optgroup label="🎓 University Campuses">
+                            <option value="AAU Campus">🎓 AAU (Addis Ababa University)</option>
+                            <option value="ASTU Campus">🎓 ASTU (Adama Science & Tech)</option>
+                            <option value="HiLCoE / St. Mary's / Unity">🎓 HiLCoE / St. Mary's / Unity</option>
+                            <option value="Hawassa / Bahir Dar Univ">🎓 Hawassa / Bahir Dar University</option>
+                            <option value="Jimma / Mekelle / Gondar Univ">🎓 Jimma / Mekelle / Gondar Univ</option>
+                        </optgroup>
+                    </select>
+
                     <input id="reg-height" type="text" placeholder="Height / ቁመት (e.g. 1.70m)" class="w-full p-3.5 border border-gray-200 rounded-2xl bg-gray-50 text-sm focus:outline-none focus:border-botOrange">
                     <select id="reg-religion" class="w-full p-3.5 border border-gray-200 rounded-2xl bg-gray-50 text-sm focus:outline-none focus:border-botOrange">
                         <option value="">Religion / ሃይማኖት</option>
@@ -1183,6 +1459,9 @@
                 <button onclick="openBunaPollModal()" id="btn-top-buna" class="bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-extrabold px-2 py-1 rounded-full flex items-center gap-0.5 shadow-sm active:scale-95 whitespace-nowrap shrink-0" title="Daily Buna Question">
                     ☕ <span>Buna</span>
                 </button>
+                <button onclick="openBunaMixerModal()" id="btn-top-mixer" class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-extrabold px-2 py-1 rounded-full flex items-center gap-0.5 shadow-sm active:scale-95 whitespace-nowrap shrink-0" title="3-Minute Blind Buna Speed-Date">
+                    ⏰ <span>Mixer</span>
+                </button>
                 <button onclick="openSpinWheelModal()" id="btn-top-spin" class="btn-shimmer bg-gradient-to-r from-amber-400 via-botOrange to-habeshaCoral text-white text-[10px] font-extrabold px-2 py-1 rounded-full flex items-center gap-0.5 shadow-sm active:scale-95 whitespace-nowrap shrink-0">
                     🎡 <span>Spin</span>
                 </button>
@@ -1249,6 +1528,20 @@
         </div>
 
         <div class="w-full max-w-sm mx-auto space-y-4 pb-8">
+            <!-- Feature 6: "Who Viewed My Profile" Vault Banner -->
+            <div id="matches-views-vault-bar" onclick="openProfileViewsModal()" class="bg-gradient-to-r from-purple-50 via-white to-amber-50 p-3.5 rounded-3xl shadow-sm border border-purple-200/80 flex items-center justify-between cursor-pointer active:scale-[0.98] transition">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-2xl bg-purple-100 text-premium flex items-center justify-center shrink-0">
+                        <i class="ph-fill ph-eye text-xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-xs font-extrabold text-buna truncate">Who Viewed Your Profile & Voice Bio</h3>
+                        <p class="text-[11px] text-gray-500 truncate">Tap to see recent visitors in the last 72h</p>
+                    </div>
+                </div>
+                <span id="matches-views-count-pill" class="bg-premium text-white text-xs font-extrabold px-2.5 py-1 rounded-full shrink-0 shadow-sm">👀 0</span>
+            </div>
+
             <div id="premium-likes-container" class="mb-5 bg-gradient-to-br from-white via-purple-50/40 to-pink-50/40 p-4 rounded-3xl shadow-sm border border-purple-100 hidden">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="font-extrabold text-buna text-xs uppercase tracking-wider flex items-center gap-1.5">
@@ -1374,6 +1667,10 @@
                 <h3 class="font-extrabold text-buna text-sm truncate" id="chat-header-name">Name</h3>
                 <p class="text-[11px] text-emerald-600 font-bold transition-all" id="chat-header-status">Matched!</p>
             </div>
+            <!-- Feature 3: Masked 3-Minute Buna Voice Call Button -->
+            <button onclick="startMaskedVoiceCall()" class="px-2.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-extrabold flex items-center gap-1 shadow-sm active:scale-90 transition shrink-0" title="Masked 3-Min Buna Voice Call (Phone Hidden)">
+                <i class="ph-fill ph-phone-call text-sm"></i> <span>Call</span>
+            </button>
             <button onclick="confirmUnmatch()" class="text-gray-400 hover:text-red-500 p-2 transition" title="Safety & Match Options">
                 <i class="ph-bold ph-dots-three-vertical text-2xl"></i>
             </button>
@@ -1429,6 +1726,11 @@
 
             <button onclick="requestAiWingman()" id="btn-ai-wingman" class="w-9 h-9 bg-purple-50 text-premium border border-purple-200 rounded-full flex items-center justify-center hover:bg-purple-100 active:scale-95 transition shrink-0 shadow-sm" title="AI Habesha Wingman">
                 <i class="ph-fill ph-sparkle text-lg"></i>
+            </button>
+
+            <!-- Feature 5: Interactive 2-Player Chat Games Trigger -->
+            <button onclick="openChatGameModal()" class="w-9 h-9 bg-pink-50 text-habeshaCoral border border-pink-200 rounded-full flex items-center justify-center hover:bg-pink-100 active:scale-95 transition shrink-0 shadow-sm" title="Play 2-Player Chat Game">
+                <i class="ph-fill ph-dice-five text-lg"></i>
             </button>
 
             <button onclick="toggleBunaGiftsTray()" class="w-9 h-9 bg-amber-50 text-botOrange border border-amber-200 rounded-full flex items-center justify-center hover:bg-amber-100 active:scale-95 transition shrink-0 shadow-sm" title="Safe First-Date Buna & Rose">
@@ -1493,9 +1795,10 @@
             </div>
 
             <h3 id="my-profile-name" class="text-xl font-extrabold text-buna flex items-center gap-1">Loading...</h3>
-            <div class="flex items-center gap-2 mt-1.5 mb-5">
-                <span id="my-profile-likes" class="text-xs text-habeshaCoral font-extrabold bg-rose-50 border border-rose-100 px-3.5 py-1 rounded-full shadow-sm">❤️ 0 Likes</span>
-                <button onclick="openPremiumModal('stars')" id="my-rose-count-badge" class="text-xs text-amber-800 font-extrabold bg-amber-50 border border-amber-200 px-3.5 py-1 rounded-full shadow-sm active:scale-95 transition">🌹 1 Rose</button>
+            <div class="flex flex-wrap items-center justify-center gap-1.5 mt-1.5 mb-5">
+                <span id="my-profile-likes" class="text-xs text-habeshaCoral font-extrabold bg-rose-50 border border-rose-100 px-3 py-1 rounded-full shadow-sm">❤️ 0 Likes</span>
+                <button onclick="openProfileViewsModal()" id="my-views-count-badge" class="text-xs text-premium font-extrabold bg-purple-50 border border-purple-200 px-3 py-1 rounded-full shadow-sm active:scale-95 transition">👀 0 Views</button>
+                <button onclick="openPremiumModal('stars')" id="my-rose-count-badge" class="text-xs text-amber-800 font-extrabold bg-amber-50 border border-amber-200 px-3 py-1 rounded-full shadow-sm active:scale-95 transition">🌹 1 Rose</button>
             </div>
 
             <!-- Profile Completion +20% Match Boost Card -->
@@ -1563,6 +1866,12 @@
                     <span class="text-[10px] font-extrabold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full uppercase">VIP</span>
                 </button>
 
+                <!-- Feature 1: 1-Tap Modest / Private Photo Blur Until Match -->
+                <button id="btn-profile-modest-blur" onclick="toggleMyModestBlur()" class="w-full bg-purple-50/80 text-purple-900 font-extrabold p-4 rounded-2xl flex items-center justify-between border border-purple-200 shadow-sm transition active:scale-95 text-sm">
+                    <div class="flex items-center gap-3"><i class="ph-fill ph-eye-slash text-xl text-premium"></i> <span id="modest-blur-btn-label">Modest Photo Blur: OFF</span></div>
+                    <span class="text-[10px] font-extrabold bg-white text-premium px-2 py-0.5 rounded-full border border-purple-200 uppercase">Free</span>
+                </button>
+
                 <button id="btn-profile-incognito" onclick="toggleVipIncognito()" class="w-full bg-slate-50 text-slate-800 font-bold p-4 rounded-2xl flex items-center justify-between border border-slate-200 shadow-sm transition active:scale-95 text-sm">
                     <div class="flex items-center gap-3"><i class="ph-fill ph-detective text-xl text-slate-700"></i> <span id="incognito-btn-label">VIP Incognito Mode: OFF</span></div>
                     <span class="text-[10px] font-extrabold bg-purple-100 text-premium px-2 py-0.5 rounded-full uppercase">VIP</span>
@@ -1596,6 +1905,8 @@
                 <button onclick="openDeleteAccountModal()" class="w-full bg-white text-gray-400 hover:text-red-600 font-bold p-3.5 rounded-2xl flex items-center justify-center gap-2 transition active:scale-95 border border-dashed border-gray-200 text-xs mt-2">
                     <i class="ph-bold ph-trash text-sm"></i> <span data-i18n="delete_account_btn">Delete Account (5 Invites / Paid VIP)</span>
                 </button>
+
+                <p id="app-build-version-footer" class="text-[10px] text-center text-gray-400 font-semibold pt-2">Habesha Date • Auto-Sync Active</p>
             </div>
         </div>
     </div>
@@ -1907,6 +2218,8 @@
             city: "",
             religion: "",
             education: "",
+            languageSpoken: "",
+            subcity: "",
             minAge: 18,
             maxAge: 60,
             onlineOnly: false,
@@ -2672,6 +2985,8 @@
             activeFilters.city = document.getElementById("filter-city").value;
             activeFilters.religion = document.getElementById("filter-religion").value;
             activeFilters.education = document.getElementById("filter-education").value;
+            activeFilters.languageSpoken = document.getElementById("filter-language-spoken")?.value || "";
+            activeFilters.subcity = document.getElementById("filter-subcity")?.value || "";
             activeFilters.minAge = parseInt(document.getElementById("filter-min-age").value) || 18;
             activeFilters.maxAge = parseInt(document.getElementById("filter-max-age").value) || 80;
             activeFilters.onlineOnly = document.getElementById("filter-online-only").checked;
@@ -2689,6 +3004,8 @@
             document.getElementById("filter-city").value = "";
             document.getElementById("filter-religion").value = "";
             document.getElementById("filter-education").value = "";
+            if (document.getElementById("filter-language-spoken")) document.getElementById("filter-language-spoken").value = "";
+            if (document.getElementById("filter-subcity")) document.getElementById("filter-subcity").value = "";
             document.getElementById("filter-min-age").value = 18;
             document.getElementById("filter-max-age").value = 60;
             document.getElementById("filter-online-only").checked = false;
@@ -2702,6 +3019,8 @@
                 city: "",
                 religion: "",
                 education: "",
+                languageSpoken: "",
+                subcity: "",
                 minAge: 18,
                 maxAge: 60,
                 onlineOnly: false,
@@ -2720,6 +3039,8 @@
             if (activeFilters.city) activeCount++;
             if (activeFilters.religion) activeCount++;
             if (activeFilters.education) activeCount++;
+            if (activeFilters.languageSpoken) activeCount++;
+            if (activeFilters.subcity) activeCount++;
             if (activeFilters.onlineOnly) activeCount++;
             if (activeFilters.verifiedOnly) activeCount++;
             if (activeFilters.voiceOnly) activeCount++;
@@ -2754,6 +3075,13 @@
 
                 if (activeFilters.religion && p.religion !== activeFilters.religion) return false;
                 if (activeFilters.education && p.education !== activeFilters.education) return false;
+                if (activeFilters.languageSpoken) {
+                    const spoken = String(p.languages_spoken || "").toLowerCase();
+                    if (!spoken.includes(activeFilters.languageSpoken.toLowerCase())) return false;
+                }
+                if (activeFilters.subcity) {
+                    if (String(p.subcity_campus || "") !== activeFilters.subcity) return false;
+                }
 
                 const age = parseInt(p.age) || 25;
                 if (age < activeFilters.minAge || age > activeFilters.maxAge) return false;
@@ -2802,6 +3130,10 @@
         function playProfileVoiceBio(url, event) {
             if (event) event.stopPropagation();
             if (!url) return;
+            const curProf = profiles[currentCardIndex];
+            if (curProf && typeof window.recordProfileView === "function" && !activeChatId) {
+                window.recordProfileView(curProf.telegram_id, "voice");
+            }
             try {
                 if (currentPlayingAudio) {
                     currentPlayingAudio.pause();
@@ -3106,8 +3438,16 @@
                     </div>
 
                     <!-- Portrait Photo Area -->
-                    <div onclick="openImageLightbox('${photoToUse}')" class="w-full flex-1 min-h-[175px] bg-[#18110E] bg-cover bg-[center_20%] bg-no-repeat relative cursor-pointer overflow-hidden" style="background-image: url('${photoToUse}')">
+                    <div onclick="${profile.blur_photos_until_match ? "showAlert('🔒 Modest Mode Active: Match with ' + (profiles[currentCardIndex]?.name || 'them') + ' to unlock clear photos!')" : `openImageLightbox('${photoToUse}')`}" class="w-full flex-1 min-h-[175px] bg-[#18110E] relative cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-[center_20%] bg-no-repeat transition-all duration-500 ${profile.blur_photos_until_match ? "blur-modest" : ""}" style="background-image: url('${photoToUse}')"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/20 pointer-events-none"></div>
+                        ${profile.blur_photos_until_match ? `
+                            <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center pointer-events-none z-20">
+                                <span class="glass-pill-dark text-white text-[11px] font-extrabold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl">
+                                    <i class="ph-fill ph-lock-key text-amber-300"></i> Modest Mode • Unblurs on Match
+                                </span>
+                            </div>
+                        ` : ""}
                         ${dotsHtml}
                         ${topLeftStackHtml}
                         ${voicePillHtml}
@@ -3620,16 +3960,25 @@
         function showProfileDetails() {
             const profile = profiles[currentCardIndex];
             if (!profile) return;
+            if (typeof window.recordProfileView === "function") {
+                window.recordProfileView(profile.telegram_id, "profile");
+            }
             const joinDate = profile.created_at ? profile.created_at.split("T")[0] : "Member";
             const verifyBadge = profile.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1 text-2xl"></i>` : "";
             const ageGenderLabel = formatAgeGender(profile.age, profile.gender);
             const photos = getProfilePhotoArray(profile);
+            const isBlurred = Boolean(profile.blur_photos_until_match);
 
             const galleryHtml = photos.length > 1 ? `
                 <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-4">
-                    ${photos.map(u => `<img onclick="openImageLightbox('${u}')" src="${u}" class="w-40 h-52 rounded-2xl object-cover shrink-0 border border-gray-200 cursor-pointer shadow-sm">`).join("")}
+                    ${photos.map(u => `<div class="w-40 h-52 rounded-2xl overflow-hidden shrink-0 border border-gray-200 shadow-sm relative"><img onclick="${isBlurred ? "" : `openImageLightbox('${u}')`}" src="${u}" class="w-full h-full object-cover ${isBlurred ? "blur-modest" : "cursor-pointer"}"></div>`).join("")}
                 </div>
             ` : "";
+
+            const extraLocalBadges = `
+                ${profile.subcity_campus ? `<span class="text-xs font-extrabold bg-orange-50 text-botOrange border border-orange-200 px-2.5 py-1 rounded-md">📍 ${profile.subcity_campus}</span>` : ""}
+                ${profile.languages_spoken ? `<span class="text-xs font-extrabold bg-purple-50 text-premium border border-purple-200 px-2.5 py-1 rounded-md">🗣️ ${profile.languages_spoken}</span>` : ""}
+            `;
 
             const voiceButtonHtml = profile.voice_bio_url ? `
                 <button onclick="playProfileVoiceBio('${profile.voice_bio_url}', event)" class="mb-4 px-4 py-2.5 bg-orange-50 text-botOrange border border-orange-200 rounded-xl font-bold text-xs flex items-center gap-2">
@@ -3657,6 +4006,7 @@
                 <h3 class="text-3xl font-bold text-buna mb-2 flex items-center">${profile.name}, ${ageGenderLabel} ${verifyBadge}</h3>
                 <div class="flex flex-wrap items-center gap-2 mb-4">
                     <span class="text-xs font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-md">🔥 ${profile.match_percent || 85}% Match</span>
+                    ${extraLocalBadges}
                     <p class="text-xs text-gray-400 font-medium"><i class="ph-fill ph-calendar-blank"></i> Joined: ${joinDate}</p>
                     <p class="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded-md flex items-center gap-1"><i class="ph-fill ph-heart"></i> ${profile.total_likes || 0} Likes</p>
                 </div>
@@ -3800,6 +4150,18 @@
 
                     const profileLikes = document.getElementById("my-profile-likes");
                     if (profileLikes) profileLikes.innerText = `❤️ ${mp.total_likes || 0} Likes`;
+
+                    const viewsBadge = document.getElementById("my-views-count-badge");
+                    if (viewsBadge) viewsBadge.innerText = `👀 ${mp.views_count || 0} Views`;
+                    const matchesViewsPill = document.getElementById("matches-views-count-pill");
+                    if (matchesViewsPill) matchesViewsPill.innerText = `👀 ${mp.views_count || 0}`;
+
+                    const modestLabel = document.getElementById("modest-blur-btn-label");
+                    if (modestLabel) {
+                        modestLabel.innerText = mp.blur_photos_until_match
+                            ? "🔒 Modest Photo Blur: ON"
+                            : "Modest Photo Blur: OFF";
+                    }
 
                     const profileName = document.getElementById("my-profile-name");
                     const crownHtml = mp.is_premium ? `<i class="ph-fill ph-crown text-premium ml-1"></i>` : "";
@@ -4225,6 +4587,10 @@
             const mType = msg.media_type || "text";
             const mUrl = msg.media_url || "";
             const text = msg.content || msg.message || "";
+
+            if (text.startsWith("[HABESHA_GAME]") && typeof window.renderInteractiveGameBubble === "function") {
+                return window.renderInteractiveGameBubble(msg, isMe);
+            }
 
             if (mType === "image" && mUrl) {
                 return `
@@ -4882,6 +5248,13 @@
                 document.getElementById("reg-intention").value = mp.intention || "";
                 const spotChk = document.getElementById("reg-allow-spotlight");
                 if (spotChk) spotChk.checked = mp.allow_spotlight !== false;
+                const blurChk = document.getElementById("reg-blur-photos");
+                if (blurChk) blurChk.checked = Boolean(mp.blur_photos_until_match);
+                const subcitySel = document.getElementById("reg-subcity-campus");
+                if (subcitySel) subcitySel.value = mp.subcity_campus || "";
+                if (typeof window.setSpokenLangPillsFromCSV === "function") {
+                    window.setSpokenLangPillsFromCSV(mp.languages_spoken || "");
+                }
 
                 if (mp.location && !KNOWN_LOCATIONS.includes(mp.location)) {
                     document.getElementById("reg-location").value = "Other";
@@ -5027,7 +5400,10 @@
                     smoking: document.getElementById("reg-smoking").value || "",
                     referred_by: referredBy,
                     language: currentLang,
-                    allow_spotlight: allowSpotlight
+                    allow_spotlight: allowSpotlight,
+                    blur_photos_until_match: Boolean(document.getElementById("reg-blur-photos")?.checked),
+                    languages_spoken: document.getElementById("reg-languages-spoken")?.value || "",
+                    subcity_campus: document.getElementById("reg-subcity-campus")?.value || ""
                 };
 
                 const response = await fetch(`${BACKEND_URL}/api/register`, {
@@ -5667,5 +6043,6 @@
 
         initApp();
     </script>
+    <script src="phase6_features.js"></script>
 </body>
 </html>
