@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="lock-viewport">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -31,22 +31,35 @@
     </script>
     <style>
         * { -webkit-tap-highlight-color: transparent; }
+
+        /* Native Root Document Scrolling for Profile, Admin, Matches & Registration */
         html, body {
-            height: 100%;
+            margin: 0;
+            padding: 0;
             width: 100%;
-            overflow: hidden;
-            overscroll-behavior: none;
+            min-height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
+
+        /* Lock Viewport Height ONLY on Single-Screen Views (Discover, Splash, Chat) */
+        html.lock-viewport,
+        html.lock-viewport body {
+            height: 100%;
+            max-height: 100dvh;
+            overflow: hidden;
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .blur-premium { filter: blur(7px) grayscale(35%); pointer-events: none; }
 
-        /* Dedicated Native Momentum Scroll Container */
+        /* Smooth Inner Scroll for Modals & Chat History */
         .touch-scroll {
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior-y: contain;
-            touch-action: pan-y;
+            overscroll-behavior-y: auto;
         }
 
         /* Ambient Warm Luxury Background Mesh */
@@ -159,7 +172,7 @@
         .modal-pop { animation: modalPop 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
     </style>
 </head>
-<body class="bg-habesha-mesh font-sans text-buna select-none">
+<body class="bg-habesha-mesh font-sans text-buna">
 
     <!-- Custom Glassmorphic Alert Box -->
     <div id="custom-alert" class="hidden fixed inset-0 z-[240] flex items-center justify-center bg-black/55 backdrop-blur-sm px-4">
@@ -859,8 +872,8 @@
         </button>
     </div>
 
-    <!-- Registration / Edit Profile View (20s Express Signup + Instant WebP Compression + Full 3-Page Editor) -->
-    <div id="view-registration" class="hidden fixed inset-0 z-[150] w-full h-[100dvh] bg-habesha-mesh touch-scroll no-scrollbar pb-32">
+    <!-- Registration / Edit Profile View (Native Document Scroll — Never Locks in Either Direction!) -->
+    <div id="view-registration" class="hidden relative z-[150] w-full min-h-[100dvh] bg-habesha-mesh pb-36">
         <div id="stats-banner" style="display: none;" class="flex-col bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-0 z-30">
             <div class="px-4 py-2.5 border-b border-gray-100 flex items-center justify-between">
                 <button type="button" onclick="closeEditProfile()" class="text-gray-600 p-1.5 rounded-full hover:bg-gray-100 transition flex items-center gap-1.5">
@@ -884,7 +897,7 @@
             </div>
         </div>
 
-        <div class="max-w-md mx-auto p-5 pb-28">
+        <div class="max-w-md mx-auto p-5 pb-20">
             <div id="reg-top-guest-nav" class="flex justify-between items-center mb-3">
                 <button type="button" id="btn-back-to-preview" onclick="returnToGuestPreview()" class="px-3.5 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-extrabold flex items-center gap-1 shadow-sm">
                     <i class="ph-bold ph-arrow-left text-botOrange"></i> Preview Feed
@@ -1012,13 +1025,11 @@
                         </select>
                     </div>
 
-                    <!-- Privacy-Safe Anonymous Channel Spotlight Opt-In -->
                     <label class="flex items-center justify-between p-3 bg-orange-50/70 border border-orange-200/70 rounded-2xl cursor-pointer">
                         <span class="text-[11px] font-bold text-buna leading-snug pr-2">✨ Allow anonymized spotlight on <b>@habeshadate1</b> (no name/phone shown — 3x faster matches)</span>
                         <input id="reg-allow-spotlight" type="checkbox" checked class="w-4 h-4 accent-botOrange rounded shrink-0">
                     </label>
 
-                    <!-- 1-Screen 20-Second Express Signup Buttons -->
                     <div id="express-signup-actions" class="space-y-2.5 pt-1">
                         <button id="express-submit-btn" onclick="submitExpressRegistration()" class="btn-shimmer w-full p-4 bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 text-white rounded-2xl font-extrabold text-sm shadow-lg shadow-emerald-200 flex items-center justify-center gap-2 active:scale-95 transition">
                             <i class="ph-fill ph-lightning text-lg text-yellow-300"></i> <span data-i18n="express_join_btn">Join & Start Matching Now!</span>
@@ -1144,8 +1155,8 @@
         </div>
     </div>
 
-    <!-- World-Class Swipe & Social Discovery View -->
-    <div id="view-swipe" class="hidden fixed inset-0 w-full h-[100dvh] pt-1.5 pb-[64px] px-2.5 flex-col bg-habesha-mesh overflow-hidden">
+    <!-- World-Class Swipe & Social Discovery View (Single-Screen Adaptive Card) -->
+    <div id="view-swipe" class="hidden fixed inset-0 w-full h-[100dvh] pt-1.5 pb-[64px] px-2.5 flex-col bg-habesha-mesh overflow-hidden select-none">
 
         <!-- Shimmering Guest VIP Showcase Top Banner -->
         <div id="guest-preview-banner" onclick="openGuestSignupModal()" class="btn-shimmer hidden w-full max-w-sm mx-auto mb-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-premium via-habeshaCoral to-botOrange text-white text-[11px] font-extrabold items-center justify-between cursor-pointer shadow-md shrink-0 active:scale-95 transition">
@@ -1212,7 +1223,7 @@
             </div>
         </div>
 
-        <!-- Luxury Adaptive Card Container (Supports Real 60fps Finger-Drag Swipe Physics!) -->
+        <!-- Luxury Adaptive Card Container -->
         <div id="card-container" class="w-full max-w-sm mx-auto flex-1 min-h-0 flex flex-col bg-white rounded-[1.85rem] card-luxury-shadow overflow-hidden border border-white/90 relative mb-0.5">
             <p class="text-gray-400 font-semibold text-sm flex h-full items-center justify-center">Loading profiles...</p>
         </div>
@@ -1230,113 +1241,109 @@
         </div>
     </div>
 
-    <!-- Matches View (Shows Personal Hinge-Style Comments, Golden Roses & Active Chats) -->
-    <div id="view-matches" class="hidden fixed inset-0 w-full h-[100dvh] flex-col bg-habesha-mesh overflow-hidden">
-        <div class="flex-1 min-h-0 w-full touch-scroll no-scrollbar pt-4 pb-32 px-4">
-            <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-5 mt-3 px-1">
-                <h2 class="font-extrabold text-3xl text-buna tracking-tight"><span data-i18n="your_matches">Your Matches</span> <span class="text-habeshaCoral">❤️</span></h2>
-                <button onclick="toggleLanguage()" class="bg-white text-buna border border-gray-200 text-xs font-extrabold px-3 py-1.5 rounded-full shadow-sm lang-toggle-btn">🇪🇹 አማ</button>
+    <!-- Matches View (Native Document Scroll — Smooth Two-Way Scrolling!) -->
+    <div id="view-matches" class="hidden w-full min-h-[100dvh] flex-col bg-habesha-mesh pt-4 pb-36 px-4">
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-5 mt-3 px-1">
+            <h2 class="font-extrabold text-3xl text-buna tracking-tight"><span data-i18n="your_matches">Your Matches</span> <span class="text-habeshaCoral">❤️</span></h2>
+            <button onclick="toggleLanguage()" class="bg-white text-buna border border-gray-200 text-xs font-extrabold px-3 py-1.5 rounded-full shadow-sm lang-toggle-btn">🇪🇹 አማ</button>
+        </div>
+
+        <div class="w-full max-w-sm mx-auto space-y-4 pb-8">
+            <div id="premium-likes-container" class="mb-5 bg-gradient-to-br from-white via-purple-50/40 to-pink-50/40 p-4 rounded-3xl shadow-sm border border-purple-100 hidden">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-extrabold text-buna text-xs uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="ph-fill ph-crown text-amber-500 text-base"></i> <span data-i18n="who_liked_you">Who Liked You</span>
+                    </h3>
+                    <span id="premium-likes-count" class="bg-gradient-to-r from-habeshaCoral to-botOrange text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full shadow-sm">0</span>
+                </div>
+                <div id="premium-likes-list" class="flex gap-3 overflow-x-auto no-scrollbar pb-2"></div>
+                <div id="premium-upsell-msg" class="text-center mt-2.5 hidden">
+                    <button onclick="openPremiumModal()" class="btn-shimmer text-xs font-extrabold text-white flex items-center justify-center gap-1.5 w-full bg-gradient-to-r from-premium to-pink-500 p-3 rounded-2xl shadow-md transition active:scale-95">
+                        <i class="ph-fill ph-lock-key-open text-sm"></i> <span data-i18n="upgrade_see_likes">Upgrade to see who liked you</span>
+                    </button>
+                </div>
             </div>
 
-            <div class="w-full max-w-sm mx-auto space-y-4 pb-12">
-                <div id="premium-likes-container" class="mb-5 bg-gradient-to-br from-white via-purple-50/40 to-pink-50/40 p-4 rounded-3xl shadow-sm border border-purple-100 hidden">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="font-extrabold text-buna text-xs uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="ph-fill ph-crown text-amber-500 text-base"></i> <span data-i18n="who_liked_you">Who Liked You</span>
-                        </h3>
-                        <span id="premium-likes-count" class="bg-gradient-to-r from-habeshaCoral to-botOrange text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full shadow-sm">0</span>
-                    </div>
-                    <div id="premium-likes-list" class="flex gap-3 overflow-x-auto no-scrollbar pb-2"></div>
-                    <div id="premium-upsell-msg" class="text-center mt-2.5 hidden">
-                        <button onclick="openPremiumModal()" class="btn-shimmer text-xs font-extrabold text-white flex items-center justify-center gap-1.5 w-full bg-gradient-to-r from-premium to-pink-500 p-3 rounded-2xl shadow-md transition active:scale-95">
-                            <i class="ph-fill ph-lock-key-open text-sm"></i> <span data-i18n="upgrade_see_likes">Upgrade to see who liked you</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="matches-container" class="w-full max-w-sm mx-auto space-y-3">
-                    <p class="text-gray-400 text-center mt-10 text-sm">Loading matches...</p>
-                </div>
+            <div id="matches-container" class="w-full max-w-sm mx-auto space-y-3">
+                <p class="text-gray-400 text-center mt-10 text-sm">Loading matches...</p>
             </div>
         </div>
     </div>
 
-    <!-- Admin Analytics, 1-Click Channel Spotlight Poster, Approvals & Spy View -->
-    <div id="view-admin" class="hidden fixed inset-0 w-full h-[100dvh] flex-col bg-habesha-mesh overflow-hidden">
-        <div class="flex-1 min-h-0 w-full touch-scroll no-scrollbar pt-4 pb-32 px-4">
-            <div class="w-full max-w-sm mx-auto flex items-center justify-between mb-4 mt-3 px-1">
-                <h2 class="font-extrabold text-2xl text-red-600 tracking-tight flex items-center gap-2">
-                    <i class="ph-fill ph-shield-star"></i> Admin Center
-                </h2>
-                <button onclick="loadAdminDashboardData()" class="p-2.5 bg-white rounded-2xl text-gray-600 shadow-sm border border-gray-100 active:scale-95"><i class="ph-bold ph-arrows-clockwise"></i></button>
-            </div>
+    <!-- Admin Analytics, 1-Click Channel Spotlight Poster, Approvals & Spy View (Native Document Scroll!) -->
+    <div id="view-admin" class="hidden w-full min-h-[100dvh] flex-col bg-habesha-mesh pt-4 pb-36 px-4">
+        <div class="w-full max-w-sm mx-auto flex items-center justify-between mb-4 mt-3 px-1">
+            <h2 class="font-extrabold text-2xl text-red-600 tracking-tight flex items-center gap-2">
+                <i class="ph-fill ph-shield-star"></i> Admin Center
+            </h2>
+            <button onclick="loadAdminDashboardData()" class="p-2.5 bg-white rounded-2xl text-gray-600 shadow-sm border border-gray-100 active:scale-95"><i class="ph-bold ph-arrows-clockwise"></i></button>
+        </div>
 
-            <div class="w-full max-w-sm mx-auto flex bg-gray-200/80 p-1 rounded-2xl mb-4 text-xs font-extrabold">
-                <button id="admin-subtab-overview" onclick="switchAdminSubTab('overview')" class="w-1/2 py-2.5 rounded-xl bg-white text-buna shadow-sm transition">📊 Analytics & Queue</button>
-                <button id="admin-subtab-spy" onclick="switchAdminSubTab('spy')" class="w-1/2 py-2.5 rounded-xl text-gray-500 transition">🕵️ Chat Spy Board</button>
-            </div>
+        <div class="w-full max-w-sm mx-auto flex bg-gray-200/80 p-1 rounded-2xl mb-4 text-xs font-extrabold">
+            <button id="admin-subtab-overview" onclick="switchAdminSubTab('overview')" class="w-1/2 py-2.5 rounded-xl bg-white text-buna shadow-sm transition">📊 Analytics & Queue</button>
+            <button id="admin-subtab-spy" onclick="switchAdminSubTab('spy')" class="w-1/2 py-2.5 rounded-xl text-gray-500 transition">🕵️ Chat Spy Board</button>
+        </div>
 
-            <div id="admin-overview-section" class="w-full max-w-sm mx-auto space-y-4 pb-12">
-                <div class="grid grid-cols-2 gap-2.5">
-                    <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
-                        <p class="text-[10px] font-extrabold text-gray-400 uppercase">Total Users</p>
-                        <p id="adm-stat-users" class="text-2xl font-extrabold text-buna mt-0.5">--</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-3xl border border-emerald-100 shadow-sm">
-                        <p class="text-[10px] font-extrabold text-emerald-600 uppercase">🟢 Online Now</p>
-                        <p id="adm-stat-online" class="text-2xl font-extrabold text-emerald-600 mt-0.5">--</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-3xl border border-purple-100 shadow-sm">
-                        <p class="text-[10px] font-extrabold text-premium uppercase">👑 VIP Premium</p>
-                        <p id="adm-stat-premium" class="text-2xl font-extrabold text-premium mt-0.5">--</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-3xl border border-blue-100 shadow-sm">
-                        <p class="text-[10px] font-extrabold text-verify uppercase">💙 Verified</p>
-                        <p id="adm-stat-verified" class="text-2xl font-extrabold text-verify mt-0.5">--</p>
-                    </div>
+        <div id="admin-overview-section" class="w-full max-w-sm mx-auto space-y-4 pb-8">
+            <div class="grid grid-cols-2 gap-2.5">
+                <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
+                    <p class="text-[10px] font-extrabold text-gray-400 uppercase">Total Users</p>
+                    <p id="adm-stat-users" class="text-2xl font-extrabold text-buna mt-0.5">--</p>
                 </div>
-
-                <!-- 1-Click Automated Viral Channel Spotlight Flywheel (@habeshadate1) -->
-                <div class="bg-gradient-to-br from-orange-50 via-rose-50 to-purple-50 p-4 rounded-3xl shadow-sm border border-orange-200">
-                    <h3 class="text-xs font-extrabold text-habeshaCoral uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                        <i class="ph-fill ph-megaphone text-base"></i> <span>1-Click @habeshadate1 Spotlight</span>
-                    </h3>
-                    <p class="text-[11px] text-gray-600 mb-3 leading-relaxed">
-                        Publish an anonymized <b>Featured Single Spotlight</b> card directly to <b>@habeshadate1</b> with a 1-tap Match % button!
-                    </p>
-                    <select id="adm-spotlight-select" class="w-full p-2.5 border border-orange-200 rounded-xl bg-white text-xs font-bold mb-2.5 focus:outline-none">
-                        <option value="">🎲 Auto-Pick Random Photo Member</option>
-                    </select>
-                    <button id="btn-post-spotlight" onclick="postChannelSpotlight()" class="btn-shimmer w-full py-3 bg-gradient-to-r from-botOrange to-habeshaCoral text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
-                        <i class="ph-bold ph-paper-plane-tilt"></i> <span>Post Spotlight Card to @habeshadate1</span>
-                    </button>
+                <div class="bg-white p-4 rounded-3xl border border-emerald-100 shadow-sm">
+                    <p class="text-[10px] font-extrabold text-emerald-600 uppercase">🟢 Online Now</p>
+                    <p id="adm-stat-online" class="text-2xl font-extrabold text-emerald-600 mt-0.5">--</p>
                 </div>
-
-                <div class="bg-white p-4 rounded-3xl shadow-sm border border-purple-100">
-                    <h3 class="text-xs font-extrabold text-premium uppercase tracking-wider mb-3 flex items-center justify-between">
-                        <span>💸 Pending Telebirr Claims</span>
-                        <span id="adm-count-payments" class="bg-purple-50 text-premium px-2.5 py-0.5 rounded-full text-xs">0</span>
-                    </h3>
-                    <div id="adm-pending-payments-list" class="space-y-2.5 text-xs text-gray-500">None pending</div>
+                <div class="bg-white p-4 rounded-3xl border border-purple-100 shadow-sm">
+                    <p class="text-[10px] font-extrabold text-premium uppercase">👑 VIP Premium</p>
+                    <p id="adm-stat-premium" class="text-2xl font-extrabold text-premium mt-0.5">--</p>
                 </div>
-
-                <div class="bg-white p-4 rounded-3xl shadow-sm border border-blue-100">
-                    <h3 class="text-xs font-extrabold text-verify uppercase tracking-wider mb-3 flex items-center justify-between">
-                        <span>🤳 Pending Selfie Verifications</span>
-                        <span id="adm-count-verifications" class="bg-blue-50 text-verify px-2.5 py-0.5 rounded-full text-xs">0</span>
-                    </h3>
-                    <div id="adm-pending-verifications-list" class="space-y-3 text-xs text-gray-500">None pending</div>
-                </div>
-
-                <div class="bg-white p-4 rounded-3xl shadow-sm border border-orange-100">
-                    <h3 class="text-xs font-extrabold text-botOrange uppercase tracking-wider mb-3">🏆 Top Viral Referrers</h3>
-                    <div id="adm-top-referrers-list" class="space-y-2 text-xs text-gray-600">Loading...</div>
+                <div class="bg-white p-4 rounded-3xl border border-blue-100 shadow-sm">
+                    <p class="text-[10px] font-extrabold text-verify uppercase">💙 Verified</p>
+                    <p id="adm-stat-verified" class="text-2xl font-extrabold text-verify mt-0.5">--</p>
                 </div>
             </div>
 
-            <div id="admin-container" class="hidden w-full max-w-sm mx-auto space-y-3 pb-12">
-                <p class="text-gray-400 text-center mt-10">Loading active chats...</p>
+            <!-- 1-Click Automated Viral Channel Spotlight Flywheel (@habeshadate1) -->
+            <div class="bg-gradient-to-br from-orange-50 via-rose-50 to-purple-50 p-4 rounded-3xl shadow-sm border border-orange-200">
+                <h3 class="text-xs font-extrabold text-habeshaCoral uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                    <i class="ph-fill ph-megaphone text-base"></i> <span>1-Click @habeshadate1 Spotlight</span>
+                </h3>
+                <p class="text-[11px] text-gray-600 mb-3 leading-relaxed">
+                    Publish an anonymized <b>Featured Single Spotlight</b> card directly to <b>@habeshadate1</b> with a 1-tap Match % button!
+                </p>
+                <select id="adm-spotlight-select" class="w-full p-2.5 border border-orange-200 rounded-xl bg-white text-xs font-bold mb-2.5 focus:outline-none">
+                    <option value="">🎲 Auto-Pick Random Photo Member</option>
+                </select>
+                <button id="btn-post-spotlight" onclick="postChannelSpotlight()" class="btn-shimmer w-full py-3 bg-gradient-to-r from-botOrange to-habeshaCoral text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+                    <i class="ph-bold ph-paper-plane-tilt"></i> <span>Post Spotlight Card to @habeshadate1</span>
+                </button>
             </div>
+
+            <div class="bg-white p-4 rounded-3xl shadow-sm border border-purple-100">
+                <h3 class="text-xs font-extrabold text-premium uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span>💸 Pending Telebirr Claims</span>
+                    <span id="adm-count-payments" class="bg-purple-50 text-premium px-2.5 py-0.5 rounded-full text-xs">0</span>
+                </h3>
+                <div id="adm-pending-payments-list" class="space-y-2.5 text-xs text-gray-500">None pending</div>
+            </div>
+
+            <div class="bg-white p-4 rounded-3xl shadow-sm border border-blue-100">
+                <h3 class="text-xs font-extrabold text-verify uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span>🤳 Pending Selfie Verifications</span>
+                    <span id="adm-count-verifications" class="bg-blue-50 text-verify px-2.5 py-0.5 rounded-full text-xs">0</span>
+                </h3>
+                <div id="adm-pending-verifications-list" class="space-y-3 text-xs text-gray-500">None pending</div>
+            </div>
+
+            <div class="bg-white p-4 rounded-3xl shadow-sm border border-orange-100">
+                <h3 class="text-xs font-extrabold text-botOrange uppercase tracking-wider mb-3">🏆 Top Viral Referrers</h3>
+                <div id="adm-top-referrers-list" class="space-y-2 text-xs text-gray-600">Loading...</div>
+            </div>
+        </div>
+
+        <div id="admin-container" class="hidden w-full max-w-sm mx-auto space-y-3 pb-8">
+            <p class="text-gray-400 text-center mt-10">Loading active chats...</p>
         </div>
     </div>
 
@@ -1467,130 +1474,128 @@
         </div>
     </div>
 
-    <!-- Luxury Profile & Settings View (Fixed Viewport + Dedicated Inner Momentum Scroll Container) -->
-    <div id="view-profile" class="hidden fixed inset-0 w-full h-[100dvh] flex-col bg-habesha-mesh overflow-hidden">
-        <div class="flex-1 min-h-0 w-full touch-scroll no-scrollbar pt-4 pb-36 px-4">
-            <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-4 mt-3 px-1">
-                <h2 class="font-extrabold text-3xl text-buna tracking-tight" data-i18n="my_profile_title">My Profile</h2>
-                <button onclick="toggleLanguage()" class="bg-white text-buna border border-gray-200 text-xs font-extrabold px-3 py-1.5 rounded-full shadow-sm lang-toggle-btn">🇪🇹 አማ</button>
+    <!-- Luxury Profile & Settings View (Native Document Scroll — Smooth Two-Way Scrolling!) -->
+    <div id="view-profile" class="hidden w-full min-h-[100dvh] flex-col bg-habesha-mesh pt-4 pb-36 px-4">
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-4 mt-3 px-1">
+            <h2 class="font-extrabold text-3xl text-buna tracking-tight" data-i18n="my_profile_title">My Profile</h2>
+            <button onclick="toggleLanguage()" class="bg-white text-buna border border-gray-200 text-xs font-extrabold px-3 py-1.5 rounded-full shadow-sm lang-toggle-btn">🇪🇹 አማ</button>
+        </div>
+
+        <div class="w-full max-w-sm mx-auto bg-white rounded-[2rem] p-6 card-luxury-shadow border border-white flex flex-col items-center mb-6 relative">
+            <div class="tibeb-ribbon h-1.5 inset-x-6 top-0 rounded-b-full absolute"></div>
+
+            <div class="p-1 rounded-full bg-gradient-to-tr from-botOrange via-habeshaCoral to-premium shadow-lg mb-3 mt-1">
+                <div id="my-profile-photo" class="w-24 h-24 rounded-full bg-gray-200 bg-cover bg-center border-2 border-white relative">
+                    <div id="my-verified-badge" class="hidden absolute bottom-0 right-0 bg-white rounded-full p-0.5 shadow-md">
+                        <i class="ph-fill ph-seal-check text-verify text-xl"></i>
+                    </div>
+                </div>
             </div>
 
-            <div class="w-full max-w-sm mx-auto bg-white rounded-[2rem] p-6 card-luxury-shadow border border-white flex flex-col items-center mb-10 relative">
-                <div class="tibeb-ribbon h-1.5 inset-x-6 top-0 rounded-b-full absolute"></div>
+            <h3 id="my-profile-name" class="text-xl font-extrabold text-buna flex items-center gap-1">Loading...</h3>
+            <div class="flex items-center gap-2 mt-1.5 mb-5">
+                <span id="my-profile-likes" class="text-xs text-habeshaCoral font-extrabold bg-rose-50 border border-rose-100 px-3.5 py-1 rounded-full shadow-sm">❤️ 0 Likes</span>
+                <button onclick="openPremiumModal('stars')" id="my-rose-count-badge" class="text-xs text-amber-800 font-extrabold bg-amber-50 border border-amber-200 px-3.5 py-1 rounded-full shadow-sm active:scale-95 transition">🌹 1 Rose</button>
+            </div>
 
-                <div class="p-1 rounded-full bg-gradient-to-tr from-botOrange via-habeshaCoral to-premium shadow-lg mb-3 mt-1">
-                    <div id="my-profile-photo" class="w-24 h-24 rounded-full bg-gray-200 bg-cover bg-center border-2 border-white relative">
-                        <div id="my-verified-badge" class="hidden absolute bottom-0 right-0 bg-white rounded-full p-0.5 shadow-md">
-                            <i class="ph-fill ph-seal-check text-verify text-xl"></i>
-                        </div>
-                    </div>
+            <!-- Profile Completion +20% Match Boost Card -->
+            <div id="profile-completion-card" onclick="openEditProfile()" class="hidden w-full bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-3.5 mb-4 text-left cursor-pointer active:scale-95 transition shadow-sm">
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-xs font-extrabold text-emerald-800">🚀 Complete Profile (+20% Boost)</span>
+                    <span id="profile-completion-pct" class="text-xs font-extrabold bg-white text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-100">50%</span>
                 </div>
-
-                <h3 id="my-profile-name" class="text-xl font-extrabold text-buna flex items-center gap-1">Loading...</h3>
-                <div class="flex items-center gap-2 mt-1.5 mb-5">
-                    <span id="my-profile-likes" class="text-xs text-habeshaCoral font-extrabold bg-rose-50 border border-rose-100 px-3.5 py-1 rounded-full shadow-sm">❤️ 0 Likes</span>
-                    <button onclick="openPremiumModal('stars')" id="my-rose-count-badge" class="text-xs text-amber-800 font-extrabold bg-amber-50 border border-amber-200 px-3.5 py-1 rounded-full shadow-sm active:scale-95 transition">🌹 1 Rose</button>
+                <div class="w-full bg-white h-2 rounded-full overflow-hidden mb-1.5 border border-emerald-100">
+                    <div id="profile-completion-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-1/2 transition-all duration-300"></div>
                 </div>
+                <p class="text-[11px] text-emerald-700 font-medium">Tap to add your Bio, Religion, or 15s Voice Intro for 3x more matches!</p>
+            </div>
 
-                <!-- Profile Completion +20% Match Boost Card -->
-                <div id="profile-completion-card" onclick="openEditProfile()" class="hidden w-full bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-3.5 mb-4 text-left cursor-pointer active:scale-95 transition shadow-sm">
-                    <div class="flex justify-between items-center mb-1.5">
-                        <span class="text-xs font-extrabold text-emerald-800">🚀 Complete Profile (+20% Boost)</span>
-                        <span id="profile-completion-pct" class="text-xs font-extrabold bg-white text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-100">50%</span>
-                    </div>
-                    <div class="w-full bg-white h-2 rounded-full overflow-hidden mb-1.5 border border-emerald-100">
-                        <div id="profile-completion-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-1/2 transition-all duration-300"></div>
-                    </div>
-                    <p class="text-[11px] text-emerald-700 font-medium">Tap to add your Bio, Religion, or 15s Voice Intro for 3x more matches!</p>
+            <!-- Shareable Telegram Story Crush Link Card -->
+            <div class="w-full bg-gradient-to-br from-rose-50 via-pink-50 to-fuchsia-50 border border-pink-200 rounded-3xl p-4 mb-4 text-left shadow-sm">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-extrabold text-habeshaCoral uppercase tracking-wider flex items-center gap-1"><i class="ph-fill ph-heart text-base"></i> <span data-i18n="crush_link_title">Telegram Story Crush Link</span></span>
+                    <span class="text-[10px] font-extrabold bg-white text-habeshaCoral px-2 py-0.5 rounded-full border border-pink-100">+Counts as Invite!</span>
                 </div>
-
-                <!-- Shareable Telegram Story Crush Link Card -->
-                <div class="w-full bg-gradient-to-br from-rose-50 via-pink-50 to-fuchsia-50 border border-pink-200 rounded-3xl p-4 mb-4 text-left shadow-sm">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs font-extrabold text-habeshaCoral uppercase tracking-wider flex items-center gap-1"><i class="ph-fill ph-heart text-base"></i> <span data-i18n="crush_link_title">Telegram Story Crush Link</span></span>
-                        <span class="text-[10px] font-extrabold bg-white text-habeshaCoral px-2 py-0.5 rounded-full border border-pink-100">+Counts as Invite!</span>
-                    </div>
-                    <p class="text-xs text-gray-600 mb-3 leading-relaxed" data-i18n="crush_link_desc">Share your personal Crush Link on your <b>Telegram Story or Bio</b>! Friends who click see your card #1.</p>
-                    <div class="flex gap-2">
-                        <button onclick="shareCrushLinkOnTelegram()" class="btn-shimmer flex-1 py-2.5 bg-gradient-to-r from-habeshaCoral to-pink-600 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
-                            <i class="ph-bold ph-share-network"></i> <span data-i18n="share_crush_btn">Share Crush Card</span>
-                        </button>
-                        <button onclick="copyCrushLink()" class="px-3.5 py-2.5 bg-white text-habeshaCoral border border-pink-200 rounded-xl font-extrabold text-xs shadow-sm active:scale-95 transition" data-i18n="copy_link_btn">
-                            Copy Link
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Two-Sided Viral Referral Card ("+5 Likes + 1 Rose per Invite & 7 Days Free VIP at 3!") -->
-                <div class="w-full bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 border border-orange-200 rounded-3xl p-4 mb-5 text-left shadow-sm">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs font-extrabold text-botOrange uppercase tracking-wider flex items-center gap-1"><i class="ph-fill ph-gift text-base"></i> <span data-i18n="free_vip_referral">Two-Sided VIP Referral</span></span>
-                        <span id="referral-progress-badge" class="text-xs font-extrabold bg-white text-buna px-2.5 py-0.5 rounded-full border border-orange-100">0 / 3 Joined</span>
-                    </div>
-                    <p class="text-xs text-gray-600 mb-2.5 leading-relaxed" data-i18n="referral_desc">You AND your friend each get <b>Bonus Likes + 1 Golden Rose 🌹</b> on every invite — plus <b>7 Days Free VIP</b> every 3 friends!</p>
-                    <div class="w-full bg-white h-2.5 rounded-full overflow-hidden mb-3 border border-orange-100">
-                        <div id="referral-progress-bar" class="bg-gradient-to-r from-botOrange to-amber-500 h-full w-0 transition-all duration-300"></div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="shareReferralOnTelegram()" class="btn-shimmer flex-1 py-2.5 bg-gradient-to-r from-botOrange to-amber-500 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
-                            <i class="ph-bold ph-paper-plane-tilt"></i> <span data-i18n="invite_tg_btn">Invite on Telegram</span>
-                        </button>
-                        <button onclick="copyReferralLink()" class="px-3.5 py-2.5 bg-white text-buna border border-orange-200 rounded-xl font-extrabold text-xs shadow-sm active:scale-95 transition" data-i18n="copy_link_btn">
-                            Copy Link
-                        </button>
-                    </div>
-                </div>
-
-                <div class="w-full space-y-2.5">
-                    <button id="btn-profile-premium" onclick="openPremiumModal()" class="btn-shimmer w-full bg-gradient-to-r from-[#2B124C] via-[#522B5B] to-premium text-white font-extrabold p-4 rounded-2xl flex items-center justify-between shadow-lg shadow-purple-200/60 transition active:scale-95 text-sm">
-                        <div class="flex items-center gap-3"><i class="ph-fill ph-crown text-xl text-amber-300"></i> <span data-i18n="upgrade_premium_btn">Upgrade to VIP (ETB / ⭐ Stars)</span></div>
-                        <i class="ph-bold ph-caret-right text-amber-300"></i>
+                <p class="text-xs text-gray-600 mb-3 leading-relaxed" data-i18n="crush_link_desc">Share your personal Crush Link on your <b>Telegram Story or Bio</b>! Friends who click see your card #1.</p>
+                <div class="flex gap-2">
+                    <button onclick="shareCrushLinkOnTelegram()" class="btn-shimmer flex-1 py-2.5 bg-gradient-to-r from-habeshaCoral to-pink-600 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
+                        <i class="ph-bold ph-share-network"></i> <span data-i18n="share_crush_btn">Share Crush Card</span>
                     </button>
-
-                    <button id="btn-profile-roses" onclick="buyStarsProduct('roses_pack')" class="w-full bg-rose-50/90 text-habeshaCoral font-extrabold p-4 rounded-2xl flex items-center justify-between border border-rose-200 shadow-sm transition active:scale-95 text-sm">
-                        <div class="flex items-center gap-3"><span class="text-xl">🌹</span> <span>Get 3 Golden Roses + 15 Likes</span></div>
-                        <span class="text-[10px] font-extrabold bg-white text-habeshaCoral px-2.5 py-0.5 rounded-full border border-rose-200">25 ⭐</span>
-                    </button>
-
-                    <button id="btn-profile-boost" onclick="triggerProfileBoost()" class="w-full bg-amber-50/90 text-amber-900 font-extrabold p-4 rounded-2xl flex items-center justify-between border border-amber-200 shadow-sm transition active:scale-95 text-sm">
-                        <div class="flex items-center gap-3"><i class="ph-fill ph-lightning text-xl text-amber-500"></i> <span data-i18n="boost_profile_btn">Boost Profile (24h Top Spot)</span></div>
-                        <span class="text-[10px] font-extrabold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full uppercase">VIP</span>
-                    </button>
-
-                    <button id="btn-profile-incognito" onclick="toggleVipIncognito()" class="w-full bg-slate-50 text-slate-800 font-bold p-4 rounded-2xl flex items-center justify-between border border-slate-200 shadow-sm transition active:scale-95 text-sm">
-                        <div class="flex items-center gap-3"><i class="ph-fill ph-detective text-xl text-slate-700"></i> <span id="incognito-btn-label">VIP Incognito Mode: OFF</span></div>
-                        <span class="text-[10px] font-extrabold bg-purple-100 text-premium px-2 py-0.5 rounded-full uppercase">VIP</span>
-                    </button>
-
-                    <button id="btn-profile-verify" onclick="openVerifyModal()" class="w-full bg-blue-50/80 text-verify font-extrabold p-4 rounded-2xl flex items-center justify-between border border-blue-100 shadow-sm transition active:scale-95 text-sm">
-                        <div class="flex items-center gap-3"><i class="ph-fill ph-seal-check text-xl"></i> <span data-i18n="get_verified_btn">Get Verified</span></div>
-                        <i class="ph-bold ph-caret-right"></i>
-                    </button>
-
-                    <button onclick="openEditProfile()" class="w-full bg-orange-50/80 text-botOrange font-extrabold p-4 rounded-2xl flex items-center justify-between border border-orange-100 hover:bg-orange-100 transition active:scale-95 shadow-sm text-sm">
-                        <div class="flex items-center gap-3"><i class="ph-bold ph-pencil-simple text-xl"></i> <span data-i18n="edit_profile_btn">Edit Profile & Photos</span></div>
-                        <i class="ph-bold ph-caret-right"></i>
-                    </button>
-
-                    <button onclick="showDownloadInstructions()" class="w-full bg-gray-50 text-gray-700 font-bold p-4 rounded-2xl flex items-center justify-between hover:bg-gray-100 transition active:scale-95 border border-gray-200/70 text-sm">
-                        <div class="flex items-center gap-3"><i class="ph-fill ph-android-logo text-xl text-emerald-600"></i> <span data-i18n="get_mobile_app_btn">Get Mobile App</span></div>
-                        <i class="ph-bold ph-caret-right"></i>
-                    </button>
-
-                    <button id="btn-profile-pause" onclick="togglePauseMyProfile()" class="w-full bg-amber-50/70 text-amber-900 font-bold p-4 rounded-2xl flex items-center justify-between hover:bg-amber-100 transition active:scale-95 border border-amber-200/80 text-sm">
-                        <div class="flex items-center gap-3"><i class="ph-fill ph-clock-countdown text-xl text-amber-600"></i> <span id="pause-btn-label" data-i18n="snooze_24h_btn">24h Snooze Profile: OFF</span></div>
-                        <span class="text-[10px] font-extrabold bg-white text-amber-800 px-2 py-0.5 rounded-full border border-amber-200 uppercase">24h Free</span>
-                    </button>
-
-                    <button onclick="logoutUser()" class="w-full bg-red-50/70 text-red-500 font-bold p-4 rounded-2xl flex items-center justify-between hover:bg-red-100 transition active:scale-95 border border-red-100 text-sm">
-                        <div class="flex items-center gap-3"><i class="ph-bold ph-sign-out text-xl"></i> <span data-i18n="logout_btn">Log Out</span></div>
-                        <i class="ph-bold ph-caret-right"></i>
-                    </button>
-
-                    <button onclick="openDeleteAccountModal()" class="w-full bg-white text-gray-400 hover:text-red-600 font-bold p-3.5 rounded-2xl flex items-center justify-center gap-2 transition active:scale-95 border border-dashed border-gray-200 text-xs mt-2">
-                        <i class="ph-bold ph-trash text-sm"></i> <span data-i18n="delete_account_btn">Delete Account (5 Invites / Paid VIP)</span>
+                    <button onclick="copyCrushLink()" class="px-3.5 py-2.5 bg-white text-habeshaCoral border border-pink-200 rounded-xl font-extrabold text-xs shadow-sm active:scale-95 transition" data-i18n="copy_link_btn">
+                        Copy Link
                     </button>
                 </div>
+            </div>
+
+            <!-- Two-Sided Viral Referral Card -->
+            <div class="w-full bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 border border-orange-200 rounded-3xl p-4 mb-5 text-left shadow-sm">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-extrabold text-botOrange uppercase tracking-wider flex items-center gap-1"><i class="ph-fill ph-gift text-base"></i> <span data-i18n="free_vip_referral">Two-Sided VIP Referral</span></span>
+                    <span id="referral-progress-badge" class="text-xs font-extrabold bg-white text-buna px-2.5 py-0.5 rounded-full border border-orange-100">0 / 3 Joined</span>
+                </div>
+                <p class="text-xs text-gray-600 mb-2.5 leading-relaxed" data-i18n="referral_desc">You AND your friend each get <b>Bonus Likes + 1 Golden Rose 🌹</b> on every invite — plus <b>7 Days Free VIP</b> every 3 friends!</p>
+                <div class="w-full bg-white h-2.5 rounded-full overflow-hidden mb-3 border border-orange-100">
+                    <div id="referral-progress-bar" class="bg-gradient-to-r from-botOrange to-amber-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="shareReferralOnTelegram()" class="btn-shimmer flex-1 py-2.5 bg-gradient-to-r from-botOrange to-amber-500 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
+                        <i class="ph-bold ph-paper-plane-tilt"></i> <span data-i18n="invite_tg_btn">Invite on Telegram</span>
+                    </button>
+                    <button onclick="copyReferralLink()" class="px-3.5 py-2.5 bg-white text-buna border border-orange-200 rounded-xl font-extrabold text-xs shadow-sm active:scale-95 transition" data-i18n="copy_link_btn">
+                        Copy Link
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-full space-y-2.5">
+                <button id="btn-profile-premium" onclick="openPremiumModal()" class="btn-shimmer w-full bg-gradient-to-r from-[#2B124C] via-[#522B5B] to-premium text-white font-extrabold p-4 rounded-2xl flex items-center justify-between shadow-lg shadow-purple-200/60 transition active:scale-95 text-sm">
+                    <div class="flex items-center gap-3"><i class="ph-fill ph-crown text-xl text-amber-300"></i> <span data-i18n="upgrade_premium_btn">Upgrade to VIP (ETB / ⭐ Stars)</span></div>
+                    <i class="ph-bold ph-caret-right text-amber-300"></i>
+                </button>
+
+                <button id="btn-profile-roses" onclick="buyStarsProduct('roses_pack')" class="w-full bg-rose-50/90 text-habeshaCoral font-extrabold p-4 rounded-2xl flex items-center justify-between border border-rose-200 shadow-sm transition active:scale-95 text-sm">
+                    <div class="flex items-center gap-3"><span class="text-xl">🌹</span> <span>Get 3 Golden Roses + 15 Likes</span></div>
+                    <span class="text-[10px] font-extrabold bg-white text-habeshaCoral px-2.5 py-0.5 rounded-full border border-rose-200">25 ⭐</span>
+                </button>
+
+                <button id="btn-profile-boost" onclick="triggerProfileBoost()" class="w-full bg-amber-50/90 text-amber-900 font-extrabold p-4 rounded-2xl flex items-center justify-between border border-amber-200 shadow-sm transition active:scale-95 text-sm">
+                    <div class="flex items-center gap-3"><i class="ph-fill ph-lightning text-xl text-amber-500"></i> <span data-i18n="boost_profile_btn">Boost Profile (24h Top Spot)</span></div>
+                    <span class="text-[10px] font-extrabold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full uppercase">VIP</span>
+                </button>
+
+                <button id="btn-profile-incognito" onclick="toggleVipIncognito()" class="w-full bg-slate-50 text-slate-800 font-bold p-4 rounded-2xl flex items-center justify-between border border-slate-200 shadow-sm transition active:scale-95 text-sm">
+                    <div class="flex items-center gap-3"><i class="ph-fill ph-detective text-xl text-slate-700"></i> <span id="incognito-btn-label">VIP Incognito Mode: OFF</span></div>
+                    <span class="text-[10px] font-extrabold bg-purple-100 text-premium px-2 py-0.5 rounded-full uppercase">VIP</span>
+                </button>
+
+                <button id="btn-profile-verify" onclick="openVerifyModal()" class="w-full bg-blue-50/80 text-verify font-extrabold p-4 rounded-2xl flex items-center justify-between border border-blue-100 shadow-sm transition active:scale-95 text-sm">
+                    <div class="flex items-center gap-3"><i class="ph-fill ph-seal-check text-xl"></i> <span data-i18n="get_verified_btn">Get Verified</span></div>
+                    <i class="ph-bold ph-caret-right"></i>
+                </button>
+
+                <button onclick="openEditProfile()" class="w-full bg-orange-50/80 text-botOrange font-extrabold p-4 rounded-2xl flex items-center justify-between border border-orange-100 hover:bg-orange-100 transition active:scale-95 shadow-sm text-sm">
+                    <div class="flex items-center gap-3"><i class="ph-bold ph-pencil-simple text-xl"></i> <span data-i18n="edit_profile_btn">Edit Profile & Photos</span></div>
+                    <i class="ph-bold ph-caret-right"></i>
+                </button>
+
+                <button onclick="showDownloadInstructions()" class="w-full bg-gray-50 text-gray-700 font-bold p-4 rounded-2xl flex items-center justify-between hover:bg-gray-100 transition active:scale-95 border border-gray-200/70 text-sm">
+                    <div class="flex items-center gap-3"><i class="ph-fill ph-android-logo text-xl text-emerald-600"></i> <span data-i18n="get_mobile_app_btn">Get Mobile App</span></div>
+                    <i class="ph-bold ph-caret-right"></i>
+                </button>
+
+                <button id="btn-profile-pause" onclick="togglePauseMyProfile()" class="w-full bg-amber-50/70 text-amber-900 font-bold p-4 rounded-2xl flex items-center justify-between hover:bg-amber-100 transition active:scale-95 border border-amber-200/80 text-sm">
+                    <div class="flex items-center gap-3"><i class="ph-fill ph-clock-countdown text-xl text-amber-600"></i> <span id="pause-btn-label" data-i18n="snooze_24h_btn">24h Snooze Profile: OFF</span></div>
+                    <span class="text-[10px] font-extrabold bg-white text-amber-800 px-2 py-0.5 rounded-full border border-amber-200 uppercase">24h Free</span>
+                </button>
+
+                <button onclick="logoutUser()" class="w-full bg-red-50/70 text-red-500 font-bold p-4 rounded-2xl flex items-center justify-between hover:bg-red-100 transition active:scale-95 border border-red-100 text-sm">
+                    <div class="flex items-center gap-3"><i class="ph-bold ph-sign-out text-xl"></i> <span data-i18n="logout_btn">Log Out</span></div>
+                    <i class="ph-bold ph-caret-right"></i>
+                </button>
+
+                <button onclick="openDeleteAccountModal()" class="w-full bg-white text-gray-400 hover:text-red-600 font-bold p-3.5 rounded-2xl flex items-center justify-center gap-2 transition active:scale-95 border border-dashed border-gray-200 text-xs mt-2">
+                    <i class="ph-bold ph-trash text-sm"></i> <span data-i18n="delete_account_btn">Delete Account (5 Invites / Paid VIP)</span>
+                </button>
             </div>
         </div>
     </div>
@@ -1629,7 +1634,21 @@
             } catch (e) {}
         }
 
-        // WebView-Safe Storage Wrappers (Prevents crashes in strict Android/Telegram WebViews)
+        // Dynamic Viewport Scroll Switcher:
+        // Locks 100dvh ONLY on single-screen views (Discover, Chat, Splash)
+        // Unlocks native two-way window scrolling on Profile, Admin, Matches & Registration!
+        function setViewportLock(locked, resetScroll = true) {
+            const root = document.documentElement;
+            if (locked) {
+                root.classList.add("lock-viewport");
+                if (resetScroll) window.scrollTo(0, 0);
+            } else {
+                root.classList.remove("lock-viewport");
+                if (resetScroll) window.scrollTo(0, 0);
+            }
+        }
+
+        // WebView-Safe Storage Wrappers
         function safeStorageGet(key, fallback = "") {
             try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; }
         }
@@ -1669,7 +1688,7 @@
         let appSessionToken = safeStorageGet("habesha_session_token", "");
         const DEFAULT_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
 
-        // Cryptographic Request Headers (Protects against ID spoofing)
+        // Cryptographic Request Headers
         function getAuthHeaders(includeJson = true) {
             const headers = {};
             if (includeJson) headers["Content-Type"] = "application/json";
@@ -1682,7 +1701,7 @@
             return headers;
         }
 
-        // Parse Deep-Link & URL Parameters (Referral, Crush, Chat, Payment)
+        // Parse Deep-Link & URL Parameters
         const urlParams = new URLSearchParams(window.location.search);
         window.pendingChatTarget = urlParams.get("chat") || "";
         const urlPaymentStatus = urlParams.get("payment") || "";
@@ -1830,7 +1849,7 @@
         const GUEST_MAX_SWIPES = 5;
         let guestSwipesUsed = parseInt(safeSessionGet("habesha_guest_swipes", "0"), 10) || 0;
         let guestLastLikedName = safeSessionGet("habesha_guest_liked_name", "");
-        let currentDiscoveryMode = "all"; // 'all', 'tidar', 'dating', 'circle'
+        let currentDiscoveryMode = "all";
         let selectedPhotoUrls = { 1: DEFAULT_AVATAR, 2: "", 3: "" };
         let selectedPhotoFiles = { 1: null, 2: null, 3: null };
         let currentPhotoSlideIndex = 0;
@@ -1853,7 +1872,7 @@
         let chatVoiceTimeoutId = null;
         let lastTypingSentAt = 0;
 
-        // Rewind, Stories, Pose & Buna Poll State
+        // Stories, Pose & Buna Poll State
         let swipeHistoryStack = [];
         let activeStoriesList = [];
         let selectedStoryFile = null;
@@ -1901,7 +1920,7 @@
         let spyUser1 = null;
         let spyUser2 = null;
 
-        // Client-Side Image Compression (Turns 6MB camera photos into fast ~160KB WebP/JPEG uploads!)
+        // Client-Side Image Compression
         async function compressImageFile(file, maxDim = 1080, quality = 0.82) {
             if (!file || !file.type || !file.type.startsWith("image/")) return file;
             return new Promise((resolve) => {
@@ -1947,7 +1966,7 @@
             });
         }
 
-        // Background Preloader for Next 3 Discover Cards (0.0s Swipe Latency)
+        // Background Preloader for Next 3 Discover Cards
         function preloadUpcomingCardPhotos() {
             for (let offset = 1; offset <= 3; offset++) {
                 const nextProfile = profiles[currentCardIndex + offset];
@@ -2176,6 +2195,7 @@
         function startExpressSignupFromGuest() {
             closeGuestSignupModal();
             isEditing = false;
+            setViewportLock(false, true);
 
             document.getElementById("view-swipe").classList.add("hidden");
             document.getElementById("view-swipe").classList.remove("flex");
@@ -2211,6 +2231,7 @@
 
         function openPinLoginFromGuest() {
             closeGuestSignupModal();
+            setViewportLock(true, true);
             document.getElementById("view-swipe").classList.add("hidden");
             document.getElementById("view-swipe").classList.remove("flex");
             document.getElementById("bottom-nav").classList.add("hidden");
@@ -2222,6 +2243,7 @@
         }
 
         function returnToGuestPreview() {
+            setViewportLock(true, true);
             document.getElementById("view-registration").classList.add("hidden");
             const loginView = document.getElementById("view-external-login");
             loginView.classList.add("hidden");
@@ -2322,6 +2344,7 @@
         }
 
         async function initApp() {
+            setViewportLock(true, true);
             applyLanguageUI();
             loadAppStats();
 
@@ -2377,6 +2400,7 @@
                     await loadDiscoverProfiles();
                     loadActiveStories();
 
+                    setViewportLock(true, true);
                     document.getElementById("view-loading").classList.add("hidden");
                     document.getElementById("view-swipe").classList.remove("hidden");
                     document.getElementById("view-swipe").classList.add("flex");
@@ -2393,7 +2417,7 @@
                     pollUnreadBadges();
 
                     if (urlPaymentStatus === "success") {
-                        showAlert("👑 Habesha Premium VIP Activated! Enjoy Unlimited Swipes, See Who Liked You, Rewind & Super Likes!");
+                        showAlert("👑 Habesha Premium VIP Activated! Enjoy Unlimited Swipes, See Who Liked You, Boost & Super Likes!");
                     }
                     if (window.pendingChatTarget) {
                         switchTab("matches");
@@ -2412,6 +2436,7 @@
                     await loadDiscoverProfiles();
                     loadActiveStories();
 
+                    setViewportLock(true, true);
                     document.getElementById("view-loading").classList.add("hidden");
                     document.getElementById("view-swipe").classList.remove("hidden");
                     document.getElementById("view-swipe").classList.add("flex");
@@ -2806,7 +2831,7 @@
             let startY = 0;
             let currentDx = 0;
             let isDragging = false;
-            let axisLocked = null; // 'x' or 'y'
+            let axisLocked = null;
             let crossedThreshold = false;
 
             surface.addEventListener("touchstart", (e) => {
@@ -2940,11 +2965,8 @@
 
                 const backBtnHtml = profiles.length > 0 ? `
                     <div class="mt-auto w-full flex justify-center items-center gap-3 pt-2.5 pb-2.5 bg-white border-t border-gray-50 px-4 shrink-0">
-                        <button onclick="rewindLastSwipe()" class="w-11 h-11 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center text-amber-600 shadow-sm active:scale-95 transition-transform" title="Rewind Last Swipe">
-                            <i class="ph-bold ph-arrow-counter-clockwise text-lg"></i>
-                        </button>
-                        <button onclick="prevCard()" class="w-11 h-11 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-95 transition-transform hover:bg-gray-200">
-                            <i class="ph-bold ph-caret-up text-xl"></i>
+                        <button onclick="prevCard()" class="px-5 py-2.5 bg-orange-50 border border-orange-200 text-botOrange rounded-full font-extrabold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition">
+                            <i class="ph-bold ph-caret-up text-sm"></i> <span>Scroll Back to Previous Profile</span>
                         </button>
                     </div>` : "";
 
@@ -3061,7 +3083,6 @@
                 </button>
             ` : "";
 
-            // Interactive Hinge-Style Prompt Bar (Tap to Reply with Comment or Golden Rose!)
             const promptDisplay = profile.icebreaker || "💬 Tap to reply or send a Golden Rose 🌹";
             const interactivePromptHtml = `
                 <div onclick="openCommentRoseModal(event)" class="mt-0.5 bg-gradient-to-r from-orange-50 via-rose-50 to-amber-50 border border-orange-200/80 rounded-xl px-2.5 py-1 text-[10px] font-bold text-buna flex items-center justify-between gap-2 cursor-pointer active:scale-98 transition">
@@ -3112,15 +3133,15 @@
                         ${interactivePromptHtml}
                     </div>
 
-                    <!-- Tactile Action Bar (Pass • Rewind • Rose/Comment • Super • Like) -->
+                    <!-- Tactile Action Bar (Pass • Scroll Back ⌃ • Rose/Comment 🌹 • Super ⭐ • Scroll Next ⌄ • Like ❤️) -->
                     <div class="w-full flex justify-between items-center px-3.5 py-1.5 bg-white shrink-0 border-t border-gray-100/80">
                         <button onclick="handleSwipe(false)" class="w-11 h-11 bg-white border-2 border-rose-100 rounded-full flex items-center justify-center text-rose-500 shadow-[0_6px_18px_rgba(244,63,94,0.16)] active:scale-90 transition hover:bg-rose-50" title="Pass">
                             <i class="ph-bold ph-x text-xl"></i>
                         </button>
 
                         <div class="flex items-center gap-1.5">
-                            <button onclick="rewindLastSwipe()" class="w-8 h-8 bg-amber-50 border border-amber-200/80 rounded-full flex items-center justify-center text-amber-600 shadow-sm active:scale-90 transition" title="Rewind (VIP)">
-                                <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
+                            <button onclick="prevCard()" class="w-8 h-8 bg-gray-100/90 hover:bg-orange-50 border border-gray-200/80 rounded-full flex items-center justify-center text-gray-700 shadow-sm active:scale-90 transition" title="Scroll Back (Previous Profile)">
+                                <i class="ph-bold ph-caret-up text-sm"></i>
                             </button>
                             <button onclick="openCommentRoseModal(event)" class="w-9 h-9 bg-gradient-to-tr from-amber-500 to-rose-500 rounded-full flex items-center justify-center text-white shadow-md shadow-rose-200 active:scale-90 transition text-sm" title="Send Comment or Golden Rose">
                                 🌹
@@ -3128,7 +3149,7 @@
                             <button onclick="handleSwipe(true, true)" class="w-9 h-9 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white shadow-md shadow-blue-200 active:scale-90 transition" title="Super Like (VIP)">
                                 <i class="ph-fill ph-star text-sm text-yellow-200"></i>
                             </button>
-                            <button onclick="scrollNext()" class="w-8 h-8 bg-gray-100/90 rounded-full flex items-center justify-center text-gray-600 shadow-sm active:scale-90 transition" title="Next Card">
+                            <button onclick="scrollNext()" class="w-8 h-8 bg-gray-100/90 hover:bg-orange-50 border border-gray-200/80 rounded-full flex items-center justify-center text-gray-700 shadow-sm active:scale-90 transition" title="Scroll Next">
                                 <i class="ph-bold ph-caret-down text-sm"></i>
                             </button>
                         </div>
@@ -3157,7 +3178,7 @@
                 currentPhotoSlideIndex = 0;
                 renderCards();
             } else {
-                showAlert("This is the last profile in this mode. Switch modes or check back soon!");
+                showAlert("This is the last profile in this mode. Tap ⌃ to scroll back or switch modes!");
             }
         }
 
@@ -3173,41 +3194,7 @@
                 currentPhotoSlideIndex = 0;
                 renderCards();
             } else {
-                showAlert("This is the first profile in your list.");
-            }
-        }
-
-        async function rewindLastSwipe() {
-            if (isGuestMode) return openGuestSignupModal();
-            if (!window.myProfileData || !window.myProfileData.is_premium) {
-                openPremiumModal();
-                return;
-            }
-            triggerHaptic("medium");
-            const lastItem = swipeHistoryStack.length > 0 ? swipeHistoryStack[swipeHistoryStack.length - 1] : null;
-            try {
-                const res = await fetch(`${BACKEND_URL}/api/rewind-swipe`, {
-                    method: "POST",
-                    headers: getAuthHeaders(true),
-                    body: JSON.stringify({
-                        swiper_id: cleanTelegramId,
-                        target_id: lastItem ? lastItem.swipedId : ""
-                    })
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.detail || "Could not rewind swipe.");
-                if (lastItem) {
-                    swipeHistoryStack.pop();
-                    currentCardIndex = Math.max(0, lastItem.cardIndex);
-                    currentPhotoSlideIndex = 0;
-                    renderCards();
-                    showAlert("↩️ Last swipe undone!");
-                } else {
-                    await loadDiscoverProfiles();
-                    showAlert("↩️ Rewound your last swipe!");
-                }
-            } catch (err) {
-                showAlert(err.message);
+                showAlert("You are at the first profile in your list.");
             }
         }
 
@@ -3796,7 +3783,7 @@
             }
         }
 
-        // --- PROFILE STATS & SETTINGS ---
+        // --- PROFILE STATS & TAB SWITCHER (UNLOCKS TWO-WAY NATIVE SCROLLING!) ---
         async function refreshProfileStats() {
             if (!cleanTelegramId || isGuestMode || cleanTelegramId === "guest") return;
             try {
@@ -3904,6 +3891,9 @@
                     tabEl.classList.replace("text-red-500", "text-gray-400");
                 }
             });
+
+            // Lock viewport ONLY on Discover ('swipe'); unlock native window scroll on Matches, Profile & Admin!
+            setViewportLock(tab === "swipe", true);
 
             const targetView = document.getElementById(`view-${tab}`);
             targetView.classList.remove("hidden");
@@ -4028,7 +4018,7 @@
             }
         }
 
-        // --- MATCHES & PENDING ADMIRERS (SHOWS HINGE COMMENTS & ROSES) ---
+        // --- MATCHES & PENDING ADMIRERS ---
         async function loadMatchesList() {
             if (isGuestMode) return;
             const container = document.getElementById("matches-container");
@@ -4181,6 +4171,7 @@
 
         async function openChat(matchId, matchName, matchPhoto, icebreaker = "", isOnline = false) {
             triggerHaptic("light");
+            setViewportLock(true, false);
             activeChatId = matchId;
             activeChatIcebreaker = icebreaker || "";
             activeChatIsOnline = isOnline;
@@ -4336,6 +4327,8 @@
             activeChatId = null;
             stopChatPolling();
             document.getElementById("view-chat").classList.replace("flex", "hidden");
+            const isSwipeActive = !document.getElementById("view-swipe").classList.contains("hidden");
+            setViewportLock(isSwipeActive, false);
             pollUnreadBadges();
         }
 
@@ -4822,8 +4815,7 @@
             document.getElementById("reg-title").innerText = titles[step - 1];
             document.getElementById("progress-bar").style.width = ["33.3%", "66.6%", "100%"][step - 1];
 
-            const regView = document.getElementById("view-registration");
-            if (regView) regView.scrollTop = 0;
+            window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
         function closeEditProfile() {
@@ -4853,6 +4845,7 @@
         function openEditProfile() {
             if (isGuestMode) return openGuestSignupModal();
             isEditing = true;
+            setViewportLock(false, true);
 
             ["view-swipe", "view-matches", "view-profile", "view-admin"].forEach(id => {
                 const el = document.getElementById(id);
@@ -5288,6 +5281,7 @@
         }
 
         function openAdminChat(u1, n1, u2, n2) {
+            setViewportLock(true, false);
             spyUser1 = { id: u1, name: n1 };
             spyUser2 = { id: u2, name: n2 };
             document.getElementById("admin-chat-header").innerText = `Spying: ${n1} & ${n2}`;
@@ -5337,6 +5331,7 @@
             spyUser1 = null;
             spyUser2 = null;
             document.getElementById("view-admin-chat").classList.replace("flex", "hidden");
+            setViewportLock(false, false);
         }
 
         // --- AI WINGMAN, BUNA CONCIERGE, SPIN WHEEL, INCOGNITO & 24H STORIES ---
