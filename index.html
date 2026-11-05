@@ -991,17 +991,44 @@
                 <i class="ph-fill ph-crown text-3xl"></i>
             </div>
             <h3 class="text-2xl font-extrabold mb-1 text-transparent bg-clip-text bg-gradient-to-r from-premium to-pink-600">Habesha Premium VIP</h3>
-            <p class="text-gray-600 mb-3.5 text-xs font-medium leading-relaxed">Unlock <b>Unlimited Swipes</b>, <b>See Who Liked You</b>, <b>Rewind (↩️)</b>, <b>VIP Boost (⚡)</b>, <b>Incognito (🕵️)</b> & <b>Super Likes</b>!</p>
+            <p class="text-gray-600 mb-3.5 text-xs font-medium leading-relaxed">Unlock <b>Unlimited Swipes</b>, <b>See Who Liked & Viewed You</b>, <b>VIP Boost (⚡)</b>, <b>Incognito (🕵️)</b> & <b>Super Likes</b>!</p>
 
-            <!-- 3 Global & Local Payment Tabs -->
+            <!-- 3 Global & Local Payment Tabs (Telegram Stars Highlighted #1!) -->
             <div class="grid grid-cols-3 bg-gray-100 p-1 rounded-2xl mb-4 text-[11px] font-extrabold gap-1">
-                <button id="tab-pay-telebirr" onclick="switchPaymentTab('telebirr')" class="py-2 rounded-xl bg-white text-buna shadow-sm transition">📱 Telebirr</button>
-                <button id="tab-pay-stars" onclick="switchPaymentTab('stars')" class="py-2 rounded-xl text-gray-500 transition">⭐ TG Stars</button>
+                <button id="tab-pay-stars" onclick="switchPaymentTab('stars')" class="py-2 rounded-xl bg-white text-buna shadow-sm transition">⭐ TG Stars</button>
+                <button id="tab-pay-telebirr" onclick="switchPaymentTab('telebirr')" class="py-2 rounded-xl text-gray-500 transition">📱 Telebirr</button>
                 <button id="tab-pay-chapa" onclick="switchPaymentTab('chapa')" class="py-2 rounded-xl text-gray-500 transition">💳 Chapa</button>
             </div>
 
-            <!-- Option 1: Direct Telebirr Transfer (Ethiopia) -->
-            <div id="pay-section-telebirr" class="text-left space-y-3 mb-4">
+            <!-- Option 1: Instant 1-Tap Telegram Stars (Works Worldwide via Apple Pay / Google Pay / Card) -->
+            <div id="pay-section-stars" class="space-y-2.5 mb-4 text-left">
+                <div class="bg-gradient-to-br from-amber-50 to-purple-50 p-3.5 rounded-2xl border border-amber-200 text-xs text-buna space-y-1">
+                    <p class="font-extrabold text-premium flex items-center gap-1.5"><i class="ph-fill ph-star text-amber-500 text-base"></i> Instant 1-Tap Telegram Stars Checkout</p>
+                    <p class="text-gray-600 leading-relaxed text-[11px]">Unlocks <b>automatically in 2 seconds</b> inside Telegram (Apple Pay, Google Pay, or Stars balance)!</p>
+                </div>
+
+                <button onclick="buyStarsProduct('vip_month')" id="btn-stars-vip" class="btn-shimmer w-full p-3.5 bg-gradient-to-r from-amber-500 via-botOrange to-habeshaCoral text-white rounded-2xl font-extrabold shadow-lg text-xs flex items-center justify-between px-4 active:scale-95 transition">
+                    <span class="flex items-center gap-2"><i class="ph-fill ph-crown text-base text-yellow-200"></i> <span id="stars-vip-btn-label">30 Days VIP + 3 Roses</span></span>
+                    <span id="stars-vip-price-pill" class="bg-white/25 px-2.5 py-0.5 rounded-full text-[11px]">150 ⭐</span>
+                </button>
+
+                <button onclick="buyStarsProduct('vip_week')" id="btn-stars-week" class="w-full p-3.5 bg-purple-50 text-premium border border-purple-200 rounded-2xl font-extrabold text-xs flex items-center justify-between px-4 active:scale-95 transition">
+                    <span class="flex items-center gap-2"><i class="ph-fill ph-lightning text-base text-amber-500"></i> <span>7 Days Starter VIP + 1 Rose</span></span>
+                    <span id="stars-week-price-pill" class="bg-white px-2.5 py-0.5 rounded-full border border-purple-200 text-[11px]">50 ⭐</span>
+                </button>
+
+                <button onclick="buyStarsProduct('roses_pack')" id="btn-stars-roses" class="w-full p-3.5 bg-rose-50 text-habeshaCoral border border-rose-200 rounded-2xl font-extrabold text-xs flex items-center justify-between px-4 active:scale-95 transition">
+                    <span>🌹 3 Golden Roses + 15 Likes</span>
+                    <span class="bg-white px-2.5 py-0.5 rounded-full border border-rose-200 text-[11px]"><span id="stars-roses-btn-label">25</span> ⭐</span>
+                </button>
+
+                <button onclick="checkStarsPaymentNow()" class="w-full py-2 text-[11px] font-extrabold text-gray-500 hover:text-premium flex items-center justify-center gap-1">
+                    <i class="ph-bold ph-arrows-clockwise"></i> <span>Paid on Telegram? Tap to Refresh Status</span>
+                </button>
+            </div>
+
+            <!-- Option 2: Direct Telebirr Transfer (Ethiopia) -->
+            <div id="pay-section-telebirr" class="hidden text-left space-y-3 mb-4">
                 <div class="bg-purple-50/70 p-3.5 rounded-2xl border border-purple-100 text-xs space-y-1.5">
                     <p class="text-gray-600 font-medium">1. Send <b id="prem-price-label" class="text-buna">100 ETB</b> via Telebirr to:</p>
                     <div class="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-purple-100 shadow-sm">
@@ -1019,20 +1046,6 @@
 
                 <button onclick="submitManualTelebirr()" id="btn-telebirr-submit" class="btn-shimmer w-full p-4 bg-gradient-to-r from-premium via-fuchsia-600 to-pink-500 text-white rounded-2xl font-extrabold shadow-lg text-sm active:scale-95 transition">
                     Verify Telebirr Payment
-                </button>
-            </div>
-
-            <!-- Option 2: Native 1-Tap Telegram Stars (Diaspora Apple Pay / Google Pay + Micro-Pack) -->
-            <div id="pay-section-stars" class="hidden space-y-3 mb-4 text-left">
-                <div class="bg-gradient-to-br from-amber-50 to-purple-50 p-4 rounded-2xl border border-amber-200 text-xs text-buna space-y-1.5">
-                    <p class="font-extrabold text-premium flex items-center gap-1.5"><i class="ph-fill ph-star text-amber-500 text-base"></i> Instant Global & Diaspora Checkout</p>
-                    <p class="text-gray-600 leading-relaxed">Pay in <b>1 tap inside Telegram</b> using Apple Pay, Google Pay, or Card—unlocks VIP & Golden Roses immediately!</p>
-                </div>
-                <button onclick="buyStarsProduct('vip_month')" id="btn-stars-vip" class="btn-shimmer w-full p-4 bg-gradient-to-r from-amber-500 via-botOrange to-habeshaCoral text-white rounded-2xl font-extrabold shadow-lg text-xs flex items-center justify-center gap-2 active:scale-95 transition">
-                    <i class="ph-fill ph-crown text-base text-yellow-200"></i> <span id="stars-vip-btn-label">Unlock 30d VIP + 3 Roses (150 ⭐ Stars)</span>
-                </button>
-                <button onclick="buyStarsProduct('roses_pack')" id="btn-stars-roses" class="w-full p-3.5 bg-rose-50 text-habeshaCoral border border-rose-200 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 active:scale-95 transition">
-                    <span>🌹 3 Golden Roses + 15 Likes (<span id="stars-roses-btn-label">25</span> ⭐ Stars)</span>
                 </button>
             </div>
 
@@ -1440,41 +1453,46 @@
             <span class="bg-white text-buna px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ml-2 shadow-sm">⚡ Join Free</span>
         </div>
 
-        <!-- Streamlined Luxury Top Header Row (Includes Live Daily Buna Poll + Spin + Likes + Filter) -->
-        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1 shrink-0 gap-1">
-            <div class="flex items-center gap-1 shrink-0">
-                <span class="w-6 h-6 rounded-lg bg-gradient-to-tr from-botOrange to-habeshaCoral text-white flex items-center justify-center shadow-sm">
+        <!-- Row 1: Brand + Language + VIP Counter + Prominently Visible FILTER Button -->
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1 shrink-0 gap-1.5">
+            <div class="flex items-center gap-1.5 min-w-0">
+                <span class="w-6 h-6 rounded-lg bg-gradient-to-tr from-botOrange to-habeshaCoral text-white flex items-center justify-center shadow-sm shrink-0">
                     <i class="ph-fill ph-flame text-xs"></i>
                 </span>
-                <h2 class="font-extrabold text-sm sm:text-base text-buna tracking-tight whitespace-nowrap" data-i18n="nav_discover">Discover</h2>
-                <div id="top-card-likes" onclick="switchTab('matches')" class="hidden items-center gap-0.5 bg-rose-50 border border-rose-200/80 text-habeshaCoral text-[10px] font-extrabold px-1.5 py-0.5 rounded-full shadow-sm whitespace-nowrap shrink-0 cursor-pointer">
+                <h2 class="font-extrabold text-base text-buna tracking-tight truncate" data-i18n="nav_discover">Discover</h2>
+                <div id="top-card-likes" onclick="switchTab('matches')" class="hidden items-center gap-0.5 bg-rose-50 border border-rose-200/80 text-habeshaCoral text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap shrink-0 cursor-pointer">
                     <i class="ph-fill ph-heart"></i> <span id="top-card-likes-count">0</span>
                 </div>
             </div>
 
-            <div class="flex items-center gap-1 shrink-0">
-                <button onclick="toggleLanguage()" class="bg-white/90 text-buna border border-gray-200/80 text-[10px] font-extrabold px-2 py-1 rounded-full shadow-sm active:scale-95 whitespace-nowrap shrink-0 lang-toggle-btn">
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="toggleLanguage()" class="bg-white/95 text-buna border border-gray-200 text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm active:scale-95 whitespace-nowrap lang-toggle-btn">
                     🇪🇹 አማ
                 </button>
-                <button onclick="openBunaPollModal()" id="btn-top-buna" class="bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-extrabold px-2 py-1 rounded-full flex items-center gap-0.5 shadow-sm active:scale-95 whitespace-nowrap shrink-0" title="Daily Buna Question">
-                    ☕ <span>Buna</span>
-                </button>
-                <button onclick="openBunaMixerModal()" id="btn-top-mixer" class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-extrabold px-2 py-1 rounded-full flex items-center gap-0.5 shadow-sm active:scale-95 whitespace-nowrap shrink-0" title="3-Minute Blind Buna Speed-Date">
-                    ⏰ <span>Mixer</span>
-                </button>
-                <button onclick="openSpinWheelModal()" id="btn-top-spin" class="btn-shimmer bg-gradient-to-r from-amber-400 via-botOrange to-habeshaCoral text-white text-[10px] font-extrabold px-2 py-1 rounded-full flex items-center gap-0.5 shadow-sm active:scale-95 whitespace-nowrap shrink-0">
-                    🎡 <span>Spin</span>
-                </button>
-                <button onclick="openPremiumModal()" id="swipes-remaining-badge" class="bg-white/90 text-botOrange border border-orange-200 text-[10px] font-extrabold px-2 py-1 rounded-full flex items-center gap-0.5 shadow-sm active:scale-95 whitespace-nowrap shrink-0">
+                <button onclick="openPremiumModal('stars')" id="swipes-remaining-badge" class="bg-white/95 text-botOrange border border-orange-200 text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95 whitespace-nowrap">
                     <i class="ph-fill ph-fire"></i> <span id="swipes-remaining-text">25</span>
                 </button>
-                <button id="filter-modal-btn" onclick="openFilterModal()" class="bg-white/90 text-buna border border-gray-200/80 text-[10px] font-extrabold px-2 py-1 rounded-full shadow-sm transition active:scale-95 flex items-center gap-0.5 whitespace-nowrap shrink-0">
-                    <i class="ph-bold ph-sliders-horizontal text-botOrange"></i>
+                <button id="filter-modal-btn" onclick="openFilterModal()" class="bg-buna text-white border border-buna text-[10px] font-extrabold px-3 py-1 rounded-full shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
+                    <i class="ph-bold ph-sliders-horizontal text-amber-300 text-xs"></i>
+                    <span data-i18n="filter_btn">Filter</span>
                 </button>
             </div>
         </div>
 
-        <!-- 3 Distinct App Modes Bar (All • Tidar/Marriage • Dating • Habesha Circle/Friends) -->
+        <!-- Row 2: Live Community Bar (Buna Poll • Blind Speed-Mixer • Daily Spin) — Never Clips! -->
+        <div class="w-full max-w-sm mx-auto grid grid-cols-3 gap-1.5 mb-1 shrink-0">
+            <button onclick="openBunaPollModal()" id="btn-top-buna" class="bg-amber-50/95 text-amber-900 border border-amber-200/90 text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">
+                <span>☕ Buna Poll</span>
+            </button>
+            <button onclick="openBunaMixerModal()" id="btn-top-mixer" class="bg-emerald-50/95 text-emerald-800 border border-emerald-200/90 text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">
+                <span>⏰ Speed Mixer</span>
+            </button>
+            <button onclick="openSpinWheelModal()" id="btn-top-spin" class="btn-shimmer bg-gradient-to-r from-amber-400 via-botOrange to-habeshaCoral text-white text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">
+                <span>🎡 Daily Spin</span>
+            </button>
+        </div>
+
+        <!-- Row 3: 3 Distinct App Modes Bar (All • Tidar/Marriage • Dating • Habesha Circle/Friends) -->
         <div class="w-full max-w-sm mx-auto flex items-center gap-1 bg-white/80 backdrop-blur-md p-0.5 rounded-full border border-orange-100/80 mb-1 shrink-0 text-[10px] font-extrabold">
             <button id="mode-pill-all" onclick="switchDiscoveryMode('all')" class="flex-1 py-1 rounded-full bg-gradient-to-r from-botOrange to-habeshaCoral text-white shadow-sm transition">✨ All</button>
             <button id="mode-pill-tidar" onclick="switchDiscoveryMode('tidar')" class="flex-1 py-1 rounded-full text-gray-600 hover:text-buna transition">💍 Tidar</button>
@@ -3778,63 +3796,30 @@
                 reader.readAsDataURL(file);
             }
         }
-
-        async function submitVerification() {
-            if (!selectedVerifySelfieFile) {
-                return showAlert(`Please tap the camera box to take your ${currentAssignedPose.title_en} selfie first!`);
-            }
-
-            const btn = document.getElementById("btn-verify-submit");
-            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> AI Checking Selfie...`;
-            btn.disabled = true;
-            try {
-                const compressedSelfie = await compressImageFile(selectedVerifySelfieFile, 1080, 0.85);
-                const fd = new FormData();
-                fd.append("file", compressedSelfie);
-                fd.append("telegram_id", cleanTelegramId);
-                fd.append("pose_code", currentAssignedPose.code || "");
-
-                const res = await fetch(`${BACKEND_URL}/api/submit-verification`, {
-                    method: "POST",
-                    headers: getAuthHeaders(false),
-                    body: fd
-                });
-                const resData = await res.json();
-                if (!res.ok) throw new Error(resData.detail || "Upload failed");
-
-                if (window.myProfileData) window.myProfileData.verification_status = "pending";
-                closeVerifyModal();
-                showAlert(`🤳 Live Selfie Submitted!\n${resData.ai_note || ""}\n\nOur safety team will activate your Verified Blue Checkmark shortly.`);
-                refreshProfileStats();
-            } catch (e) {
-                showAlert(e.message || "Verification upload failed. Please try again.");
-            } finally {
-                btn.innerHTML = "Submit Selfie for Review";
-                btn.disabled = false;
-            }
-        }
-
-        // --- GLOBAL PAYMENTS: TELEBIRR, 1-TAP TELEGRAM STARS & CHAPA ---
+        // --- GLOBAL PAYMENTS: 1-TAP TELEGRAM STARS, TELEBIRR & CHAPA ---
         async function openPremiumModal(defaultTab = "") {
             if (isGuestMode) {
                 openGuestSignupModal();
                 return;
             }
             document.getElementById("premium-modal").classList.remove("hidden");
-            if (defaultTab) {
-                switchPaymentTab(defaultTab);
-            } else {
-                const myLoc = String(window.myProfileData?.location || "").toLowerCase();
-                if (myLoc.includes("diaspora")) switchPaymentTab("stars");
-            }
+            switchPaymentTab(defaultTab || "stars");
+
             try {
                 const res = await fetch(`${BACKEND_URL}/api/payment-info`);
                 const info = await res.json();
                 if (info.telebirr_phone) document.getElementById("telebirr-merchant-phone").innerText = info.telebirr_phone;
                 if (info.telebirr_name) document.getElementById("telebirr-merchant-name").innerText = info.telebirr_name;
                 if (info.price_etb) document.getElementById("prem-price-label").innerText = `${info.price_etb} ETB`;
-                if (info.stars_vip_price) document.getElementById("stars-vip-btn-label").innerText = `Unlock 30d VIP + 3 Roses (${info.stars_vip_price} ⭐ Stars)`;
-                if (info.stars_roses_price) document.getElementById("stars-roses-btn-label").innerText = `${info.stars_roses_price}`;
+                if (info.stars_vip_price && document.getElementById("stars-vip-price-pill")) {
+                    document.getElementById("stars-vip-price-pill").innerText = `${info.stars_vip_price} ⭐`;
+                }
+                if (info.stars_weekly_price && document.getElementById("stars-week-price-pill")) {
+                    document.getElementById("stars-week-price-pill").innerText = `${info.stars_weekly_price} ⭐`;
+                }
+                if (info.stars_roses_price && document.getElementById("stars-roses-btn-label")) {
+                    document.getElementById("stars-roses-btn-label").innerText = `${info.stars_roses_price}`;
+                }
             } catch (e) {}
         }
 
@@ -3843,7 +3828,7 @@
         }
 
         function switchPaymentTab(tab) {
-            ["telebirr", "stars", "chapa"].forEach(t => {
+            ["stars", "telebirr", "chapa"].forEach(t => {
                 const btn = document.getElementById(`tab-pay-${t}`);
                 const sec = document.getElementById(`pay-section-${t}`);
                 if (!btn || !sec) return;
@@ -3857,39 +3842,72 @@
             });
         }
 
+        async function checkStarsPaymentNow() {
+            triggerHaptic("light");
+            await refreshProfileStats();
+            if (window.myProfileData && window.myProfileData.is_premium) {
+                closePremiumModal();
+                showAlert("👑 Habesha Premium VIP is Active! Enjoy Unlimited Swipes & See Who Liked You!");
+            } else {
+                showAlert(`🌹 Current Balance: ${(window.myProfileData && window.myProfileData.golden_roses) || 0} Golden Roses.\nIf you just completed a Stars payment in Telegram, wait 2 seconds and tap Refresh again!`);
+            }
+        }
+
         async function buyStarsProduct(product = "vip_month") {
             if (isGuestMode) return openGuestSignupModal();
             triggerHaptic("medium");
+
+            const isInsideTelegramMiniApp = Boolean(tg && tg.initData && typeof tg.openInvoice === "function");
+
             try {
                 const res = await fetch(`${BACKEND_URL}/api/payment/stars-invoice`, {
                     method: "POST",
                     headers: getAuthHeaders(true),
-                    body: JSON.stringify({ telegram_id: cleanTelegramId, product: product })
+                    body: JSON.stringify({
+                        telegram_id: cleanTelegramId,
+                        product: product,
+                        send_to_chat: !isInsideTelegramMiniApp
+                    })
                 });
                 const data = await res.json();
                 if (!res.ok || !data.invoice_url) {
                     throw new Error(data.detail || "Could not create Telegram Stars invoice.");
                 }
 
-                if (tg && typeof tg.openInvoice === "function") {
+                if (isInsideTelegramMiniApp) {
                     tg.openInvoice(data.invoice_url, async (status) => {
                         if (status === "paid") {
                             triggerHaptic("success");
                             closePremiumModal();
                             closeCommentRoseModal();
-                            await refreshProfileStats();
-                            showAlert(product === "roses_pack"
-                                ? "🌹 3 Golden Habesha Roses + 15 Bonus Likes unlocked!"
-                                : "👑 Habesha Premium VIP + 3 Golden Roses unlocked! Enjoy Unlimited Swipes & See Who Liked You!");
+                            setTimeout(async () => {
+                                await refreshProfileStats();
+                                showAlert(
+                                    product === "roses_pack"
+                                        ? "🌹 3 Golden Habesha Roses + 15 Bonus Likes unlocked!"
+                                        : "👑 Habesha Premium VIP Activated! Enjoy Unlimited Swipes & See Who Liked You!"
+                                );
+                            }, 700);
+                        } else if (status === "failed") {
+                            showAlert("Telegram Stars payment could not be completed. Please check your Stars balance and try again.");
                         }
                     });
                 } else {
+                    // Standalone Android APK / External Browser: Opens invoice in Telegram AND sends Pay button to @ethiopia_date_bot!
                     openTelegramTarget(data.invoice_url);
+                    showAlert("⭐ Opening Telegram Stars Checkout!\n\nWe also sent the 1-tap Pay button to @ethiopia_date_bot on Telegram. Once paid, return here and your VIP / Roses unlock automatically!");
                 }
             } catch (e) {
-                showAlert(e.message);
+                showAlert(e.message || "Could not start Telegram Stars payment.");
             }
         }
+
+        // Auto-sync VIP & Roses when returning from Telegram app to Android APK
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible" && cleanTelegramId && !isGuestMode) {
+                refreshProfileStats();
+            }
+        });
 
         function copyTelebirrPhone() {
             const phone = document.getElementById("telebirr-merchant-phone").innerText.trim();
@@ -4629,9 +4647,7 @@
                 }
 
                 if (!data.messages || data.messages.length === 0) {
-                    if (!isPolling) {
-                        messagesContainer.innerHTML = `<div class="text-center text-xs text-gray-400 my-4">Today</div><div class="flex justify-start"><div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%] text-xs">You matched with <b>${matchName}</b>! Tap ✨ AI Wingman or ☕ Safe First-Date Invite below to break the ice.</div></div>`;
-                    }
+                    messagesContainer.innerHTML = `<div class="text-center text-xs text-gray-400 my-4">Today</div><div class="flex justify-start"><div class="bg-white border border-gray-100 text-buna px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm max-w-[75%] text-xs">You matched with <b>${matchName}</b>! Tap ✨ AI Wingman, 🎲 Game, or ☕ Safe First-Date Invite below to break the ice.</div></div>`;
                     return;
                 }
 
@@ -4649,19 +4665,21 @@
 
                     const editTag = msg.is_edited ? `<span class="italic text-[9px] ml-1 opacity-70">(edited)</span>` : "";
                     const reactionTag = msg.reaction ? `<div class="absolute -bottom-2 -right-2 bg-white rounded-full shadow-sm text-sm p-0.5 border border-gray-100 z-10 cursor-pointer">${msg.reaction}</div>` : "";
-                    const safeText = contentText.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, "\\n");
+                    const encodedMsgText = encodeURIComponent(contentText);
+                    const isGameCard = contentText.startsWith("[HABESHA_GAME]");
                     const innerMediaHtml = renderChatMediaContent(msg, isMe);
 
                     if (isMe) {
                         const ticks = msg.is_read ? "✓✓" : "✓";
                         const tickColor = msg.is_read ? "text-amber-100" : "text-white/70";
                         return `
-                            <div class="flex justify-end mb-2 relative group cursor-pointer" onclick="openMsgMenu('${msg.id}', true, '${safeText}', false)">
+                            <div id="chat-msg-row-${msg.id}" class="flex justify-end mb-2 relative group cursor-pointer" onclick="openMsgMenu('${msg.id}', true, '${encodedMsgText}', ${isGameCard})">
                                 <div class="bg-gradient-to-br from-botOrange to-habeshaCoral text-white px-4 py-2.5 rounded-2xl rounded-tr-sm shadow-md shadow-orange-200/50 max-w-[78%] break-words flex flex-col relative text-sm">
                                     ${innerMediaHtml}
                                     <div class="flex items-center justify-end gap-1 text-[10px] opacity-85 mt-0.5 self-end">
                                         <span>${timeStr}</span> ${editTag}
                                         <span class="${tickColor} font-extrabold ml-1">${ticks}</span>
+                                        <i class="ph-bold ph-dots-three-outline text-[10px] ml-1 opacity-75"></i>
                                     </div>
                                     ${reactionTag}
                                 </div>
@@ -4669,11 +4687,12 @@
                         `;
                     } else {
                         return `
-                            <div class="flex justify-start mb-2 relative group cursor-pointer" onclick="openMsgMenu('${msg.id}', false, '${safeText}', false)">
+                            <div id="chat-msg-row-${msg.id}" class="flex justify-start mb-2 relative group cursor-pointer" onclick="openMsgMenu('${msg.id}', false, '${encodedMsgText}', ${isGameCard})">
                                 <div class="bg-white border border-orange-100/80 text-buna px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-sm max-w-[78%] break-words flex flex-col relative text-sm">
                                     ${innerMediaHtml}
                                     <div class="flex items-center gap-1 text-[10px] text-gray-400 mt-0.5 self-end text-right">
                                         <span>${timeStr}</span> ${editTag}
+                                        <i class="ph-bold ph-dots-three-outline text-[10px] ml-1 opacity-60"></i>
                                     </div>
                                     ${reactionTag}
                                 </div>
@@ -5385,94 +5404,94 @@
                     location: finalLocation,
                     height: document.getElementById("reg-height").value.trim(),
                     religion: document.getElementById("reg-religion").value || "",
-                    education: document.getElementById("reg-education").value || "",
-                    occupation: document.getElementById("reg-occupation").value.trim(),
-                    bio: bioText,
-                    photo_url: selectedPhotoUrls[1] || DEFAULT_AVATAR,
-                    photo_url_2: selectedPhotoUrls[2] || "",
-                    photo_url_3: selectedPhotoUrls[3] || "",
-                    voice_bio_url: finalVoiceUrl || "",
-                    icebreaker: document.getElementById("reg-icebreaker").value || "",
-                    travel_banner: document.getElementById("reg-travel-banner").value || "",
-                    intention: document.getElementById("reg-intention").value || "",
-                    kids: document.getElementById("reg-kids").value || "",
-                    drinking: document.getElementById("reg-drinking").value || "",
-                    smoking: document.getElementById("reg-smoking").value || "",
-                    referred_by: referredBy,
-                    language: currentLang,
-                    allow_spotlight: allowSpotlight,
-                    blur_photos_until_match: Boolean(document.getElementById("reg-blur-photos")?.checked),
-                    languages_spoken: document.getElementById("reg-languages-spoken")?.value || "",
-                    subcity_campus: document.getElementById("reg-subcity-campus")?.value || ""
-                };
+        function openMsgMenu(id, isMe, encodedText, isGameCard = false) {
+            if (!id || id === "undefined") return;
+            selectedMsgId = String(id);
+            let currentText = "";
+            try {
+                currentText = decodeURIComponent(encodedText || "");
+            } catch (e) {
+                currentText = encodedText || "";
+            }
 
-                const response = await fetch(`${BACKEND_URL}/api/register`, {
+            const modal = document.getElementById("msg-action-modal");
+            const box = document.getElementById("msg-action-box");
+
+            document.getElementById("inline-edit-box").classList.add("hidden");
+            document.getElementById("inline-edit-box").classList.remove("flex");
+
+            document.getElementById("btn-delete-msg").style.display = "flex";
+            document.getElementById("btn-delete-msg").onclick = () => triggerDelete();
+
+            if (isMe && !isGameCard) {
+                document.getElementById("btn-edit-msg").style.display = "flex";
+                document.getElementById("btn-edit-msg").onclick = () => showInlineEdit(currentText);
+            } else {
+                document.getElementById("btn-edit-msg").style.display = "none";
+            }
+
+            modal.classList.remove("hidden");
+            setTimeout(() => box.classList.remove("translate-y-full"), 10);
+        }
+
+        function closeMsgMenu() {
+            const modal = document.getElementById("msg-action-modal");
+            const box = document.getElementById("msg-action-box");
+            box.classList.add("translate-y-full");
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 300);
+        }
+
+        async function sendReaction(emoji) {
+            if (!selectedMsgId) return;
+            triggerHaptic("light");
+            const id = selectedMsgId;
+            selectedMsgId = null;
+            closeMsgMenu();
+            try {
+                await fetch(`${BACKEND_URL}/api/react-message/${encodeURIComponent(id)}`, {
                     method: "POST",
                     headers: getAuthHeaders(true),
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ emoji: emoji })
                 });
+                loadChatHistory(activeChatId, document.getElementById("chat-header-name").innerText, false);
+            } catch (e) {}
+        }
 
-                const regResult = await response.json();
-                if (!response.ok) {
-                    throw new Error(regResult.detail || "Server Error");
+        function triggerDelete() {
+            if (!selectedMsgId) return;
+            document.getElementById("delete-msg-confirm").classList.remove("hidden");
+        }
+
+        function closeDeleteMsgConfirm() {
+            document.getElementById("delete-msg-confirm").classList.add("hidden");
+        }
+
+        async function executeDeleteMsg() {
+            closeDeleteMsgConfirm();
+            if (!selectedMsgId) return;
+            const id = String(selectedMsgId);
+            selectedMsgId = null;
+            closeMsgMenu();
+
+            // Instant optimistic UI removal so the bubble disappears immediately
+            const msgRow = document.getElementById(`chat-msg-row-${id}`);
+            if (msgRow) msgRow.remove();
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/delete-message/${encodeURIComponent(id)}`, {
+                    method: "POST",
+                    headers: getAuthHeaders(false)
+                });
+                if (!res.ok) throw new Error("Could not delete message");
+                if (activeChatId) {
+                    await loadChatHistory(activeChatId, document.getElementById("chat-header-name").innerText, false);
                 }
-
-                triggerHaptic("success");
-                isGuestMode = false;
-                isEditing = false;
-                guestSwipesUsed = 0;
-                guestLastLikedName = "";
-                safeSessionRemove("habesha_guest_swipes");
-                safeSessionRemove("habesha_guest_liked_name");
-                window.myProfileData = { ...window.myProfileData, ...payload };
-
-                const guestBanner = document.getElementById("guest-preview-banner");
-                if (guestBanner) {
-                    guestBanner.classList.add("hidden");
-                    guestBanner.classList.remove("flex");
-                }
-
-                document.getElementById("stats-banner").style.display = "none";
-                document.getElementById("view-registration").classList.add("hidden");
-
-                const bottomNav = document.getElementById("bottom-nav");
-                bottomNav.classList.remove("hidden");
-                bottomNav.classList.add("flex");
-
-                switchTab("swipe");
-
-                try {
-                    const chk = await fetch(`${BACKEND_URL}/api/check-user/${cleanTelegramId}`);
-                    const chkData = await chk.json();
-                    if (chkData.profile) window.myProfileData = chkData.profile;
-                    updateSwipesRemainingUI();
-                    if (chkData.is_admin) {
-                        document.getElementById("tab-admin").classList.remove("hidden");
-                        document.getElementById("tab-admin").classList.add("flex");
-                    }
-                } catch (e) {}
-
-                currentCardIndex = 0;
-                await loadDiscoverProfiles();
-                loadActiveStories();
-
-                showAlert(
-                    isQuickSave
-                        ? "✅ Profile updated!"
-                        : (regResult.referral_bonus_unlocked
-                            ? "🎉 Welcome to Habesha Date! You received +10 Bonus Likes & +1 Free Golden Rose 🌹 from your invite link!"
-                            : "🎉 Welcome to Habesha Date! You received 1 Free Golden Rose 🌹 — swipe or tap ☕ Buna Poll to meet your match!")
-                );
-            } catch (err) {
-                showAlert("Failed to save profile: " + err.message);
-            } finally {
-                if (submitBtn) {
-                    submitBtn.innerHTML = isEditing ? `<span>Update Profile</span><i class="ph-bold ph-check-circle"></i>` : `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
-                    submitBtn.disabled = false;
-                }
-                if (expressBtn) {
-                    expressBtn.innerHTML = `<i class="ph-fill ph-lightning text-lg"></i> <span>Join & Start Matching Now!</span>`;
-                    expressBtn.disabled = false;
+            } catch (e) {
+                showAlert("Could not delete message right now. Please try again.");
+                if (activeChatId) {
+                    loadChatHistory(activeChatId, document.getElementById("chat-header-name").innerText, false);
                 }
             }
         }
