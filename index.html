@@ -3796,6 +3796,43 @@
                 reader.readAsDataURL(file);
             }
         }
+
+        async function submitVerification() {
+            if (!selectedVerifySelfieFile) {
+                return showAlert(`Please tap the box above to take a live selfie showing: ${currentAssignedPose.title_en}`);
+            }
+            const btn = document.getElementById("btn-verify-submit");
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Uploading Selfie...`;
+            btn.disabled = true;
+
+            try {
+                const compressedSelfie = await compressImageFile(selectedVerifySelfieFile, 1080, 0.85);
+                const fd = new FormData();
+                fd.append("file", compressedSelfie);
+                fd.append("telegram_id", cleanTelegramId);
+                fd.append("pose_code", currentAssignedPose.code || "peace");
+
+                const res = await fetch(`${BACKEND_URL}/api/submit-verification`, {
+                    method: "POST",
+                    headers: getAuthHeaders(false),
+                    body: fd
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Upload failed");
+
+                selectedVerifySelfieFile = null;
+                closeVerifyModal();
+                triggerHaptic("success");
+                showAlert("✅ Verification selfie submitted! Our AI & moderation team will activate your Blue Checkmark shortly.");
+                refreshProfileStats();
+            } catch (err) {
+                showAlert(err.message || "Could not upload verification selfie.");
+            } finally {
+                btn.innerHTML = "Submit Selfie for Review";
+                btn.disabled = false;
+            }
+        }
+
         // --- GLOBAL PAYMENTS: 1-TAP TELEGRAM STARS, TELEBIRR & CHAPA ---
         async function openPremiumModal(defaultTab = "") {
             if (isGuestMode) {
@@ -4872,98 +4909,6 @@
             }
         }
 
-        function openMsgMenu(id, isMe, currentText, isDeleted) {
-            selectedMsgId = id;
-            const modal = document.getElementById("msg-action-modal");
-            const box = document.getElementById("msg-action-box");
-
-            document.getElementById("inline-edit-box").classList.add("hidden");
-            document.getElementById("inline-edit-box").classList.remove("flex");
-
-            document.getElementById("btn-delete-msg").style.display = "flex";
-            document.getElementById("btn-delete-msg").onclick = () => triggerDelete();
-
-            if (isMe) {
-                document.getElementById("btn-edit-msg").style.display = "flex";
-                document.getElementById("btn-edit-msg").onclick = () => showInlineEdit(currentText);
-            } else {
-                document.getElementById("btn-edit-msg").style.display = "none";
-            }
-
-            modal.classList.remove("hidden");
-            setTimeout(() => box.classList.remove("translate-y-full"), 10);
-        }
-
-        function closeMsgMenu() {
-            const modal = document.getElementById("msg-action-modal");
-            const box = document.getElementById("msg-action-box");
-            box.classList.add("translate-y-full");
-            setTimeout(() => {
-                modal.classList.add("hidden");
-                selectedMsgId = null;
-            }, 300);
-        }
-
-        async function sendReaction(emoji) {
-            if (!selectedMsgId) return;
-            triggerHaptic("light");
-            const id = selectedMsgId;
-            closeMsgMenu();
-            try {
-                await fetch(`${BACKEND_URL}/api/react-message/${id}`, {
-                    method: "POST",
-                    headers: getAuthHeaders(true),
-                    body: JSON.stringify({ emoji: emoji })
-                });
-                loadChatHistory(activeChatId, document.getElementById("chat-header-name").innerText, true);
-            } catch (e) {}
-        }
-
-        function triggerDelete() {
-            if (!selectedMsgId) return;
-            document.getElementById("delete-msg-confirm").classList.remove("hidden");
-        }
-
-        function closeDeleteMsgConfirm() {
-            document.getElementById("delete-msg-confirm").classList.add("hidden");
-        }
-
-        async function executeDeleteMsg() {
-            closeDeleteMsgConfirm();
-            if (!selectedMsgId) return;
-            const id = selectedMsgId;
-            closeMsgMenu();
-            try {
-                await fetch(`${BACKEND_URL}/api/delete-message/${id}`, { method: "DELETE", headers: getAuthHeaders(false) });
-                loadChatHistory(activeChatId, document.getElementById("chat-header-name").innerText, true);
-            } catch (e) {}
-        }
-
-        function showInlineEdit(oldText) {
-            const editBox = document.getElementById("inline-edit-box");
-            const editInput = document.getElementById("inline-edit-input");
-            editInput.value = oldText;
-            editBox.classList.remove("hidden");
-            editBox.classList.add("flex");
-            editInput.focus();
-        }
-
-        async function saveInlineEdit() {
-            if (!selectedMsgId) return;
-            const newText = document.getElementById("inline-edit-input").value.trim();
-            if (!newText) return;
-            const id = selectedMsgId;
-            closeMsgMenu();
-            try {
-                await fetch(`${BACKEND_URL}/api/edit-message/${id}`, {
-                    method: "PUT",
-                    headers: getAuthHeaders(true),
-                    body: JSON.stringify({ new_text: newText })
-                });
-                loadChatHistory(activeChatId, document.getElementById("chat-header-name").innerText, true);
-            } catch (e) {}
-        }
-
         function confirmUnmatch() {
             document.getElementById("custom-confirm").classList.remove("hidden");
         }
@@ -5404,6 +5349,93 @@
                     location: finalLocation,
                     height: document.getElementById("reg-height").value.trim(),
                     religion: document.getElementById("reg-religion").value || "",
+                    education: document.getElementById("reg-education").value || "",
+                    occupation: document.getElementById("reg-occupation").value.trim(),
+                    kids: document.getElementById("reg-kids").value || "",
+                    drinking: document.getElementById("reg-drinking").value || "",
+                    smoking: document.getElementById("reg-smoking").value || "",
+                    intention: document.getElementById("reg-intention").value || "",
+                    bio: bioText,
+                    icebreaker: document.getElementById("reg-icebreaker").value || "",
+                    travel_banner: document.getElementById("reg-travel-banner").value || "",
+                    photo_url: selectedPhotoUrls[1] || DEFAULT_AVATAR,
+                    photo_url_2: selectedPhotoUrls[2] || "",
+                    photo_url_3: selectedPhotoUrls[3] || "",
+                    voice_bio_url: finalVoiceUrl || "",
+                    referred_by: referredBy,
+                    language: currentLang,
+                    allow_spotlight: allowSpotlight,
+                    blur_photos_until_match: Boolean(document.getElementById("reg-blur-photos")?.checked),
+                    languages_spoken: document.getElementById("reg-languages-spoken")?.value || "",
+                    subcity_campus: document.getElementById("reg-subcity-campus")?.value || ""
+                };
+
+                const res = await fetch(`${BACKEND_URL}/api/register`, {
+                    method: "POST",
+                    headers: getAuthHeaders(true),
+                    body: JSON.stringify(payload)
+                });
+                const regData = await res.json();
+                if (!res.ok) throw new Error(regData.detail || "Could not save profile.");
+
+                isGuestMode = false;
+                isEditing = false;
+                const statsBanner = document.getElementById("stats-banner");
+                if (statsBanner) statsBanner.style.display = "none";
+                document.getElementById("view-registration").classList.add("hidden");
+
+                triggerHaptic("success");
+                await initApp();
+
+                if (regData.referral_bonus_unlocked) {
+                    showAlert("🎁 Welcome Gift Unlocked! You received +10 Bonus Likes + 1 Free Golden Rose 🌹 from your invite link!");
+                } else if (isQuickSave) {
+                    showAlert("✅ Profile updated!");
+                } else if (isExpress) {
+                    showAlert("🎉 Welcome to Habesha Date! Start swiping or vote on today's ☕ Buna Poll!");
+                }
+            } catch (err) {
+                showAlert(err.message || "Error saving profile.");
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<span>Complete</span><i class="ph-bold ph-check-circle"></i>`;
+                }
+                if (expressBtn) {
+                    expressBtn.disabled = false;
+                    expressBtn.innerHTML = `<i class="ph-fill ph-lightning text-lg text-yellow-300"></i> <span>Join & Start Matching Now!</span>`;
+                }
+            }
+        }
+
+        function showInlineEdit(oldText) {
+            const editBox = document.getElementById("inline-edit-box");
+            const editInput = document.getElementById("inline-edit-input");
+            editInput.value = oldText || "";
+            editBox.classList.remove("hidden");
+            editBox.classList.add("flex");
+            editInput.focus();
+        }
+
+        async function saveInlineEdit() {
+            if (!selectedMsgId) return;
+            const newText = document.getElementById("inline-edit-input").value.trim();
+            if (!newText) return;
+            const id = String(selectedMsgId);
+            selectedMsgId = null;
+            closeMsgMenu();
+            try {
+                await fetch(`${BACKEND_URL}/api/edit-message/${encodeURIComponent(id)}`, {
+                    method: "PUT",
+                    headers: getAuthHeaders(true),
+                    body: JSON.stringify({ new_text: newText })
+                });
+                if (activeChatId) {
+                    loadChatHistory(activeChatId, document.getElementById("chat-header-name").innerText, false);
+                }
+            } catch (e) {}
+        }
+
         function openMsgMenu(id, isMe, encodedText, isGameCard = false) {
             if (!id || id === "undefined") return;
             selectedMsgId = String(id);
