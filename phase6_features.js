@@ -152,6 +152,18 @@
                 pollUnreadBadges();
                 break;
 
+            case "stars_payment_confirmed":
+                triggerHaptic("success");
+                if (typeof closePremiumModal === "function") closePremiumModal();
+                if (typeof closeCommentRoseModal === "function") closeCommentRoseModal();
+                if (typeof refreshProfileStats === "function") refreshProfileStats();
+                showAlert(
+                    pkt.product === "roses_pack"
+                        ? "🌹 Telegram Stars Confirmed! 3 Golden Roses + 15 Bonus Likes added!"
+                        : "👑 Telegram Stars Confirmed! Habesha Premium VIP is now Active!"
+                );
+                break;
+
             case "profile_viewed":
                 if (window.myProfileData) {
                     window.myProfileData.views_count = (parseInt(window.myProfileData.views_count || 0, 10) + 1);
