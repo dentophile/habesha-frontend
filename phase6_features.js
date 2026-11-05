@@ -47,6 +47,7 @@
     // FEATURE 8: ANDROID APK AUTO-UPDATE BUILD VERSION CHECK & LIVE BUNA BADGE
     // =========================================================================
     async function checkAppBuildVersionAndBunaHour() {
+        if (typeof BACKEND_URL === "undefined") return;
         try {
             const res = await fetch(`${BACKEND_URL}/api/app-version`, { cache: "no-store" });
             if (!res.ok) return;
@@ -926,8 +927,15 @@
     }
 
     // --- BOOTSTRAP PHASE 6+ MODULE ---
-    checkAppBuildVersionAndBunaHour();
-    setTimeout(connectRealtimeWebSocket, 1200);
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+            checkAppBuildVersionAndBunaHour();
+            setTimeout(connectRealtimeWebSocket, 1200);
+        });
+    } else {
+        checkAppBuildVersionAndBunaHour();
+        setTimeout(connectRealtimeWebSocket, 1200);
+    }
     if (callSignalPollTimer) clearInterval(callSignalPollTimer);
     callSignalPollTimer = setInterval(pollFallbackWebRTCSignals, 5000);
 })();
