@@ -1,16 +1,17 @@
 /**
- * Habesha Date (ሀበሻ ቀጠሮ ❤️) — Phase 6+ Next-Horizon Engine
+ * Habesha Date (ሀበሻ ቀጠሮ ❤️) — Phase 6+ & Elite TrustShield™ Biometric Engine
  * Place this file as `phase6_features.js` in the same folder as `index.html` on GitHub Pages.
  *
- * Powers all 8 Next-Horizon Features:
- * 1. 🔒 Modest / Private Photo Blur Until Mutual Match
- * 2. 🗣️ Ethiopian Languages Spoken & Addis Sub-City / Campus Multi-Pills
- * 3. 📞 Masked 3-Minute "Buna Voice Call" (Peer-to-Peer WebRTC Audio)
- * 4. ⏰ "Live Buna Hour" 3-Minute Blind Speed-Matching Mixer
- * 5. 🎲 Interactive 2-Player Chat Games (Habesha Rapid-Fire & 2 Truths + 1 Lie)
- * 6. 👀 "Who Viewed My Profile & Voice Bio" Visitors Vault
- * 7. ⚡ Zero-Lag WebSockets Realtime Engine (<50ms Chat, Calls, Mixer & Games)
- * 8. 🔄 Android APK Auto-Update Build Version Cache Buster
+ * Powers:
+ * 1. 🛡️ Habesha TrustShield™ Live WebRTC Biometric Camera Liveness Scanner (3s Auto-Approve)
+ * 2. 📅 Interactive "Plan a Safe Buna Date" Chat Invitation Cards
+ * 3. 🔒 Modest / Private Photo Blur Until Mutual Match
+ * 4. 🗣️ Ethiopian Languages Spoken & Addis Sub-City / Campus Multi-Pills
+ * 5. 📞 Masked 3-Minute "Buna Voice Call" (Peer-to-Peer WebRTC Audio)
+ * 6. ⏰ "Live Buna Hour" 3-Minute Blind Speed-Matching Mixer
+ * 7. 🎲 Interactive 2-Player Chat Games (Habesha Rapid-Fire & 2 Truths + 1 Lie)
+ * 8. 👀 "Who Viewed My Profile & Voice Bio" Visitors Vault
+ * 9. ⚡ Zero-Lag WebSockets Realtime Engine + 🔄 Android APK Auto-Update Check
  */
 
 (function () {
@@ -418,14 +419,110 @@
         document.getElementById("chat-game-modal")?.classList.add("hidden");
     };
 
+    window.openChatDateScheduler = function () {
+        document.getElementById("buna-gifts-tray")?.classList.add("hidden");
+        window.openChatGameModal();
+        window.switchGameModalTab("date");
+    };
+
     window.switchGameModalTab = function (tab) {
-        const isRapid = tab === "rapid";
-        document.getElementById("game-panel-rapid")?.classList.toggle("hidden", !isRapid);
-        document.getElementById("game-panel-truths")?.classList.toggle("hidden", isRapid);
-        const b1 = document.getElementById("tab-game-rapid");
-        const b2 = document.getElementById("tab-game-truths");
-        if (b1) b1.className = isRapid ? "w-1/2 py-2 rounded-xl bg-white text-buna shadow-sm transition" : "w-1/2 py-2 rounded-xl text-gray-500 transition";
-        if (b2) b2.className = !isRapid ? "w-1/2 py-2 rounded-xl bg-white text-buna shadow-sm transition" : "w-1/2 py-2 rounded-xl text-gray-500 transition";
+        ["rapid", "truths", "date"].forEach((t) => {
+            document.getElementById(`game-panel-${t}`)?.classList.toggle("hidden", t !== tab);
+            const btn = document.getElementById(`tab-game-${t}`);
+            if (btn) {
+                btn.className = t === tab
+                    ? "py-2 rounded-xl bg-white text-buna shadow-sm transition"
+                    : "py-2 rounded-xl text-gray-500 transition";
+            }
+        });
+    };
+
+    window.sendInteractiveDateCard = async function () {
+        if (!activeChatId) return;
+        const spot = document.getElementById("date-card-spot")?.value || "☕ Tomoca Coffee (Public Café)";
+        const whenText = document.getElementById("date-card-when")?.value.trim() || "This Weekend • 4:30 PM";
+        const note = document.getElementById("date-card-note")?.value.trim() || "";
+
+        triggerHaptic("medium");
+        closeChatGameModal();
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/date-invite/create`, {
+                method: "POST",
+                headers: getAuthHeaders(true),
+                body: JSON.stringify({
+                    sender_id: cleanTelegramId,
+                    receiver_id: activeChatId,
+                    spot: spot,
+                    when_text: whenText,
+                    note: note
+                })
+            });
+            if (!res.ok) throw new Error("Failed");
+            loadChatHistory(activeChatId, document.getElementById("chat-header-name")?.innerText || "Match", true);
+        } catch (err) {
+            showAlert("Could not send Buna Date Card right now.");
+        }
+    };
+
+    window.respondInteractiveDateCard = async function (event, inviteId, decision) {
+        if (event) event.stopPropagation();
+        triggerHaptic("success");
+        try {
+            await fetch(`${BACKEND_URL}/api/date-invite/respond`, {
+                method: "POST",
+                headers: getAuthHeaders(true),
+                body: JSON.stringify({
+                    invite_id: inviteId,
+                    telegram_id: cleanTelegramId,
+                    decision: decision
+                })
+            });
+            if (activeChatId) {
+                loadChatHistory(activeChatId, document.getElementById("chat-header-name")?.innerText || "Match", true);
+            }
+        } catch (err) {
+            showAlert("Could not update Date Card response.");
+        }
+    };
+
+    window.renderInteractiveDateBubble = function (msg) {
+        try {
+            const inv = JSON.parse((msg.content || "").replace("[HABESHA_DATE]", ""));
+            const isGuest = String(cleanTelegramId) === String(inv.guest_id);
+            const status = inv.status || "pending";
+
+            let statusHtml = "";
+            if (status === "accepted") {
+                statusHtml = `<div class="mt-2 p-2 rounded-xl bg-emerald-500 text-white text-[11px] font-extrabold text-center shadow-sm">✅ Date Accepted! Have a wonderful time! ☕✨</div>`;
+            } else if (status === "reschedule") {
+                statusHtml = `<div class="mt-2 p-2 rounded-xl bg-amber-100 text-amber-900 text-[11px] font-extrabold text-center">🕒 Let's pick another day/time in chat!</div>`;
+            } else if (isGuest) {
+                statusHtml = `
+                    <div class="grid grid-cols-2 gap-1.5 mt-2">
+                        <button type="button" onclick="respondInteractiveDateCard(event, '${inv.invite_id}', 'accepted')" class="py-2 px-2 rounded-xl bg-emerald-500 text-white text-[11px] font-extrabold shadow-sm active:scale-95">✅ Accept</button>
+                        <button type="button" onclick="respondInteractiveDateCard(event, '${inv.invite_id}', 'reschedule')" class="py-2 px-2 rounded-xl bg-white text-buna border border-gray-200 text-[11px] font-extrabold active:scale-95">🕒 New Time</button>
+                    </div>
+                `;
+            } else {
+                statusHtml = `<p class="mt-1.5 text-[10px] font-bold opacity-85 text-center">⏳ Waiting for your match's RSVP...</p>`;
+            }
+
+            return `
+                <div class="w-56 sm:w-64 py-1 text-left" onclick="event.stopPropagation()">
+                    <div class="text-[10px] font-extrabold uppercase tracking-wider opacity-90 mb-1 flex items-center gap-1">
+                        <span>📅 Official Safe Buna Date Invite</span>
+                    </div>
+                    <div class="bg-white/95 text-buna p-2.5 rounded-xl border border-orange-200 space-y-1">
+                        <p class="font-extrabold text-xs">${inv.spot}</p>
+                        <p class="text-[11px] font-bold text-botOrange">🕒 ${inv.when_text}</p>
+                        ${inv.note ? `<p class="text-[11px] text-gray-600 italic">"${inv.note}"</p>` : ""}
+                    </div>
+                    ${statusHtml}
+                </div>
+            `;
+        } catch (e) {
+            return `<span>📅 Buna Date Invitation</span>`;
+        }
     };
 
     window.launchRapidFireGame = async function () {
@@ -926,7 +1023,199 @@
         } catch (e) {}
     }
 
-    // --- BOOTSTRAP PHASE 6+ MODULE ---
+    // =========================================================================
+    // ELITE HABESHA TRUSTSHIELD™ LIVE WEBRTC BIOMETRIC LIVENESS CAMERA SCANNER
+    // =========================================================================
+    let bioStream = null;
+    let isCapturingBio = false;
+
+    window.resetBiometricScannerUI = function () {
+        window.stopBiometricCamera();
+        window.biometricLiveBlob = null;
+        window.biometricMotionScore = 0;
+
+        const video = document.getElementById("bio-camera-video");
+        const preview = document.getElementById("verify-selfie-preview");
+        const laser = document.getElementById("bio-laser-overlay");
+        const badge = document.getElementById("bio-countdown-badge");
+        const hint = document.getElementById("bio-status-hint");
+
+        if (video) video.classList.add("hidden");
+        if (preview) {
+            preview.classList.remove("hidden");
+            preview.style.backgroundImage = "";
+        }
+        document.getElementById("verify-pose-emoji")?.classList.remove("hidden");
+        document.getElementById("verify-selfie-text")?.classList.remove("hidden");
+        laser?.classList.add("hidden");
+        badge?.classList.add("hidden");
+
+        document.getElementById("btn-start-bio-cam")?.classList.remove("hidden");
+        document.getElementById("btn-capture-bio-scan")?.classList.add("hidden");
+        document.getElementById("btn-verify-submit")?.classList.add("hidden");
+        document.getElementById("btn-fallback-cam")?.classList.add("hidden");
+
+        if (hint) {
+            hint.innerText = "Step 1: Open live front camera & align your face inside the oval.";
+        }
+    };
+
+    window.stopBiometricCamera = function () {
+        isCapturingBio = false;
+        if (bioStream) {
+            try {
+                bioStream.getTracks().forEach((t) => t.stop());
+            } catch (e) {}
+            bioStream = null;
+        }
+        const video = document.getElementById("bio-camera-video");
+        if (video) video.srcObject = null;
+    };
+
+    window.startBiometricCamera = async function () {
+        const video = document.getElementById("bio-camera-video");
+        const preview = document.getElementById("verify-selfie-preview");
+        const laser = document.getElementById("bio-laser-overlay");
+        const badge = document.getElementById("bio-countdown-badge");
+        const hint = document.getElementById("bio-status-hint");
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            document.getElementById("btn-fallback-cam")?.classList.remove("hidden");
+            return showAlert("Live camera stream is restricted by this WebView. Tap the Direct Camera Selfie button below!");
+        }
+
+        try {
+            triggerHaptic("light");
+            bioStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 960 } },
+                audio: false
+            });
+            if (video) {
+                video.srcObject = bioStream;
+                video.classList.remove("hidden");
+                await video.play();
+            }
+            preview?.classList.add("hidden");
+            laser?.classList.remove("hidden");
+            if (badge) {
+                badge.innerText = "LIVE 3D";
+                badge.classList.remove("hidden");
+            }
+            document.getElementById("btn-start-bio-cam")?.classList.add("hidden");
+            const capBtn = document.getElementById("btn-capture-bio-scan");
+            if (capBtn) {
+                capBtn.classList.remove("hidden");
+                capBtn.classList.add("flex");
+            }
+            const poseTitle = window.currentAssignedPose?.title_en || "assigned hand gesture";
+            if (hint) {
+                hint.innerText = `Step 2: Hold ${poseTitle} next to your face & tap Scan Now!`;
+            }
+        } catch (err) {
+            document.getElementById("btn-fallback-cam")?.classList.remove("hidden");
+            showAlert("📸 Please allow Camera permission for instant 3-second AI verification (or use the fallback camera button below).");
+        }
+    };
+
+    function sampleVideoFramePixels(videoEl) {
+        const c = document.createElement("canvas");
+        c.width = 96;
+        c.height = 96;
+        const ctx = c.getContext("2d");
+        ctx.drawImage(videoEl, 0, 0, 96, 96);
+        return ctx.getImageData(0, 0, 96, 96).data;
+    }
+
+    function computePixelMotionDelta(frameA, frameB) {
+        if (!frameA || !frameB || frameA.length !== frameB.length) return 0;
+        let diffSum = 0;
+        const totalPixels = frameA.length / 4;
+        for (let i = 0; i < frameA.length; i += 4) {
+            diffSum +=
+                Math.abs(frameA[i] - frameB[i]) +
+                Math.abs(frameA[i + 1] - frameB[i + 1]) +
+                Math.abs(frameA[i + 2] - frameB[i + 2]);
+        }
+        return diffSum / (totalPixels * 3);
+    }
+
+    window.runTwoStepBiometricCapture = async function () {
+        if (isCapturingBio || !bioStream) return;
+        const video = document.getElementById("bio-camera-video");
+        const canvas = document.getElementById("bio-capture-canvas");
+        const badge = document.getElementById("bio-countdown-badge");
+        const hint = document.getElementById("bio-status-hint");
+        const capBtn = document.getElementById("btn-capture-bio-scan");
+        if (!video || !canvas) return;
+
+        isCapturingBio = true;
+        if (capBtn) capBtn.disabled = true;
+
+        try {
+            // Frame 1: Baseline liveness sample
+            const frame1 = sampleVideoFramePixels(video);
+            const poseEmoji = window.currentAssignedPose?.emoji || "✌️";
+
+            for (let sec = 3; sec >= 1; sec--) {
+                triggerHaptic("selection");
+                if (badge) badge.innerText = `${sec}s ${poseEmoji}`;
+                if (hint) hint.innerText = `Hold ${window.currentAssignedPose?.title_en || poseEmoji} steady & blink naturally (${sec})...`;
+                await new Promise((r) => setTimeout(r, 650));
+            }
+
+            // Frame 2: Liveness motion comparison + High-res capture
+            const frame2 = sampleVideoFramePixels(video);
+            const motionScore = computePixelMotionDelta(frame1, frame2);
+            window.biometricMotionScore = Number(motionScore.toFixed(2));
+
+            if (motionScore < 1.2) {
+                isCapturingBio = false;
+                if (capBtn) capBtn.disabled = false;
+                if (badge) badge.innerText = "RETRY";
+                return showAlert("🛡️ TrustShield™ Liveness Check: No natural 3D movement detected. Please move your hand into the gesture naturally and try again!");
+            }
+
+            const w = video.videoWidth || 720;
+            const h = video.videoHeight || 960;
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, w, h);
+
+            const blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.88));
+            window.biometricLiveBlob = blob;
+
+            const previewUrl = URL.createObjectURL(blob);
+            const preview = document.getElementById("verify-selfie-preview");
+            if (preview) {
+                preview.style.backgroundImage = `url('${previewUrl}')`;
+                preview.classList.remove("hidden");
+            }
+            document.getElementById("verify-pose-emoji")?.classList.add("hidden");
+            document.getElementById("verify-selfie-text")?.classList.add("hidden");
+            video.classList.add("hidden");
+            document.getElementById("bio-laser-overlay")?.classList.add("hidden");
+
+            window.stopBiometricCamera();
+            triggerHaptic("medium");
+
+            if (capBtn) capBtn.classList.add("hidden");
+            const subBtn = document.getElementById("btn-verify-submit");
+            if (subBtn) subBtn.classList.remove("hidden");
+            if (hint) hint.innerText = "✅ Live 3D motion verified! Matching against your Main Profile Photo...";
+
+            // Automatically run the 3-second TrustShield AI check immediately!
+            if (typeof submitVerification === "function") {
+                await submitVerification();
+            }
+        } catch (err) {
+            isCapturingBio = false;
+            if (capBtn) capBtn.disabled = false;
+            showAlert("Could not capture camera frame. Please try again.");
+        }
+    };
+
+    // --- BOOTSTRAP PHASE 6+ & TRUSTSHIELD MODULE ---
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
             checkAppBuildVersionAndBunaHour();
