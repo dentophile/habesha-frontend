@@ -6,6 +6,10 @@
 (function () {
     "use strict";
 
+    window.__PHASE7_LOADED__ = true;
+    const getApiBase = () => (typeof BACKEND_URL !== "undefined" ? BACKEND_URL : (typeof API_URL !== "undefined" ? API_URL : "https://habesha-backend-xhc5.onrender.com"));
+    const getUid = () => (typeof cleanTelegramId !== "undefined" && cleanTelegramId ? cleanTelegramId : (typeof currentUserId !== "undefined" && currentUserId ? currentUserId : "guest"));
+
     const P7_CACHE = {};
     let voiceLiveRecorder = null;
     let voiceLiveChunks = [];
@@ -302,16 +306,20 @@
         `;
         document.body.appendChild(root);
 
+        const quickbarHtml = `<div id="p7-discover-quickbar" class="w-full max-w-sm mx-auto grid grid-cols-3 gap-1.5 mb-1 shrink-0">
+                    <button onclick="openVoiceLivenessModal()" class="bg-cyan-50/95 text-cyan-800 border border-cyan-200 text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">💎 Diamond Scan</button>
+                    <button onclick="document.getElementById('p7-passport-modal').classList.remove('hidden')" class="bg-sky-50/95 text-sky-800 border border-sky-200 text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">✈️ Passport</button>
+                    <button onclick="openSafeGuardianModal()" class="bg-emerald-50/95 text-emerald-800 border border-emerald-200 text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">🛡️ Guardian</button>
+                </div>`;
+
         const modeBar = document.getElementById("mode-pill-all")?.parentElement;
-        if (modeBar && !document.getElementById("p7-discover-quickbar")) {
-            modeBar.insertAdjacentHTML(
-                "afterend",
-                `<div id="p7-discover-quickbar" class="w-full max-w-sm mx-auto grid grid-cols-3 gap-1.5 mb-1 shrink-0">
-                    <button onclick="openVoiceLivenessModal()" class="bg-cyan-50/95 text-cyan-800 border border-cyan-200 text-[10px] font-extrabold py-0.5 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">💎 Diamond Scan</button>
-                    <button onclick="document.getElementById('p7-passport-modal').classList.remove('hidden')" class="bg-sky-50/95 text-sky-800 border border-sky-200 text-[10px] font-extrabold py-0.5 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">✈️ Passport</button>
-                    <button onclick="openSafeGuardianModal()" class="bg-emerald-50/95 text-emerald-800 border border-emerald-200 text-[10px] font-extrabold py-0.5 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">🛡️ Guardian</button>
-                </div>`
-            );
+        const cardContainer = document.getElementById("card-container");
+        if (!document.getElementById("p7-discover-quickbar")) {
+            if (modeBar) {
+                modeBar.insertAdjacentHTML("afterend", quickbarHtml);
+            } else if (cardContainer) {
+                cardContainer.insertAdjacentHTML("beforebegin", quickbarHtml);
+            }
         }
 
         const verifyModalCard = document.querySelector("#verify-modal > div");
@@ -329,10 +337,11 @@
         }
 
         const boostBtn = document.getElementById("btn-profile-boost");
-        if (boostBtn && boostBtn.parentElement && !document.getElementById("p7-profile-suite")) {
+        const fallbackProfileBox = document.querySelector("#view-profile .max-w-sm");
+        if (!document.getElementById("p7-profile-suite") && (boostBtn || fallbackProfileBox)) {
             const suite = document.createElement("div");
             suite.id = "p7-profile-suite";
-            suite.className = "space-y-2.5";
+            suite.className = "w-full space-y-2.5";
             suite.innerHTML = `
                 <button onclick="openVoiceLivenessModal()" class="w-full bg-gradient-to-r from-cyan-50 to-sky-50 text-cyan-900 font-extrabold p-4 rounded-2xl flex items-center justify-between border border-cyan-200 shadow-sm transition active:scale-95 text-sm">
                     <div class="flex items-center gap-3"><span class="text-xl">💎</span> <span id="p7-diamond-btn-lbl">Acoustic Voice Liveness (Diamond)</span></div>
@@ -359,19 +368,14 @@
                     <i class="ph-bold ph-download-simple text-botOrange"></i>
                 </button>
             `;
-            boostBtn.parentElement.insertBefore(suite, boostBtn);
+            if (boostBtn && boostBtn.parentElement) {
+                boostBtn.parentElement.insertBefore(suite, boostBtn);
+            } else if (fallbackProfileBox) {
+                fallbackProfileBox.appendChild(suite);
+            }
         }
 
-        const bunaTrayFlex = document.querySelector("#buna-gifts-tray .flex.gap-2");
-        if (bunaTrayFlex && !document.getElementById("p7-chat-treat-btn")) {
-            bunaTrayFlex.insertAdjacentHTML(
-                "afterbegin",
-                `<button id="p7-chat-treat-btn" onclick="openEndorseAndTreatModal()" class="shrink-0 bg-gradient-to-r from-amber-500 to-botOrange text-white px-3 py-1.5 rounded-full text-xs font-extrabold shadow-sm active:scale-95">🎁 Real Buna Gift (50⭐) / 🏅 Endorse</button>
-                 <button onclick="openSafeGuardianModal()" class="shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-full text-xs font-extrabold shadow-sm active:scale-95">🛡️ Safe Date Timer</button>`
-            );
-        }
-
-        const wingmanHeader = document.querySelector("#ai-wingman-tray > div:first-child");
+        const bunaTrayFlex = document.querySelector("#buna-gifts-tray .flex.gap-2") || document.querySelector("#buna-gifts-drawer .grid");
         if (wingmanHeader && !document.getElementById("p7-btn-revive")) {
             wingmanHeader.insertAdjacentHTML(
                 "beforeend",
@@ -918,6 +922,20 @@
         setTimeout(enrichDiscoverFeedPhase7, 1500);
         setTimeout(checkMutualOnlineSpark, 5000);
         setInterval(checkMutualOnlineSpark, 35000);
+
+        if (window.location.search.includes("diag=1")) {
+            setTimeout(() => {
+                const msg = [
+                    "✅ Phase 7 JS: RUNNING",
+                    "📦 Phase 6 JS: " + (window.__PHASE6_LOADED__ ? "RUNNING" : "NOT DETECTED"),
+                    "🎯 Quickbar Injected: " + Boolean(document.getElementById("p7-discover-quickbar")),
+                    "👤 Profile Suite Injected: " + Boolean(document.getElementById("p7-profile-suite")),
+                    "🌐 API URL: " + getApiBase(),
+                    "🆔 User ID: " + getUid()
+                ].join("\n");
+                if (typeof showAlert === "function") showAlert(msg);
+            }, 900);
+        }
     }
 
     if (document.readyState === "loading") {
