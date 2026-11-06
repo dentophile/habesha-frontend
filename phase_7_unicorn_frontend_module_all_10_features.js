@@ -1,6 +1,6 @@
 /**
  * Habesha Date (ሀበሻ ቀጠሮ ❤️) — Phase 7 "Unicorn Tier" Frontend Engine
- * Save as `phase7_features.js` in the root of your `habesha-frontend` repo.
+ * Save as `phase7_features.js` in the same folder as `index.html` on GitHub Pages.
  */
 
 (function () {
@@ -22,7 +22,6 @@
         finances: "💼 Financial Style"
     };
 
-    // #9 PROGRESSIVE WEB APP (PWA) MANIFEST, IOS META & SERVICE WORKER
     function setupProgressiveWebApp() {
         try {
             const head = document.head;
@@ -88,14 +87,12 @@
         }
     };
 
-    // INJECT ALL PHASE 7 MODALS, DISCOVER PILLS, PROFILE SUITE & CHAT BUTTONS
     function injectPhase7ModalsAndButtons() {
         if (document.getElementById("p7-modals-root")) return;
 
         const root = document.createElement("div");
         root.id = "p7-modals-root";
         root.innerHTML = `
-            <!-- #10 Mutual Online Spark Floating Pill -->
             <div id="p7-mutual-spark-banner" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-[232] w-[92%] max-w-sm bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 text-white px-4 py-2.5 rounded-full shadow-2xl border border-white/30 items-center justify-between gap-2 cursor-pointer modal-pop">
                 <div onclick="openSparkMatchChat()" class="flex items-center gap-2 min-w-0 flex-1">
                     <span class="w-2.5 h-2.5 rounded-full bg-lime-300 animate-ping shrink-0"></span>
@@ -104,7 +101,6 @@
                 <button onclick="document.getElementById('p7-mutual-spark-banner').classList.add('hidden')" class="text-white/80 text-xs font-bold px-1">✕</button>
             </div>
 
-            <!-- #1 Acoustic Voice Liveness Modal (Diamond Badge) -->
             <div id="p7-voice-liveness-modal" class="hidden fixed inset-0 z-[215] flex items-center justify-center bg-black/75 backdrop-blur-md px-4">
                 <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl text-center relative overflow-hidden border border-cyan-200 modal-pop">
                     <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
@@ -125,7 +121,6 @@
                 </div>
             </div>
 
-            <!-- #2 Safe Date Guardian & 1-Tap SOS Modal -->
             <div id="p7-safe-guardian-modal" class="hidden fixed inset-0 z-[215] flex items-center justify-center bg-black/75 backdrop-blur-md px-4">
                 <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl text-center relative overflow-hidden border border-emerald-200 modal-pop">
                     <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
@@ -164,7 +159,6 @@
                 </div>
             </div>
 
-            <!-- #3 Deep 6-Pillar Tidar Marriage Blueprint Modal -->
             <div id="p7-tidar-modal" class="hidden fixed inset-0 z-[215] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
                 <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl relative overflow-hidden border border-amber-200 modal-pop max-h-[90vh] touch-scroll no-scrollbar">
                     <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
@@ -219,7 +213,6 @@
                 </div>
             </div>
 
-            <!-- #5 5-Second Vibe Loop Video Upload Modal -->
             <div id="p7-vibe-video-modal" class="hidden fixed inset-0 z-[215] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
                 <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl text-center relative overflow-hidden border border-pink-200 modal-pop">
                     <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
@@ -237,7 +230,6 @@
                 </div>
             </div>
 
-            <!-- #6 Positive Dater Endorsement Modal & #7 Real Buna Treat Modal -->
             <div id="p7-endorse-treat-modal" class="hidden fixed inset-0 z-[215] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
                 <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl relative overflow-hidden border border-amber-200 modal-pop">
                     <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
@@ -269,7 +261,6 @@
                 </div>
             </div>
 
-            <!-- #8 Privacy-Fuzzed GPS & VIP Passport Mode Modal -->
             <div id="p7-passport-modal" class="hidden fixed inset-0 z-[215] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
                 <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl text-center relative overflow-hidden border border-sky-200 modal-pop">
                     <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
@@ -311,7 +302,6 @@
         `;
         document.body.appendChild(root);
 
-        // Add visible Phase 7 Quick-Access Pills right on the Discover screen!
         const modeBar = document.getElementById("mode-pill-all")?.parentElement;
         if (modeBar && !document.getElementById("p7-discover-quickbar")) {
             modeBar.insertAdjacentHTML(
@@ -324,7 +314,6 @@
             );
         }
 
-        // Inject Diamond Voice Liveness trigger inside #verify-modal
         const verifyModalCard = document.querySelector("#verify-modal > div");
         if (verifyModalCard && !document.getElementById("p7-open-voice-liveness-btn")) {
             const dBtn = document.createElement("button");
@@ -339,7 +328,6 @@
             verifyModalCard.appendChild(dBtn);
         }
 
-        // Inject Phase 7 Power Suite inside #view-profile
         const boostBtn = document.getElementById("btn-profile-boost");
         if (boostBtn && boostBtn.parentElement && !document.getElementById("p7-profile-suite")) {
             const suite = document.createElement("div");
@@ -374,7 +362,6 @@
             boostBtn.parentElement.insertBefore(suite, boostBtn);
         }
 
-        // Inject Safe Date Guardian, Real Buna Gift & AI Revival inside Chat trays
         const bunaTrayFlex = document.querySelector("#buna-gifts-tray .flex.gap-2");
         if (bunaTrayFlex && !document.getElementById("p7-chat-treat-btn")) {
             bunaTrayFlex.insertAdjacentHTML(
@@ -393,7 +380,6 @@
         }
     }
 
-    // #1 ACOUSTIC VOICE LIVENESS FUNCTIONS
     window.openVoiceLivenessModal = async function () {
         if (isGuestMode) return openGuestSignupModal();
         document.getElementById("p7-voice-liveness-modal")?.classList.remove("hidden");
@@ -465,7 +451,6 @@
         }
     };
 
-    // #2 SAFE DATE GUARDIAN & SOS FUNCTIONS
     window.openSafeGuardianModal = async function () {
         if (isGuestMode) return openGuestSignupModal();
         document.getElementById("p7-safe-guardian-modal")?.classList.remove("hidden");
@@ -529,7 +514,6 @@
         }
     };
 
-    // #3 6-PILLAR TIDAR MARRIAGE BLUEPRINT
     window.openTidarBlueprintModal = function () {
         if (isGuestMode) return openGuestSignupModal();
         const mine = (P7_CACHE[cleanTelegramId] && P7_CACHE[cleanTelegramId].tidar_blueprint) || {};
@@ -565,7 +549,6 @@
         }
     };
 
-    // #5 5-SECOND VIBE LOOP VIDEO UPLOAD & #8 GPS / PASSPORT MODE
     window.handleVibeVideoUpload = async function (event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -644,7 +627,6 @@
         loadDiscoverProfiles();
     };
 
-    // #6 ENDORSEMENTS, #7 REAL BUNA TREAT (50 ⭐), #4 AI TRANSLATE & #10 REVIVE
     window.openEndorseAndTreatModal = function () {
         document.getElementById("buna-gifts-tray")?.classList.add("hidden");
         document.getElementById("p7-endorse-treat-modal")?.classList.remove("hidden");
@@ -749,7 +731,6 @@
         } catch (e) {}
     };
 
-    // SEAMLESS HOOKS INTO DISCOVER CARDS, FULL PROFILE & CHAT RENDERING
     async function enrichDiscoverFeedPhase7() {
         if (typeof profiles === "undefined" || !Array.isArray(profiles) || profiles.length === 0) return;
         const ids = profiles.slice(0, 60).map((p) => String(p.telegram_id)).filter(Boolean);
