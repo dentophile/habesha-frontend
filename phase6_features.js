@@ -1,28 +1,15 @@
 /**
  * Habesha Date (ሀበሻ ቀጠሮ ❤️) — Phase 6+ & Elite TrustShield™ Biometric Engine
- * Place this file as `phase6_features.js` in the same folder as `index.html` on GitHub Pages.
- *
- * Powers:
- * 1. 🛡️ Habesha TrustShield™ Live WebRTC Biometric Camera Liveness Scanner (3s Auto-Approve)
- * 2. 📅 Interactive "Plan a Safe Buna Date" Chat Invitation Cards
- * 3. 🔒 Modest / Private Photo Blur Until Mutual Match
- * 4. 🗣️ Ethiopian Languages Spoken & Addis Sub-City / Campus Multi-Pills
- * 5. 📞 Masked 3-Minute "Buna Voice Call" (Peer-to-Peer WebRTC Audio)
- * 6. ⏰ "Live Buna Hour" 3-Minute Blind Speed-Matching Mixer
- * 7. 🎲 Interactive 2-Player Chat Games (Habesha Rapid-Fire & 2 Truths + 1 Lie)
- * 8. 👀 "Who Viewed My Profile & Voice Bio" Visitors Vault
- * 9. ⚡ Zero-Lag WebSockets Realtime Engine + 🔄 Android APK Auto-Update Check
+ * Save as `phase6_features.js` in the same folder as `index.html` on GitHub Pages.
  */
 
 (function () {
     "use strict";
 
-    // --- STATE VARIABLES ---
     let realtimeSocket = null;
     let wsHeartbeatTimer = null;
     let wsReconnectTimer = null;
 
-    // WebRTC Masked 3-Minute Buna Voice Call State
     let peerConnection = null;
     let localAudioStream = null;
     let callPartnerId = null;
@@ -39,14 +26,10 @@
         ]
     };
 
-    // Live Buna Hour 3-Minute Speed-Mixer State
     let mixerPollTimer = null;
     let mixerOpen = false;
     let currentMixerPartner = null;
 
-    // =========================================================================
-    // FEATURE 8: ANDROID APK AUTO-UPDATE BUILD VERSION CHECK & LIVE BUNA BADGE
-    // =========================================================================
     async function checkAppBuildVersionAndBunaHour() {
         if (typeof BACKEND_URL === "undefined") return;
         try {
@@ -60,7 +43,6 @@
                 footerEl.innerText = `Habesha Date • Build ${serverVer}`;
             }
 
-            // Highlight the Live Buna Mixer pill during evening Buna Hour (8:00–9:30 PM EAT)
             const mixerBtn = document.getElementById("btn-top-mixer");
             if (mixerBtn && data.is_live_buna_hour) {
                 mixerBtn.classList.add("ring-2", "ring-emerald-400", "animate-pulse");
@@ -77,14 +59,9 @@
                 }
                 safeStorageSet("habesha_cached_build_ver", serverVer);
             }
-        } catch (err) {
-            // Non-blocking check
-        }
+        } catch (err) {}
     }
 
-    // =========================================================================
-    // FEATURE 7: ZERO-LAG WEBSOCKET REALTIME ENGINE (<50ms Instant Delivery)
-    // =========================================================================
     function connectRealtimeWebSocket() {
         if (!cleanTelegramId || cleanTelegramId === "guest" || cleanTelegramId === "undefined") {
             return;
@@ -195,9 +172,6 @@
         }
     }
 
-    // =========================================================================
-    // FEATURE 1 & 2: MODEST PHOTO BLUR & ETHIOPIAN LANGUAGE MULTI-PILLS
-    // =========================================================================
     window.toggleSpokenLangPill = function (btnEl) {
         if (!btnEl) return;
         triggerHaptic("selection");
@@ -278,9 +252,6 @@
         }
     };
 
-    // =========================================================================
-    // FEATURE 6: "WHO VIEWED MY PROFILE & VOICE BIO" VAULT
-    // =========================================================================
     window.recordProfileView = function (viewedId, viewType = "profile") {
         if (!cleanTelegramId || isGuestMode || cleanTelegramId === "guest" || !viewedId) return;
         if (String(cleanTelegramId) === String(viewedId)) return;
@@ -406,9 +377,6 @@
         }
     };
 
-    // =========================================================================
-    // FEATURE 5: INTERACTIVE 2-PLAYER CHAT GAMES (RAPID-FIRE & 2 TRUTHS + 1 LIE)
-    // =========================================================================
     window.openChatGameModal = function () {
         if (!activeChatId) return;
         triggerHaptic("light");
@@ -646,9 +614,6 @@
         }
     };
 
-    // =========================================================================
-    // FEATURE 4: "LIVE BUNA HOUR" 3-MINUTE BLIND SPEED-MATCHING MIXER
-    // =========================================================================
     window.openBunaMixerModal = async function () {
         if (isGuestMode) return openGuestSignupModal();
         triggerHaptic("medium");
@@ -807,9 +772,6 @@
         pollBunaMixerState("join");
     };
 
-    // =========================================================================
-    // FEATURE 3: MASKED 3-MINUTE "BUNA VOICE CALL" (WEBRTC AUDIO)
-    // =========================================================================
     async function sendWebRTCSignalToServer(receiverId, signalType, dataObj = {}) {
         try {
             await fetch(`${BACKEND_URL}/api/webrtc/signal`, {
@@ -1023,9 +985,6 @@
         } catch (e) {}
     }
 
-    // =========================================================================
-    // ELITE HABESHA TRUSTSHIELD™ LIVE WEBRTC BIOMETRIC LIVENESS CAMERA SCANNER
-    // =========================================================================
     let bioStream = null;
     let isCapturingBio = false;
 
@@ -1152,7 +1111,6 @@
         if (capBtn) capBtn.disabled = true;
 
         try {
-            // Frame 1: Baseline liveness sample
             const frame1 = sampleVideoFramePixels(video);
             const poseEmoji = window.currentAssignedPose?.emoji || "✌️";
 
@@ -1163,7 +1121,6 @@
                 await new Promise((r) => setTimeout(r, 650));
             }
 
-            // Frame 2: Liveness motion comparison + High-res capture
             const frame2 = sampleVideoFramePixels(video);
             const motionScore = computePixelMotionDelta(frame1, frame2);
             window.biometricMotionScore = Number(motionScore.toFixed(2));
@@ -1204,7 +1161,6 @@
             if (subBtn) subBtn.classList.remove("hidden");
             if (hint) hint.innerText = "✅ Live 3D motion verified! Matching against your Main Profile Photo...";
 
-            // Automatically run the 3-second TrustShield AI check immediately!
             if (typeof submitVerification === "function") {
                 await submitVerification();
             }
@@ -1215,7 +1171,6 @@
         }
     };
 
-    // --- BOOTSTRAP PHASE 6+ & TRUSTSHIELD MODULE ---
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
             checkAppBuildVersionAndBunaHour();
