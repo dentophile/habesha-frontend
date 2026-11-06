@@ -1,22 +1,12 @@
 /**
  * Habesha Date (ሀበሻ ቀጠሮ ❤️) — Phase 7 "Unicorn Tier" Frontend Engine
- * Implements all 10 Phase 7 features seamlessly on top of index.html & phase6_features.js:
- *  1. 💎 Acoustic Voice Liveness ("TrustShield Level 4" Diamond Badge)
- *  2. 🚨 Safe Date Guardian (90-Min Check-In Timer + 1-Tap Emergency SOS)
- *  3. 💍 Deep 6-Pillar "Tidar Alignment" Marriage Blueprint
- *  4. 🌐 1-Tap AI Cultural & Script Translator Inside Chat
- *  5. 🎬 5-Second "Vibe Loop" Profile Videos (Live Motion Cards)
- *  6. 🏅 Positive "Dater Reputation" Endorsements
- *  7. ☕ Real-World "Send a Macchiato / Buna Treat" Micro-Gifting (50 ⭐)
- *  8. 📍 Privacy-Fuzzed GPS Distance (~km) + ✈️ VIP Passport Mode
- *  9. 📱 iOS & Android Progressive Web App (PWA) Manifest + Home-Screen Install
- * 10. ⚡ "Mutual Online Spark" Live Banner + AI Chat Revival ("Buna Rescue")
+ * Save as `phase7_features.js` in the root of your `habesha-frontend` repo.
  */
 
 (function () {
     "use strict";
 
-    const P7_CACHE = {}; // { telegram_id: snapshot }
+    const P7_CACHE = {};
     let voiceLiveRecorder = null;
     let voiceLiveChunks = [];
     let isRecordingLiveness = false;
@@ -32,9 +22,7 @@
         finances: "💼 Financial Style"
     };
 
-    // =========================================================================
     // #9 PROGRESSIVE WEB APP (PWA) MANIFEST, IOS META & SERVICE WORKER
-    // =========================================================================
     function setupProgressiveWebApp() {
         try {
             const head = document.head;
@@ -94,15 +82,13 @@
         }
         const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
         if (isIOS) {
-            showAlert("📱 Install on iPhone:\n\n1. Tap Safari's Share icon (⬆️) at the bottom.\n2. Scroll down and tap 'Add to Home Screen'!\n\nLaunches full-screen in 0.3 seconds!");
+            showAlert("📱 Install on iPhone:\n\n1. Tap Safari's Share icon (⬆️) at the bottom.\n2. Scroll down and tap 'Add to Home Screen'!");
         } else {
             showAlert("📱 Tap your browser menu (⋮) -> 'Install App' or 'Add to Home Screen' for 1-tap full-screen access!");
         }
     };
 
-    // =========================================================================
-    // INJECT ALL PHASE 7 MODALS, PROFILE CONTROLS & CHAT UPGRADES
-    // =========================================================================
+    // INJECT ALL PHASE 7 MODALS, DISCOVER PILLS, PROFILE SUITE & CHAT BUTTONS
     function injectPhase7ModalsAndButtons() {
         if (document.getElementById("p7-modals-root")) return;
 
@@ -132,7 +118,7 @@
                         <p id="p7-voice-phrase-am" class="text-sm font-extrabold text-buna mb-1">ዛሬ ጀበና ቡና አብረን እንጠጣ — ቁጥር --</p>
                         <p id="p7-voice-phrase-en" class="text-xs font-bold text-verify italic">Loading live security code...</p>
                     </div>
-                    <p id="p7-voice-rec-status" class="text-[11px] font-bold text-gray-500 mb-3">Tap below, speak clearly for 4 seconds, then tap Verify!</p>
+                    <p id="p7-voice-rec-status" class="text-[11px] font-bold text-gray-500 mb-3">Tap below, speak clearly for 4 seconds, then auto-verify!</p>
                     <button id="p7-btn-voice-rec" onclick="toggleVoiceLivenessRecord()" class="btn-shimmer w-full py-4 bg-gradient-to-r from-cyan-600 via-verify to-indigo-600 text-white rounded-2xl font-extrabold text-xs shadow-lg flex items-center justify-center gap-2 active:scale-95 transition">
                         <i class="ph-fill ph-microphone text-lg"></i> <span>🎙️ Start 4-Second Live Voice Scan</span>
                     </button>
@@ -325,6 +311,19 @@
         `;
         document.body.appendChild(root);
 
+        // Add visible Phase 7 Quick-Access Pills right on the Discover screen!
+        const modeBar = document.getElementById("mode-pill-all")?.parentElement;
+        if (modeBar && !document.getElementById("p7-discover-quickbar")) {
+            modeBar.insertAdjacentHTML(
+                "afterend",
+                `<div id="p7-discover-quickbar" class="w-full max-w-sm mx-auto grid grid-cols-3 gap-1.5 mb-1 shrink-0">
+                    <button onclick="openVoiceLivenessModal()" class="bg-cyan-50/95 text-cyan-800 border border-cyan-200 text-[10px] font-extrabold py-0.5 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">💎 Diamond Scan</button>
+                    <button onclick="document.getElementById('p7-passport-modal').classList.remove('hidden')" class="bg-sky-50/95 text-sky-800 border border-sky-200 text-[10px] font-extrabold py-0.5 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">✈️ Passport</button>
+                    <button onclick="openSafeGuardianModal()" class="bg-emerald-50/95 text-emerald-800 border border-emerald-200 text-[10px] font-extrabold py-0.5 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">🛡️ Guardian</button>
+                </div>`
+            );
+        }
+
         // Inject Diamond Voice Liveness trigger inside #verify-modal
         const verifyModalCard = document.querySelector("#verify-modal > div");
         if (verifyModalCard && !document.getElementById("p7-open-voice-liveness-btn")) {
@@ -394,9 +393,7 @@
         }
     }
 
-    // =========================================================================
     // #1 ACOUSTIC VOICE LIVENESS FUNCTIONS
-    // =========================================================================
     window.openVoiceLivenessModal = async function () {
         if (isGuestMode) return openGuestSignupModal();
         document.getElementById("p7-voice-liveness-modal")?.classList.remove("hidden");
@@ -468,9 +465,7 @@
         }
     };
 
-    // =========================================================================
     // #2 SAFE DATE GUARDIAN & SOS FUNCTIONS
-    // =========================================================================
     window.openSafeGuardianModal = async function () {
         if (isGuestMode) return openGuestSignupModal();
         document.getElementById("p7-safe-guardian-modal")?.classList.remove("hidden");
@@ -534,9 +529,7 @@
         }
     };
 
-    // =========================================================================
     // #3 6-PILLAR TIDAR MARRIAGE BLUEPRINT
-    // =========================================================================
     window.openTidarBlueprintModal = function () {
         if (isGuestMode) return openGuestSignupModal();
         const mine = (P7_CACHE[cleanTelegramId] && P7_CACHE[cleanTelegramId].tidar_blueprint) || {};
@@ -572,9 +565,7 @@
         }
     };
 
-    // =========================================================================
     // #5 5-SECOND VIBE LOOP VIDEO UPLOAD & #8 GPS / PASSPORT MODE
-    // =========================================================================
     window.handleVibeVideoUpload = async function (event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -653,9 +644,7 @@
         loadDiscoverProfiles();
     };
 
-    // =========================================================================
     // #6 ENDORSEMENTS, #7 REAL BUNA TREAT (50 ⭐), #4 AI TRANSLATE & #10 REVIVE
-    // =========================================================================
     window.openEndorseAndTreatModal = function () {
         document.getElementById("buna-gifts-tray")?.classList.add("hidden");
         document.getElementById("p7-endorse-treat-modal")?.classList.remove("hidden");
@@ -760,9 +749,7 @@
         } catch (e) {}
     };
 
-    // =========================================================================
     // SEAMLESS HOOKS INTO DISCOVER CARDS, FULL PROFILE & CHAT RENDERING
-    // =========================================================================
     async function enrichDiscoverFeedPhase7() {
         if (typeof profiles === "undefined" || !Array.isArray(profiles) || profiles.length === 0) return;
         const ids = profiles.slice(0, 60).map((p) => String(p.telegram_id)).filter(Boolean);
@@ -789,7 +776,6 @@
         const cardEl = document.getElementById("active-swipe-card");
         if (!cardEl) return;
 
-        // 1. 💎 Diamond Badge + 📍 Distance / Passport Pill
         const headerRow = cardEl.querySelector("h3");
         if (headerRow && snap.is_diamond_verified && !headerRow.innerHTML.includes("💎")) {
             headerRow.insertAdjacentHTML(
@@ -804,7 +790,6 @@
             );
         }
 
-        // 2. 🎬 5-Second Muted Looping Vibe Video Overlay on Card Photo
         const photoBox = cardEl.querySelector(".bg-\\[\\#18110E\\]");
         if (photoBox && snap.vibe_video_url && !prof.blur_photos_until_match && !photoBox.querySelector("video")) {
             const vid = document.createElement("video");
@@ -820,7 +805,6 @@
     }
 
     function hookExistingFunctions() {
-        // Hook renderCards
         if (typeof window.renderCards === "function" && !window._p7RenderHooked) {
             window._p7RenderHooked = true;
             const origRenderCards = window.renderCards;
@@ -835,7 +819,6 @@
             };
         }
 
-        // Hook showProfileDetails to append 6-Pillar Tidar Alignment & Endorsement Badges
         if (typeof window.showProfileDetails === "function" && !window._p7DetailsHooked) {
             window._p7DetailsHooked = true;
             const origDetails = window.showProfileDetails;
@@ -882,7 +865,6 @@
             };
         }
 
-        // Hook renderChatMediaContent for [HABESHA_TREAT] vouchers + 🌐 1-Tap AI Translate on incoming bubbles
         if (typeof window.renderChatMediaContent === "function" && !window._p7ChatHooked) {
             window._p7ChatHooked = true;
             const origMedia = window.renderChatMediaContent;
@@ -913,7 +895,6 @@
         }
     }
 
-    // #10 Poll Mutual Online Spark every 35s
     let currentSparkMatch = null;
     window.openSparkMatchChat = function () {
         document.getElementById("p7-mutual-spark-banner")?.classList.add("hidden");
