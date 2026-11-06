@@ -6,6 +6,8 @@
 (function () {
     "use strict";
 
+    window.__PHASE6_LOADED__ = true;
+
     let realtimeSocket = null;
     let wsHeartbeatTimer = null;
     let wsReconnectTimer = null;
