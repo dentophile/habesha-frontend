@@ -1507,48 +1507,46 @@
             <span class="bg-white text-buna px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ml-2 shadow-sm">⚡ Join Free</span>
         </div>
 
-        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1 shrink-0 gap-1.5">
+        <!-- Neat Single Top Header: Brand + Likes + Language + VIP Counter + ✨ Lounge + ⚙️ Filter -->
+        <div class="w-full max-w-sm mx-auto flex justify-between items-center mb-1.5 shrink-0 gap-1">
             <div class="flex items-center gap-1.5 min-w-0">
                 <span class="w-6 h-6 rounded-lg bg-gradient-to-tr from-botOrange to-habeshaCoral text-white flex items-center justify-center shadow-sm shrink-0">
                     <i class="ph-fill ph-flame text-xs"></i>
                 </span>
                 <h2 class="font-extrabold text-base text-buna tracking-tight truncate" data-i18n="nav_discover">Discover</h2>
+                <span id="active-mode-badge" onclick="if(typeof openHabeshaLoungeModal==='function') openHabeshaLoungeModal()" class="hidden text-[9px] font-extrabold bg-orange-100 text-botOrange px-2 py-0.5 rounded-full cursor-pointer whitespace-nowrap shrink-0">✨ All</span>
                 <div id="top-card-likes" onclick="switchTab('matches')" class="hidden items-center gap-0.5 bg-rose-50 border border-rose-200/80 text-habeshaCoral text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap shrink-0 cursor-pointer">
                     <i class="ph-fill ph-heart"></i> <span id="top-card-likes-count">0</span>
                 </div>
             </div>
 
-            <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="toggleLanguage()" class="bg-white/95 text-buna border border-gray-200 text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm active:scale-95 whitespace-nowrap lang-toggle-btn">
+            <div class="flex items-center gap-1 shrink-0">
+                <button onclick="toggleLanguage()" class="bg-white/95 text-buna border border-gray-200 text-[10px] font-extrabold px-2 py-1 rounded-full shadow-sm active:scale-95 whitespace-nowrap lang-toggle-btn">
                     🇪🇹 አማ
                 </button>
-                <button onclick="openPremiumModal('stars')" id="swipes-remaining-badge" class="bg-white/95 text-botOrange border border-orange-200 text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm active:scale-95 whitespace-nowrap">
+                <button onclick="openPremiumModal('stars')" id="swipes-remaining-badge" class="bg-white/95 text-botOrange border border-orange-200 text-[10px] font-extrabold px-2 py-1 rounded-full flex items-center gap-0.5 shadow-sm active:scale-95 whitespace-nowrap">
                     <i class="ph-fill ph-fire"></i> <span id="swipes-remaining-text">25</span>
                 </button>
-                <button id="filter-modal-btn" onclick="openFilterModal()" class="bg-buna text-white border border-buna text-[10px] font-extrabold px-3 py-1 rounded-full shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
+                <button id="top-lounge-btn" onclick="if(typeof openHabeshaLoungeModal==='function') openHabeshaLoungeModal(); else openSpinWheelModal();" class="btn-shimmer bg-gradient-to-r from-botOrange to-habeshaCoral text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
+                    <span>✨ Lounge</span>
+                </button>
+                <button id="filter-modal-btn" onclick="openFilterModal()" class="bg-buna text-white border border-buna text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
                     <i class="ph-bold ph-sliders-horizontal text-amber-300 text-xs"></i>
                     <span data-i18n="filter_btn">Filter</span>
+                    <span id="filter-btn-count" class="hidden bg-botOrange text-white text-[9px] font-extrabold px-1.5 rounded-full">0</span>
                 </button>
             </div>
         </div>
 
-        <div class="w-full max-w-sm mx-auto grid grid-cols-3 gap-1.5 mb-1 shrink-0">
-            <button onclick="openBunaPollModal()" id="btn-top-buna" class="bg-amber-50/95 text-amber-900 border border-amber-200/90 text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">
-                <span>☕ Buna Poll</span>
-            </button>
-            <button onclick="openBunaMixerModal()" id="btn-top-mixer" class="bg-emerald-50/95 text-emerald-800 border border-emerald-200/90 text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">
-                <span>⏰ Speed Mixer</span>
-            </button>
-            <button onclick="openSpinWheelModal()" id="btn-top-spin" class="btn-shimmer bg-gradient-to-r from-amber-400 via-botOrange to-habeshaCoral text-white text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">
-                <span>🎡 Daily Spin</span>
-            </button>
-        </div>
-
-        <div class="w-full max-w-sm mx-auto flex items-center gap-1 bg-white/80 backdrop-blur-md p-0.5 rounded-full border border-orange-100/80 mb-1 shrink-0 text-[10px] font-extrabold">
-            <button id="mode-pill-all" onclick="switchDiscoveryMode('all')" class="flex-1 py-1 rounded-full bg-gradient-to-r from-botOrange to-habeshaCoral text-white shadow-sm transition">✨ All</button>
-            <button id="mode-pill-tidar" onclick="switchDiscoveryMode('tidar')" class="flex-1 py-1 rounded-full text-gray-600 hover:text-buna transition">💍 Tidar</button>
-            <button id="mode-pill-dating" onclick="switchDiscoveryMode('dating')" class="flex-1 py-1 rounded-full text-gray-600 hover:text-buna transition">❤️ Dating</button>
-            <button id="mode-pill-circle" onclick="switchDiscoveryMode('circle')" class="flex-1 py-1 rounded-full text-gray-600 hover:text-buna transition">🤝 Circle</button>
+        <!-- Hidden Legacy Rows (Moved Cleanly Inside ✨ Lounge Modal) -->
+        <div class="hidden">
+            <button onclick="openBunaPollModal()" id="btn-top-buna">☕ Buna Poll</button>
+            <button onclick="openBunaMixerModal()" id="btn-top-mixer">⏰ Speed Mixer</button>
+            <button onclick="openSpinWheelModal()" id="btn-top-spin">🎡 Daily Spin</button>
+            <button id="mode-pill-all" onclick="switchDiscoveryMode('all')">✨ All</button>
+            <button id="mode-pill-tidar" onclick="switchDiscoveryMode('tidar')">💍 Tidar</button>
+            <button id="mode-pill-dating" onclick="switchDiscoveryMode('dating')">❤️ Dating</button>
+            <button id="mode-pill-circle" onclick="switchDiscoveryMode('circle')">🤝 Circle</button>
         </div>
 
         <div class="w-full max-w-sm mx-auto flex items-center justify-between gap-2 mb-1 shrink-0">
@@ -1986,7 +1984,7 @@
         </button>
     </div>
     <!-- END OF COMBINED PART 1 + PART 2 — PASTE PART 3 (<script> ... </body></html>) DIRECTLY BELOW THIS LINE -->
-   <!-- MAIN JAVASCRIPT ENGINE (PASTE DIRECTLY BELOW COMBINED index_part1.html) -->
+    <!-- MAIN JAVASCRIPT ENGINE (PASTE DIRECTLY BELOW COMBINED index_part1.html) -->
     <script>
         const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
         if (tg) {
@@ -2822,22 +2820,52 @@
         async function switchDiscoveryMode(mode) {
             triggerHaptic("selection");
             currentDiscoveryMode = mode;
+            const modeNames = { all: "✨ All", tidar: "💍 Tidar", dating: "❤️ Dating", circle: "🤝 Circle" };
+            const modeBadge = document.getElementById("active-mode-badge");
+            if (modeBadge) {
+                if (mode === "all") {
+                    modeBadge.classList.add("hidden");
+                } else {
+                    modeBadge.innerText = modeNames[mode] || "✨ All";
+                    modeBadge.classList.remove("hidden");
+                }
+            }
             ["all", "tidar", "dating", "circle"].forEach(m => {
                 const btn = document.getElementById(`mode-pill-${m}`);
-                if (!btn) return;
-                btn.className = m === mode
-                    ? "flex-1 py-1 rounded-full bg-gradient-to-r from-botOrange to-habeshaCoral text-white shadow-sm transition"
-                    : "flex-1 py-1 rounded-full text-gray-600 hover:text-buna transition";
+                const loungeBtn = document.getElementById(`lounge-mode-pill-${m}`);
+                const activeCls = "flex-1 py-1.5 rounded-xl bg-gradient-to-r from-botOrange to-habeshaCoral text-white shadow-sm transition";
+                const idleCls = "flex-1 py-1.5 rounded-xl bg-white text-gray-600 border border-gray-200 hover:text-buna transition";
+                if (btn) btn.className = m === mode ? activeCls : idleCls;
+                if (loungeBtn) loungeBtn.className = m === mode ? activeCls : idleCls;
             });
             await loadDiscoverProfiles();
         }
 
         async function loadDiscoverProfiles() {
+            const container = document.getElementById("card-container");
+            if (container) {
+                container.innerHTML = `<div class="flex h-full items-center justify-center gap-2 text-gray-400 font-bold text-xs"><i class="ph ph-spinner animate-spin text-xl text-botOrange"></i> <span>Finding matches...</span></div>`;
+            }
             try {
                 const targetUid = (!isGuestMode && cleanTelegramId && cleanTelegramId !== "guest") ? cleanTelegramId : "guest";
                 const params = new URLSearchParams();
                 params.set("mode", currentDiscoveryMode);
                 if (pendingCrushId) params.set("crush_id", pendingCrushId);
+
+                // Pass active filters directly to the backend so full database is searched!
+                if (activeFilters.gender) params.set("gender", activeFilters.gender);
+                if (activeFilters.intention) params.set("intention", activeFilters.intention);
+                if (activeFilters.city) params.set("city", activeFilters.city);
+                if (activeFilters.religion) params.set("religion", activeFilters.religion);
+                if (activeFilters.education) params.set("education", activeFilters.education);
+                if (activeFilters.languageSpoken) params.set("language_spoken", activeFilters.languageSpoken);
+                if (activeFilters.subcity) params.set("subcity", activeFilters.subcity);
+                if (activeFilters.minAge > 18) params.set("min_age", String(activeFilters.minAge));
+                if (activeFilters.maxAge < 80) params.set("max_age", String(activeFilters.maxAge));
+                if (activeFilters.onlineOnly) params.set("online_only", "true");
+                if (activeFilters.verifiedOnly) params.set("verified_only", "true");
+                if (activeFilters.voiceOnly) params.set("voice_only", "true");
+                if (activeFilters.newOnly) params.set("new_only", "true");
 
                 let res = await fetch(`${BACKEND_URL}/api/get-potential-matches/${encodeURIComponent(targetUid)}?${params.toString()}`);
                 if (!res.ok && targetUid === "guest") {
@@ -2982,6 +3010,20 @@
         }
 
         function openFilterModal() {
+            // Sync modal inputs with current activeFilters state
+            document.getElementById("filter-gender").value = activeFilters.gender || "";
+            document.getElementById("filter-intention").value = activeFilters.intention || "";
+            document.getElementById("filter-city").value = activeFilters.city || "";
+            document.getElementById("filter-religion").value = activeFilters.religion || "";
+            document.getElementById("filter-education").value = activeFilters.education || "";
+            if (document.getElementById("filter-language-spoken")) document.getElementById("filter-language-spoken").value = activeFilters.languageSpoken || "";
+            if (document.getElementById("filter-subcity")) document.getElementById("filter-subcity").value = activeFilters.subcity || "";
+            document.getElementById("filter-min-age").value = activeFilters.minAge || 18;
+            document.getElementById("filter-max-age").value = activeFilters.maxAge || 60;
+            document.getElementById("filter-online-only").checked = Boolean(activeFilters.onlineOnly);
+            document.getElementById("filter-verified-only").checked = Boolean(activeFilters.verifiedOnly);
+            document.getElementById("filter-voice-only").checked = Boolean(activeFilters.voiceOnly);
+            document.getElementById("filter-new-only").checked = Boolean(activeFilters.newOnly);
             document.getElementById("filter-modal").classList.remove("hidden");
         }
 
@@ -2989,26 +3031,37 @@
             document.getElementById("filter-modal").classList.add("hidden");
         }
 
-        function applyDiscoveryFilters() {
-            activeFilters.gender = document.getElementById("filter-gender").value;
-            activeFilters.intention = document.getElementById("filter-intention").value;
-            activeFilters.city = document.getElementById("filter-city").value;
-            activeFilters.religion = document.getElementById("filter-religion").value;
-            activeFilters.education = document.getElementById("filter-education").value;
-            activeFilters.languageSpoken = document.getElementById("filter-language-spoken")?.value || "";
-            activeFilters.subcity = document.getElementById("filter-subcity")?.value || "";
-            activeFilters.minAge = parseInt(document.getElementById("filter-min-age").value) || 18;
-            activeFilters.maxAge = parseInt(document.getElementById("filter-max-age").value) || 80;
+        async function applyDiscoveryFilters() {
+            triggerHaptic("medium");
+            let minA = parseInt(document.getElementById("filter-min-age").value, 10) || 18;
+            let maxA = parseInt(document.getElementById("filter-max-age").value, 10) || 80;
+            if (minA > maxA) {
+                const tmp = minA;
+                minA = maxA;
+                maxA = tmp;
+            }
+            activeFilters.gender = document.getElementById("filter-gender").value.trim();
+            activeFilters.intention = document.getElementById("filter-intention").value.trim();
+            activeFilters.city = document.getElementById("filter-city").value.trim();
+            activeFilters.religion = document.getElementById("filter-religion").value.trim();
+            activeFilters.education = document.getElementById("filter-education").value.trim();
+            activeFilters.languageSpoken = (document.getElementById("filter-language-spoken")?.value || "").trim();
+            activeFilters.subcity = (document.getElementById("filter-subcity")?.value || "").trim();
+            activeFilters.minAge = Math.max(18, minA);
+            activeFilters.maxAge = Math.min(80, maxA);
             activeFilters.onlineOnly = document.getElementById("filter-online-only").checked;
             activeFilters.verifiedOnly = document.getElementById("filter-verified-only").checked;
             activeFilters.voiceOnly = document.getElementById("filter-voice-only").checked;
             activeFilters.newOnly = document.getElementById("filter-new-only").checked;
 
+            // When a user explicitly selects a filter, don't let a stale crush_id override it
+            pendingCrushId = "";
             closeFilterModal();
-            applyAllFilters();
+            await loadDiscoverProfiles();
         }
 
-        function resetDiscoveryFilters() {
+        async function resetDiscoveryFilters() {
+            triggerHaptic("light");
             document.getElementById("filter-gender").value = "";
             document.getElementById("filter-intention").value = "";
             document.getElementById("filter-city").value = "";
@@ -3029,7 +3082,7 @@
                 onlineOnly: false, verifiedOnly: false, voiceOnly: false, newOnly: false
             };
             closeFilterModal();
-            applyAllFilters();
+            await loadDiscoverProfiles();
         }
 
         function applyAllFilters() {
@@ -3048,6 +3101,7 @@
             if (activeFilters.minAge > 18 || activeFilters.maxAge < 60) activeCount++;
 
             const pill = document.getElementById("active-filter-pill");
+            const btnCount = document.getElementById("filter-btn-count");
             if (pill) {
                 if (activeCount > 0) {
                     pill.innerText = `${activeCount} Filter${activeCount > 1 ? "s" : ""} Active ✕`;
@@ -3056,27 +3110,47 @@
                     pill.classList.add("hidden");
                 }
             }
+            if (btnCount) {
+                if (activeCount > 0) {
+                    btnCount.innerText = String(activeCount);
+                    btnCount.classList.remove("hidden");
+                } else {
+                    btnCount.classList.add("hidden");
+                }
+            }
+
+            const fGender = (activeFilters.gender || "").toLowerCase();
+            const fIntent = (activeFilters.intention || "").toLowerCase();
+            const fCity = activeFilters.city || "";
+            const fRel = (activeFilters.religion || "").toLowerCase();
+            const fEdu = (activeFilters.education || "").toLowerCase();
+            const fLang = (activeFilters.languageSpoken || "").toLowerCase();
+            const fSub = (activeFilters.subcity || "").toLowerCase();
 
             profiles = allProfiles.filter(p => {
-                if (p.is_crush_target) return true;
-                if (activeFilters.gender && p.gender !== activeFilters.gender) return false;
-                if (activeFilters.intention && p.intention !== activeFilters.intention) return false;
-                if (activeFilters.city) {
-                    const userLoc = String(p.location || "");
-                    if (activeFilters.city === "ALL_DIASPORA" || activeFilters.city === "Diaspora") {
+                if (p.is_crush_target && activeCount === 0) return true;
+                if (fGender) {
+                    const pg = String(p.gender || "").trim().toLowerCase();
+                    if ((fGender === "woman" || fGender === "female") && pg !== "woman" && pg !== "female") return false;
+                    if ((fGender === "man" || fGender === "male") && pg !== "man" && pg !== "male") return false;
+                }
+                if (fIntent && !String(p.intention || "").toLowerCase().includes(fIntent)) return false;
+                if (fCity) {
+                    const userLoc = String(p.location || "").trim();
+                    if (fCity === "ALL_DIASPORA" || fCity === "Diaspora") {
                         if (!userLoc.toLowerCase().includes("diaspora")) return false;
-                    } else if (activeFilters.city === "ALL_ETHIOPIA") {
+                    } else if (fCity === "ALL_ETHIOPIA") {
                         if (userLoc.toLowerCase().includes("diaspora") || !userLoc) return false;
-                    } else if (userLoc !== activeFilters.city) {
+                    } else if (!userLoc.toLowerCase().includes(fCity.toLowerCase())) {
                         return false;
                     }
                 }
-                if (activeFilters.religion && p.religion !== activeFilters.religion) return false;
-                if (activeFilters.education && p.education !== activeFilters.education) return false;
-                if (activeFilters.languageSpoken && !String(p.languages_spoken || "").toLowerCase().includes(activeFilters.languageSpoken.toLowerCase())) return false;
-                if (activeFilters.subcity && String(p.subcity_campus || "") !== activeFilters.subcity) return false;
+                if (fRel && !String(p.religion || "").toLowerCase().includes(fRel)) return false;
+                if (fEdu && !String(p.education || "").toLowerCase().includes(fEdu)) return false;
+                if (fLang && !String(p.languages_spoken || "").toLowerCase().includes(fLang)) return false;
+                if (fSub && !String(p.subcity_campus || "").toLowerCase().includes(fSub)) return false;
 
-                const age = parseInt(p.age) || 25;
+                const age = parseInt(p.age, 10) || 24;
                 if (age < activeFilters.minAge || age > activeFilters.maxAge) return false;
                 if (activeFilters.onlineOnly && !p.is_online) return false;
                 if (activeFilters.verifiedOnly && !p.is_verified) return false;
@@ -3314,11 +3388,11 @@
             if (profile.is_crush_target) {
                 topOverlayBadges += `<div class="bg-gradient-to-r from-habeshaCoral to-rose-500 text-white px-2.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1 shadow-lg border border-white/30">💘 Shared Crush Card</div>`;
             }
-            if (profile.admirer_comment) {
-                const safeAdmirer = String(profile.admirer_comment).replace(/</g, "&lt;");
-                topOverlayBadges += `<div class="bg-gradient-to-r from-amber-500 to-rose-600 text-white px-2.5 py-1 rounded-2xl text-[10px] font-extrabold shadow-lg border border-white/40 max-w-[230px] truncate">💬 "${safeAdmirer}"</div>`;
-            } else if (profile.super_liked_me) {
+            if (profile.super_liked_me) {
                 topOverlayBadges += `<div class="bg-gradient-to-r from-blue-600 to-indigo-500 text-white px-2.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1 shadow-lg border border-white/30 animate-pulse"><i class="ph-fill ph-star text-yellow-300"></i> Super Liked You!</div>`;
+            }
+            if (profile.travel_banner) {
+                topOverlayBadges += `<div class="bg-sky-500/90 backdrop-blur-sm text-white px-2.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1 shadow-lg border border-white/30">${profile.travel_banner}</div>`;
             }
             const topLeftStackHtml = topOverlayBadges ? `<div class="absolute top-5 left-3 z-20 flex flex-col gap-1 items-start">${topOverlayBadges}</div>` : "";
 
@@ -3893,6 +3967,7 @@
             `;
 
             const extraLocalBadges = `
+                ${profile.travel_banner ? `<span class="text-xs font-extrabold bg-sky-50 text-sky-700 border border-sky-200 px-2.5 py-1 rounded-md">${profile.travel_banner}</span>` : ""}
                 ${profile.subcity_campus ? `<span class="text-xs font-extrabold bg-orange-50 text-botOrange border border-orange-200 px-2.5 py-1 rounded-md">📍 ${profile.subcity_campus}</span>` : ""}
                 ${profile.languages_spoken ? `<span class="text-xs font-extrabold bg-purple-50 text-premium border border-purple-200 px-2.5 py-1 rounded-md">🗣️ ${profile.languages_spoken}</span>` : ""}
             `;
@@ -3936,6 +4011,8 @@
                     <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">Religion</span><span class="font-semibold">${profile.religion || "N/A"}</span></div>
                     <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">Looking For</span><span class="font-semibold">${profile.intention || "N/A"}</span></div>
                     <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">Kids</span><span class="font-semibold">${profile.kids || "N/A"}</span></div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">Drinking</span><span class="font-semibold">${profile.drinking || "N/A"}</span></div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">Smoking</span><span class="font-semibold">${profile.smoking || "N/A"}</span></div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2.5 mt-4 mb-4">
@@ -5436,11 +5513,9 @@
             } catch (e) {}
         }
 
-   initApp();
+        initApp();
     </script>
     <script src="phase6_features.js?v=9"></script>
     <script src="phase7_features.js?v=9"></script>
 </body>
 </html>
-
-
