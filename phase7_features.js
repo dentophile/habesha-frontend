@@ -120,11 +120,13 @@
     function injectModalsAndUnifiedBar() {
         if (document.getElementById("p7-modals-root")) return;
 
-        // Audit Fix #2: Declutter the old 3-button row on Discover so photos get 15% more vertical screen space
+        // Hide ALL extra upper rows on Discover so only the sleek top header + Stories Bar remain!
         const oldRow = document.getElementById("btn-top-buna")?.parentElement;
-        if (oldRow && oldRow.classList.contains("grid-cols-3")) {
-            oldRow.classList.add("hidden");
-        }
+        if (oldRow) oldRow.classList.add("hidden");
+        const oldModeRow = document.getElementById("mode-pill-all")?.parentElement;
+        if (oldModeRow) oldModeRow.classList.add("hidden");
+        const existingQuickbar = document.getElementById("p7-discover-quickbar");
+        if (existingQuickbar) existingQuickbar.remove();
 
         const root = document.createElement("div");
         root.id = "p7-modals-root";
@@ -138,16 +140,27 @@
                 <button onclick="document.getElementById('p7-mutual-spark-banner').classList.add('hidden')" class="text-white/80 text-xs font-bold px-1">✕</button>
             </div>
 
-            <!-- SLEEK "✨ HABESHA LOUNGE" UNIFIED DRAWER (Declutters Discover!) -->
+            <!-- SLEEK "✨ HABESHA LOUNGE" UNIFIED DRAWER (Holds Modes + All Upper Row Features!) -->
             <div id="p8-lounge-modal" class="hidden fixed inset-0 z-[212] flex items-end sm:items-center justify-center bg-black/65 backdrop-blur-sm px-0 sm:px-4">
                 <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] p-5 w-full max-w-sm shadow-2xl relative overflow-hidden modal-pop max-h-[88vh] touch-scroll no-scrollbar">
                     <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
                     <div class="flex items-center justify-between mb-3 pt-1">
                         <div>
-                            <h3 class="text-lg font-extrabold text-buna">✨ Habesha Lounge & Hub</h3>
-                            <p class="text-[11px] text-gray-500">All live mixers, safety tools, and cultural features in 1 place</p>
+                            <h3 class="text-lg font-extrabold text-buna">✨ Habesha Lounge & Modes</h3>
+                            <p class="text-[11px] text-gray-500">Switch discovery modes, play live mixers & explore perks</p>
                         </div>
                         <button onclick="document.getElementById('p8-lounge-modal').classList.add('hidden')" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+                    </div>
+
+                    <!-- Discovery Mode Switcher Inside Lounge -->
+                    <div class="bg-orange-50/70 border border-orange-200/80 p-2.5 rounded-2xl mb-3 text-left">
+                        <p class="text-[10px] font-extrabold text-botOrange uppercase tracking-wider mb-1.5">🎯 Discovery Mode</p>
+                        <div class="flex items-center gap-1.5 text-[11px] font-extrabold">
+                            <button id="lounge-mode-pill-all" onclick="closeLoungeAndRun(() => switchDiscoveryMode('all'))" class="flex-1 py-1.5 rounded-xl bg-gradient-to-r from-botOrange to-habeshaCoral text-white shadow-sm transition">✨ All</button>
+                            <button id="lounge-mode-pill-tidar" onclick="closeLoungeAndRun(() => switchDiscoveryMode('tidar'))" class="flex-1 py-1.5 rounded-xl bg-white text-gray-600 border border-gray-200 hover:text-buna transition">💍 Tidar</button>
+                            <button id="lounge-mode-pill-dating" onclick="closeLoungeAndRun(() => switchDiscoveryMode('dating'))" class="flex-1 py-1.5 rounded-xl bg-white text-gray-600 border border-gray-200 hover:text-buna transition">❤️ Dating</button>
+                            <button id="lounge-mode-pill-circle" onclick="closeLoungeAndRun(() => switchDiscoveryMode('circle'))" class="flex-1 py-1.5 rounded-xl bg-white text-gray-600 border border-gray-200 hover:text-buna transition">🤝 Circle</button>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2 text-left mb-3">
@@ -502,20 +515,13 @@
         `;
         document.body.appendChild(root);
 
-        // Single Compact 3-Pill Bar on Discover: 💌 Top 3 Picks • 🎙️ Voice Sparks • ✨ Lounge (All Tools)
-        const quickbarHtml = `
-            <div id="p7-discover-quickbar" class="w-full max-w-sm mx-auto grid grid-cols-3 gap-1.5 mb-1 shrink-0">
-                <button onclick="openDailyCuratedModal()" class="bg-rose-50/95 text-habeshaCoral border border-rose-200 text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">💌 Top 3 Picks</button>
-                <button onclick="openVoiceSparksModal()" class="bg-purple-50/95 text-premium border border-purple-200 text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">🎙️ Voice Sparks</button>
-                <button onclick="openHabeshaLoungeModal()" class="btn-shimmer bg-gradient-to-r from-buna via-[#3D251B] to-botOrange text-white text-[10px] font-extrabold py-1 px-2 rounded-full flex items-center justify-center gap-1 shadow-sm active:scale-95 truncate">✨ Lounge</button>
-            </div>
-        `;
-
-        const modeBar = document.getElementById("mode-pill-all")?.parentElement;
-        const cardContainer = document.getElementById("card-container");
-        if (!document.getElementById("p7-discover-quickbar")) {
-            if (modeBar) modeBar.insertAdjacentHTML("afterend", quickbarHtml);
-            else if (cardContainer) cardContainer.insertAdjacentHTML("beforebegin", quickbarHtml);
+        // Ensure `✨ Lounge` button is present right next to `Filter` in the top header even on older index.html builds
+        const filterBtn = document.getElementById("filter-modal-btn");
+        if (filterBtn && filterBtn.parentElement && !document.getElementById("top-lounge-btn")) {
+            filterBtn.insertAdjacentHTML(
+                "beforebegin",
+                `<button id="top-lounge-btn" onclick="openHabeshaLoungeModal()" class="btn-shimmer bg-gradient-to-r from-botOrange to-habeshaCoral text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap"><span>✨ Lounge</span></button>`
+            );
         }
 
         // Inject Profile Suite Buttons
