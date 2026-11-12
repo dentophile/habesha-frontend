@@ -140,9 +140,9 @@
                 <button onclick="document.getElementById('p7-mutual-spark-banner').classList.add('hidden')" class="text-white/80 text-xs font-bold px-1">✕</button>
             </div>
 
-            <!-- SLEEK "✨ HABESHA LOUNGE" UNIFIED DRAWER (Bi-Directional Android Scroll Ready!) -->
-            <div id="p8-lounge-modal" onclick="if(event.target===this) this.classList.add('hidden')" class="hidden fixed inset-0 z-[212] flex items-center justify-center bg-black/65 backdrop-blur-sm p-3 overflow-hidden" style="touch-action: none; overscroll-behavior: none;">
-                <div class="bg-white rounded-[2rem] p-5 pb-16 w-full max-w-sm shadow-2xl relative overflow-y-scroll touch-scroll modal-pop" style="display: block; height: 82vh; max-height: 82vh; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior-y: contain;">
+            <!-- SLEEK "✨ HABESHA LOUNGE" UNIFIED DRAWER (Pure Native Scroll Ready!) -->
+            <div id="p8-lounge-modal" onclick="if(event.target===this) this.classList.add('hidden')" class="hidden fixed inset-0 z-[212] flex items-center justify-center bg-black/65 backdrop-blur-sm p-3 overflow-hidden">
+                <div class="bg-white rounded-[2rem] p-5 pb-16 w-full max-w-sm shadow-2xl relative overflow-y-auto touch-scroll modal-pop" style="display: block; height: 82vh; max-height: 82vh; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior-y: contain;">
                     <div class="tibeb-ribbon h-1.5 w-full sticky top-0 left-0 z-20"></div>
                     <div class="flex items-center justify-between mb-3 pt-1 sticky top-0 bg-white/95 backdrop-blur-sm z-10 pb-2 border-b border-orange-50">
                         <div>
