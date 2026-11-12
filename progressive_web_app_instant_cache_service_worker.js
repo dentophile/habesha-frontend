@@ -1,6 +1,5 @@
-const CACHE_NAME = "habesha-date-pwa-v7";
+const CACHE_NAME = "habesha-date-pwa-v17";
 const STATIC_ASSETS = [
-    "./",
     "https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
     "https://unpkg.com/@phosphor-icons/web"
 ];
@@ -23,7 +22,15 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
     const req = event.request;
-    if (req.method !== "GET" || req.url.includes("/api/") || req.url.includes("/ws/")) {
+    // Never serve stale cached HTML or JS files in the Android APK — always fetch fresh network first!
+    if (
+        req.method !== "GET" ||
+        req.url.includes("/api/") ||
+        req.url.includes("/ws/") ||
+        req.url.endsWith(".js") ||
+        req.url.includes(".js?") ||
+        req.mode === "navigate"
+    ) {
         return;
     }
     event.respondWith(
