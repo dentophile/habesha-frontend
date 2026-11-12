@@ -271,7 +271,7 @@
                     if (showAllBtn) {
                         showAllBtn.insertAdjacentHTML(
                             "afterend",
-                            `<button id="p10-empty-recycle-btn" onclick="if(window.HabeshaPhase9) window.HabeshaPhase9.recycleStackNow()" class="mt-2 px-5 py-2.5 bg-amber-50 text-amber-900 border border-amber-200 rounded-2xl text-xs font-extrabold shadow-sm active:scale-95 transition">♻️ Recycle Passed Profiles</button>`
+                            `<button id="p10-empty-recycle-btn" onclick="window.forceRecycleDiscoverStack(this)" class="mt-2 px-5 py-2.5 bg-amber-50 text-amber-900 border border-amber-200 rounded-2xl text-xs font-extrabold shadow-sm active:scale-95 transition">♻️ Recycle Passed Profiles</button>`
                         );
                     }
                 }
@@ -279,6 +279,37 @@
             window._p10EmptyObserver.observe(cardContainer, { childList: true, subtree: true });
         }
     }
+
+    window.forceRecycleDiscoverStack = async function (btn) {
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "♻️ Restoring Profiles...";
+        }
+        try {
+            const uid = getUid();
+            await fetch(`${getApiBase()}/api/phase9/recycle-stack/${encodeURIComponent(uid)}`).catch(() => {});
+            const freshRes = await fetch(`${getApiBase()}/api/get-potential-matches/${encodeURIComponent(uid)}?mode=all`).then(r => r.json()).catch(() => ({}));
+            const list = freshRes.matches || [];
+            if (list.length > 0 && typeof window.renderCards === "function") {
+                window.allProfiles = list;
+                window.profiles = list;
+                window.currentCardIndex = 0;
+                window.currentPhotoSlideIndex = 0;
+                window.renderCards();
+                return;
+            }
+            if (typeof window.loadDiscoverProfiles === "function") {
+                await window.loadDiscoverProfiles();
+            }
+        } catch (e) {
+            if (typeof window.loadDiscoverProfiles === "function") await window.loadDiscoverProfiles();
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "♻️ Recycle Passed Profiles";
+            }
+        }
+    };
 
     function initPhase10() {
         injectPhase10Styles();
