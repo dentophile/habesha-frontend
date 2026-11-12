@@ -460,32 +460,47 @@
         document.body.appendChild(modal);
     }
 
-    // Android APK Bi-Directional Touch-Scroll Unlocker (Fixes downward drag lock!)
-    function unlockAndroidApkWebViewScroll(loungeModal, innerCard) {
-        if (!loungeModal || !innerCard) return;
+    // Universal Scroll Unlocker for Profile, Admin, Matches, Registration & Lounge Modal
+    function unlockAllAppViewsAndLoungeScroll() {
+        // 1. Ensure html/body never block native vertical scrolling on non-Discover tabs
+        document.documentElement.style.removeProperty("overscroll-behavior-y");
+        document.body.style.removeProperty("overscroll-behavior-y");
 
-        // 1. Disable Android native pull-to-refresh & outer container scrolling so ONLY innerCard scrolls
-        document.documentElement.style.overscrollBehaviorY = "none";
-        document.body.style.overscrollBehaviorY = "none";
+        // 2. Make Profile, Admin, Matches & Registration self-contained native scroll containers
+        // so Android WebView never freezes them even if html.lock-viewport is active!
+        ["view-profile", "view-admin", "view-matches", "view-registration"].forEach((id) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.style.height = "100dvh";
+            el.style.maxHeight = "100dvh";
+            el.style.overflowY = "auto";
+            el.style.overflowX = "hidden";
+            el.style.webkitOverflowScrolling = "touch";
+            el.style.touchAction = "pan-y";
+            el.style.overscrollBehaviorY = "contain";
+        });
+
+        // 3. Configure #p8-lounge-modal inner card with pure native touch scrolling (NO preventDefault!)
+        const loungeModal = document.getElementById("p8-lounge-modal");
+        if (!loungeModal) return;
+        const innerCard = loungeModal.firstElementChild;
+        if (!innerCard) return;
 
         loungeModal.style.overflow = "hidden";
-        loungeModal.style.touchAction = "none";
-        loungeModal.style.alignItems = "center";
-        loungeModal.style.padding = "12px";
+        loungeModal.style.touchAction = "auto";
 
-        // 2. Make innerCard the single, dedicated block scroll container
         innerCard.classList.remove("overflow-hidden", "max-h-[85dvh]", "no-scrollbar");
         innerCard.style.display = "block";
         innerCard.style.height = "82vh";
         innerCard.style.maxHeight = "82vh";
-        innerCard.style.overflowY = "scroll";
+        innerCard.style.overflowY = "auto";
         innerCard.style.overflowX = "hidden";
         innerCard.style.webkitOverflowScrolling = "touch";
         innerCard.style.touchAction = "pan-y";
         innerCard.style.overscrollBehaviorY = "contain";
         innerCard.style.paddingBottom = "64px";
 
-        // 3. Inject 1-Tap ▲ Up / ▼ Down helper buttons in the sticky Lounge header for instant Android navigation
+        // Keep the handy ▲ / ▼ quick-scroll buttons in the Lounge header
         const headerRow = innerCard.querySelector(".sticky");
         if (headerRow && !headerRow.querySelector("#p9-apk-scroll-btns")) {
             const closeBtn = headerRow.querySelector("button");
@@ -507,39 +522,11 @@
             if (upBtn) upBtn.onclick = () => innerCard.scrollBy({ top: -240, behavior: "smooth" });
             if (downBtn) downBtn.onclick = () => innerCard.scrollBy({ top: 240, behavior: "smooth" });
         }
-
-        // 4. Explicit Bi-Directional Touch-Drag Engine (Guarantees both upward & downward scrolling on Android APK!)
-        if (!innerCard.dataset.apkScrollBound) {
-            innerCard.dataset.apkScrollBound = "1";
-            let startY = 0;
-            let startScrollTop = 0;
-
-            innerCard.addEventListener("touchstart", (e) => {
-                e.stopPropagation();
-                if (e.touches && e.touches.length === 1) {
-                    startY = e.touches[0].clientY;
-                    startScrollTop = innerCard.scrollTop;
-                }
-            }, { passive: true });
-
-            innerCard.addEventListener("touchmove", (e) => {
-                e.stopPropagation();
-                if (!e.touches || e.touches.length !== 1) return;
-                const currentY = e.touches[0].clientY;
-                const deltaY = startY - currentY; // >0 finger moves up (scroll down), <0 finger moves down (scroll up)
-
-                // If user drags finger downward (deltaY < 0), prevent Android WebView pull-to-refresh from locking it!
-                if (e.cancelable) {
-                    e.preventDefault();
-                }
-                innerCard.scrollTop = startScrollTop + deltaY;
-            }, { passive: false });
-        }
     }
 
     async function bustAndroidApkServiceWorkerCacheOnce() {
         try {
-            const APK_SW_VERSION = "v18_bidirectional_scroll_fix";
+            const APK_SW_VERSION = "v19_all_tabs_scroll_fix";
             if (localStorage.getItem("hd_apk_sw_ver") === APK_SW_VERSION) return;
             localStorage.setItem("hd_apk_sw_ver", APK_SW_VERSION);
 
@@ -558,13 +545,12 @@
 
     // Strictly inject ONLY inside the popup `#p8-lounge-modal` (never inside `#top-lounge-btn`!)
     function injectIntoLoungeModalStrict() {
+        unlockAllAppViewsAndLoungeScroll();
+
         const loungeModal = document.getElementById("p8-lounge-modal");
         if (!loungeModal) return;
         const innerCard = loungeModal.firstElementChild;
         if (!innerCard) return;
-
-        // Unlock Android APK WebView scrolling
-        unlockAndroidApkWebViewScroll(loungeModal, innerCard);
 
         if (innerCard.querySelector("#p9-lounge-section")) return;
 
