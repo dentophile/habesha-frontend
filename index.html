@@ -2872,7 +2872,7 @@
                     res = await fetch(`${BACKEND_URL}/api/get-potential-matches/0?${params.toString()}`);
                 }
                 const data = await res.json();
-                allProfiles = data.matches || [];
+                allProfiles = Array.isArray(data) ? data : (data.matches || data.users || []);
                 applyAllFilters();
             } catch (e) {
                 allProfiles = [];
@@ -5515,9 +5515,9 @@
 
         initApp();
     </script>
-    <script src="phase6_features.js?v=18"></script>
-    <script src="phase7_features.js?v=18"></script>
-    <script src="phase9_features.js?v=18"></script>
-    <script src="phase10_features.js?v=18"></script>
+    <script src="phase6_features.js?v=19"></script>
+    <script src="phase7_features.js?v=19"></script>
+    <script src="phase9_features.js?v=19"></script>
+    <script src="phase10_features.js?v=19"></script>
 </body>
 </html>
