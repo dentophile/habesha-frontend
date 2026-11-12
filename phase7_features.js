@@ -140,14 +140,14 @@
                 <button onclick="document.getElementById('p7-mutual-spark-banner').classList.add('hidden')" class="text-white/80 text-xs font-bold px-1">✕</button>
             </div>
 
-            <!-- SLEEK "✨ HABESHA LOUNGE" UNIFIED DRAWER (Holds Modes + All Upper Row Features!) -->
-            <div id="p8-lounge-modal" onclick="if(event.target===this) this.classList.add('hidden')" class="hidden fixed inset-0 z-[212] flex items-start sm:items-center justify-center bg-black/65 backdrop-blur-sm px-0 sm:px-4 pt-[6vh] pb-[4vh] overflow-y-auto" style="-webkit-overflow-scrolling: touch; touch-action: pan-y;">
-                <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] p-5 pb-14 w-full max-w-sm shadow-2xl relative overflow-y-scroll touch-scroll no-scrollbar modal-pop" style="max-height: 82vh; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
+            <!-- SLEEK "✨ HABESHA LOUNGE" UNIFIED DRAWER (Bi-Directional Android Scroll Ready!) -->
+            <div id="p8-lounge-modal" onclick="if(event.target===this) this.classList.add('hidden')" class="hidden fixed inset-0 z-[212] flex items-center justify-center bg-black/65 backdrop-blur-sm p-3 overflow-hidden" style="touch-action: none; overscroll-behavior: none;">
+                <div class="bg-white rounded-[2rem] p-5 pb-16 w-full max-w-sm shadow-2xl relative overflow-y-scroll touch-scroll modal-pop" style="display: block; height: 82vh; max-height: 82vh; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior-y: contain;">
                     <div class="tibeb-ribbon h-1.5 w-full sticky top-0 left-0 z-20"></div>
                     <div class="flex items-center justify-between mb-3 pt-1 sticky top-0 bg-white/95 backdrop-blur-sm z-10 pb-2 border-b border-orange-50">
                         <div>
                             <h3 class="text-lg font-extrabold text-buna">✨ Habesha Lounge & Modes</h3>
-                            <p class="text-[11px] text-gray-500">Swipe up/down to explore all modes & live mixers</p>
+                            <p class="text-[11px] text-gray-500">Swipe up/down or tap ▲/▼ to scroll</p>
                         </div>
                         <button onclick="document.getElementById('p8-lounge-modal').classList.add('hidden')" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 shrink-0"><i class="ph-bold ph-x"></i></button>
                     </div>
