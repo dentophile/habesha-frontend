@@ -261,6 +261,23 @@
                 return origAdmin.apply(this, arguments);
             };
         }
+
+        // 5. Auto-inject "♻️ Second-Chance Refresh" button when Discover reaches "You're All Caught Up!"
+        const cardContainer = document.getElementById("card-container");
+        if (cardContainer && !window._p10EmptyObserver) {
+            window._p10EmptyObserver = new MutationObserver(() => {
+                if (cardContainer.innerText.includes("Caught Up") && !cardContainer.querySelector("#p10-empty-recycle-btn")) {
+                    const showAllBtn = cardContainer.querySelector("button[onclick*='resetDiscoveryFilters']");
+                    if (showAllBtn) {
+                        showAllBtn.insertAdjacentHTML(
+                            "afterend",
+                            `<button id="p10-empty-recycle-btn" onclick="if(window.HabeshaPhase9) window.HabeshaPhase9.recycleStackNow()" class="mt-2 px-5 py-2.5 bg-amber-50 text-amber-900 border border-amber-200 rounded-2xl text-xs font-extrabold shadow-sm active:scale-95 transition">♻️ Recycle Passed Profiles</button>`
+                        );
+                    }
+                }
+            });
+            window._p10EmptyObserver.observe(cardContainer, { childList: true, subtree: true });
+        }
     }
 
     function initPhase10() {
