@@ -460,6 +460,57 @@
         document.body.appendChild(modal);
     }
 
+    // Android APK WebView Touch-Scroll Unlocker + Auto Service-Worker Cache Buster
+    function unlockAndroidApkWebViewScroll(loungeModal, innerCard) {
+        if (!loungeModal || !innerCard) return;
+
+        // 1. Make both the backdrop and card natively scrollable on Android WebView (use vh, not dvh)
+        loungeModal.style.overflowY = "auto";
+        loungeModal.style.webkitOverflowScrolling = "touch";
+        loungeModal.style.touchAction = "pan-y";
+        loungeModal.style.alignItems = "flex-start";
+        loungeModal.style.paddingTop = "6vh";
+        loungeModal.style.paddingBottom = "4vh";
+
+        innerCard.classList.remove("overflow-hidden", "max-h-[85dvh]");
+        innerCard.style.maxHeight = "82vh";
+        innerCard.style.overflowY = "scroll";
+        innerCard.style.webkitOverflowScrolling = "touch";
+        innerCard.style.touchAction = "pan-y";
+        innerCard.style.overscrollBehavior = "contain";
+        innerCard.style.paddingBottom = "56px";
+
+        // Stop parent touchmove listeners on Discover from hijacking vertical finger drags inside Lounge
+        if (!innerCard.dataset.apkScrollBound) {
+            innerCard.dataset.apkScrollBound = "1";
+            innerCard.addEventListener("touchstart", (e) => {
+                e.stopPropagation();
+            }, { passive: true });
+            innerCard.addEventListener("touchmove", (e) => {
+                e.stopPropagation();
+            }, { passive: true });
+        }
+    }
+
+    async function bustAndroidApkServiceWorkerCacheOnce() {
+        try {
+            const APK_SW_VERSION = "v17_android_scroll_fix";
+            if (localStorage.getItem("hd_apk_sw_ver") === APK_SW_VERSION) return;
+            localStorage.setItem("hd_apk_sw_ver", APK_SW_VERSION);
+
+            if ("caches" in window) {
+                const keys = await caches.keys();
+                await Promise.all(keys.map((k) => caches.delete(k)));
+            }
+            if ("serviceWorker" in navigator) {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                for (const reg of regs) {
+                    await reg.update().catch(() => {});
+                }
+            }
+        } catch (e) {}
+    }
+
     // Strictly inject ONLY inside the popup `#p8-lounge-modal` (never inside `#top-lounge-btn`!)
     function injectIntoLoungeModalStrict() {
         const loungeModal = document.getElementById("p8-lounge-modal");
@@ -467,13 +518,8 @@
         const innerCard = loungeModal.firstElementChild;
         if (!innerCard) return;
 
-        // Fix Lounge scrolling even if an older phase7_features.js is cached
-        innerCard.classList.remove("overflow-hidden");
-        innerCard.style.overflowY = "auto";
-        innerCard.style.maxHeight = "85dvh";
-        innerCard.style.webkitOverflowScrolling = "touch";
-        innerCard.style.touchAction = "pan-y";
-        innerCard.style.paddingBottom = "44px";
+        // Unlock Android APK WebView scrolling
+        unlockAndroidApkWebViewScroll(loungeModal, innerCard);
 
         if (innerCard.querySelector("#p9-lounge-section")) return;
 
@@ -521,10 +567,18 @@
     }
 
     async function initPhase9() {
+        bustAndroidApkServiceWorkerCacheOnce();
         injectPhase9Styles();
         cleanHeaderLoungeButton();
         bindShowAllProfilesOverride();
         setTimeout(injectIntoLoungeModalStrict, 600);
+
+        // Also re-apply Android scroll unlock whenever ✨ Lounge is tapped
+        document.addEventListener("click", (e) => {
+            if (e.target.closest("#top-lounge-btn")) {
+                setTimeout(injectIntoLoungeModalStrict, 50);
+            }
+        }, true);
 
         try {
             const uid = getUserId();
