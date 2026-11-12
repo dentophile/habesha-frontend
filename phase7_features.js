@@ -141,8 +141,8 @@
             </div>
 
             <!-- SLEEK "✨ HABESHA LOUNGE" UNIFIED DRAWER (Holds Modes + All Upper Row Features!) -->
-            <div id="p8-lounge-modal" onclick="if(event.target===this) this.classList.add('hidden')" class="hidden fixed inset-0 z-[212] flex items-end sm:items-center justify-center bg-black/65 backdrop-blur-sm px-0 sm:px-4">
-                <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] p-5 pb-12 w-full max-w-sm shadow-2xl relative overflow-y-auto touch-scroll no-scrollbar modal-pop max-h-[85dvh]" style="-webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;">
+            <div id="p8-lounge-modal" onclick="if(event.target===this) this.classList.add('hidden')" class="hidden fixed inset-0 z-[212] flex items-start sm:items-center justify-center bg-black/65 backdrop-blur-sm px-0 sm:px-4 pt-[6vh] pb-[4vh] overflow-y-auto" style="-webkit-overflow-scrolling: touch; touch-action: pan-y;">
+                <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] p-5 pb-14 w-full max-w-sm shadow-2xl relative overflow-y-scroll touch-scroll no-scrollbar modal-pop" style="max-height: 82vh; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
                     <div class="tibeb-ribbon h-1.5 w-full sticky top-0 left-0 z-20"></div>
                     <div class="flex items-center justify-between mb-3 pt-1 sticky top-0 bg-white/95 backdrop-blur-sm z-10 pb-2 border-b border-orange-50">
                         <div>
