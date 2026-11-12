@@ -460,41 +460,86 @@
         document.body.appendChild(modal);
     }
 
-    // Android APK WebView Touch-Scroll Unlocker + Auto Service-Worker Cache Buster
+    // Android APK Bi-Directional Touch-Scroll Unlocker (Fixes downward drag lock!)
     function unlockAndroidApkWebViewScroll(loungeModal, innerCard) {
         if (!loungeModal || !innerCard) return;
 
-        // 1. Make both the backdrop and card natively scrollable on Android WebView (use vh, not dvh)
-        loungeModal.style.overflowY = "auto";
-        loungeModal.style.webkitOverflowScrolling = "touch";
-        loungeModal.style.touchAction = "pan-y";
-        loungeModal.style.alignItems = "flex-start";
-        loungeModal.style.paddingTop = "6vh";
-        loungeModal.style.paddingBottom = "4vh";
+        // 1. Disable Android native pull-to-refresh & outer container scrolling so ONLY innerCard scrolls
+        document.documentElement.style.overscrollBehaviorY = "none";
+        document.body.style.overscrollBehaviorY = "none";
 
-        innerCard.classList.remove("overflow-hidden", "max-h-[85dvh]");
+        loungeModal.style.overflow = "hidden";
+        loungeModal.style.touchAction = "none";
+        loungeModal.style.alignItems = "center";
+        loungeModal.style.padding = "12px";
+
+        // 2. Make innerCard the single, dedicated block scroll container
+        innerCard.classList.remove("overflow-hidden", "max-h-[85dvh]", "no-scrollbar");
+        innerCard.style.display = "block";
+        innerCard.style.height = "82vh";
         innerCard.style.maxHeight = "82vh";
         innerCard.style.overflowY = "scroll";
+        innerCard.style.overflowX = "hidden";
         innerCard.style.webkitOverflowScrolling = "touch";
         innerCard.style.touchAction = "pan-y";
-        innerCard.style.overscrollBehavior = "contain";
-        innerCard.style.paddingBottom = "56px";
+        innerCard.style.overscrollBehaviorY = "contain";
+        innerCard.style.paddingBottom = "64px";
 
-        // Stop parent touchmove listeners on Discover from hijacking vertical finger drags inside Lounge
+        // 3. Inject 1-Tap ▲ Up / ▼ Down helper buttons in the sticky Lounge header for instant Android navigation
+        const headerRow = innerCard.querySelector(".sticky");
+        if (headerRow && !headerRow.querySelector("#p9-apk-scroll-btns")) {
+            const closeBtn = headerRow.querySelector("button");
+            const navWrap = document.createElement("div");
+            navWrap.id = "p9-apk-scroll-btns";
+            navWrap.style.cssText = "display:flex;align-items:center;gap:6px;";
+            navWrap.innerHTML = `
+                <button type="button" id="p9-scroll-up-btn" style="width:30px;height:30px;border-radius:999px;border:1px solid #FED7AA;background:#FFF7ED;color:#FF7A1A;font-weight:800;font-size:12px;">▲</button>
+                <button type="button" id="p9-scroll-down-btn" style="width:30px;height:30px;border-radius:999px;border:1px solid #FED7AA;background:#FFF7ED;color:#FF7A1A;font-weight:800;font-size:12px;">▼</button>
+            `;
+            if (closeBtn) {
+                headerRow.insertBefore(navWrap, closeBtn);
+                navWrap.appendChild(closeBtn);
+            } else {
+                headerRow.appendChild(navWrap);
+            }
+            const upBtn = navWrap.querySelector("#p9-scroll-up-btn");
+            const downBtn = navWrap.querySelector("#p9-scroll-down-btn");
+            if (upBtn) upBtn.onclick = () => innerCard.scrollBy({ top: -240, behavior: "smooth" });
+            if (downBtn) downBtn.onclick = () => innerCard.scrollBy({ top: 240, behavior: "smooth" });
+        }
+
+        // 4. Explicit Bi-Directional Touch-Drag Engine (Guarantees both upward & downward scrolling on Android APK!)
         if (!innerCard.dataset.apkScrollBound) {
             innerCard.dataset.apkScrollBound = "1";
+            let startY = 0;
+            let startScrollTop = 0;
+
             innerCard.addEventListener("touchstart", (e) => {
                 e.stopPropagation();
+                if (e.touches && e.touches.length === 1) {
+                    startY = e.touches[0].clientY;
+                    startScrollTop = innerCard.scrollTop;
+                }
             }, { passive: true });
+
             innerCard.addEventListener("touchmove", (e) => {
                 e.stopPropagation();
-            }, { passive: true });
+                if (!e.touches || e.touches.length !== 1) return;
+                const currentY = e.touches[0].clientY;
+                const deltaY = startY - currentY; // >0 finger moves up (scroll down), <0 finger moves down (scroll up)
+
+                // If user drags finger downward (deltaY < 0), prevent Android WebView pull-to-refresh from locking it!
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+                innerCard.scrollTop = startScrollTop + deltaY;
+            }, { passive: false });
         }
     }
 
     async function bustAndroidApkServiceWorkerCacheOnce() {
         try {
-            const APK_SW_VERSION = "v17_android_scroll_fix";
+            const APK_SW_VERSION = "v18_bidirectional_scroll_fix";
             if (localStorage.getItem("hd_apk_sw_ver") === APK_SW_VERSION) return;
             localStorage.setItem("hd_apk_sw_ver", APK_SW_VERSION);
 
