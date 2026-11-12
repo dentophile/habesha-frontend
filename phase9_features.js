@@ -465,7 +465,17 @@
         const loungeModal = document.getElementById("p8-lounge-modal");
         if (!loungeModal) return;
         const innerCard = loungeModal.firstElementChild;
-        if (!innerCard || innerCard.querySelector("#p9-lounge-section")) return;
+        if (!innerCard) return;
+
+        // Fix Lounge scrolling even if an older phase7_features.js is cached
+        innerCard.classList.remove("overflow-hidden");
+        innerCard.style.overflowY = "auto";
+        innerCard.style.maxHeight = "85dvh";
+        innerCard.style.webkitOverflowScrolling = "touch";
+        innerCard.style.touchAction = "pan-y";
+        innerCard.style.paddingBottom = "44px";
+
+        if (innerCard.querySelector("#p9-lounge-section")) return;
 
         const sec = document.createElement("div");
         sec.id = "p9-lounge-section";
