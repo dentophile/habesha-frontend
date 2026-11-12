@@ -141,15 +141,15 @@
             </div>
 
             <!-- SLEEK "✨ HABESHA LOUNGE" UNIFIED DRAWER (Holds Modes + All Upper Row Features!) -->
-            <div id="p8-lounge-modal" class="hidden fixed inset-0 z-[212] flex items-end sm:items-center justify-center bg-black/65 backdrop-blur-sm px-0 sm:px-4">
-                <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] p-5 w-full max-w-sm shadow-2xl relative overflow-hidden modal-pop max-h-[88vh] touch-scroll no-scrollbar">
-                    <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
-                    <div class="flex items-center justify-between mb-3 pt-1">
+            <div id="p8-lounge-modal" onclick="if(event.target===this) this.classList.add('hidden')" class="hidden fixed inset-0 z-[212] flex items-end sm:items-center justify-center bg-black/65 backdrop-blur-sm px-0 sm:px-4">
+                <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] p-5 pb-12 w-full max-w-sm shadow-2xl relative overflow-y-auto touch-scroll no-scrollbar modal-pop max-h-[85dvh]" style="-webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;">
+                    <div class="tibeb-ribbon h-1.5 w-full sticky top-0 left-0 z-20"></div>
+                    <div class="flex items-center justify-between mb-3 pt-1 sticky top-0 bg-white/95 backdrop-blur-sm z-10 pb-2 border-b border-orange-50">
                         <div>
                             <h3 class="text-lg font-extrabold text-buna">✨ Habesha Lounge & Modes</h3>
-                            <p class="text-[11px] text-gray-500">Switch discovery modes, play live mixers & explore perks</p>
+                            <p class="text-[11px] text-gray-500">Swipe up/down to explore all modes & live mixers</p>
                         </div>
-                        <button onclick="document.getElementById('p8-lounge-modal').classList.add('hidden')" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+                        <button onclick="document.getElementById('p8-lounge-modal').classList.add('hidden')" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 shrink-0"><i class="ph-bold ph-x"></i></button>
                     </div>
 
                     <!-- Discovery Mode Switcher Inside Lounge -->
