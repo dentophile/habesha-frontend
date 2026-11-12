@@ -338,11 +338,45 @@
     async function recycleStackNow() {
         document.getElementById("p8-lounge-modal")?.classList.add("hidden");
         const uid = getUserId();
-        const res = await fetch(`${API_BASE}/api/phase9/recycle-stack/${uid}`).then(r => r.json()).catch(() => ({ ok: false }));
-        if (typeof showAlert === "function") showAlert(res.message || "♻️ Discover stack refreshed!");
-        if (typeof window.loadDiscoverProfiles === "function") {
-            window.loadDiscoverProfiles();
+        try {
+            await fetch(`${API_BASE}/api/phase9/recycle-stack/${uid}`).catch(() => {});
+            const freshRes = await fetch(`${API_BASE}/api/get-potential-matches/${uid}?mode=all`).then(r => r.json()).catch(() => ({}));
+            const list = freshRes.matches || [];
+            if (list.length > 0) {
+                window.allProfiles = list;
+                window.profiles = list;
+                window.currentCardIndex = 0;
+                window.currentPhotoSlideIndex = 0;
+                if (typeof window.renderCards === "function") window.renderCards();
+                return;
+            }
+            if (typeof window.loadDiscoverProfiles === "function") {
+                await window.loadDiscoverProfiles();
+            }
+        } catch (e) {
+            if (typeof window.loadDiscoverProfiles === "function") {
+                await window.loadDiscoverProfiles();
+            }
         }
+    }
+
+    function bindShowAllProfilesOverride() {
+        document.addEventListener("click", async (e) => {
+            const btn = e.target.closest("button");
+            if (!btn) return;
+            const txt = (btn.textContent || "").trim().toLowerCase();
+            if (txt.includes("show all profiles") || txt.includes("recycle passed profiles")) {
+                e.preventDefault();
+                e.stopPropagation();
+                const orig = btn.innerHTML;
+                btn.innerHTML = "♻️ Restoring Profiles...";
+                btn.disabled = true;
+                await recycleStackNow();
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            }
+        }, true);
+    }
     }
 
     function openAnthemPickerModal() {
@@ -480,6 +514,7 @@
     async function initPhase9() {
         injectPhase9Styles();
         cleanHeaderLoungeButton();
+        bindShowAllProfilesOverride();
         setTimeout(injectIntoLoungeModalStrict, 600);
 
         try {
