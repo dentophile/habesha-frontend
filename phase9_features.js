@@ -377,7 +377,6 @@
             }
         }, true);
     }
-    }
 
     function openAnthemPickerModal() {
         document.getElementById("p8-lounge-modal")?.classList.add("hidden");
