@@ -163,6 +163,88 @@
                         </div>
                     </div>
 
+                    <!-- Dual Ordering System: Default (Smart Match) + Custom Order System -->
+                    <div id="p8-custom-order-section" class="bg-gradient-to-br from-purple-50/80 via-white to-orange-50/70 border border-purple-200/80 p-2.5 rounded-2xl mb-3 text-left">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <p class="text-[10px] font-extrabold text-premium uppercase tracking-wider flex items-center gap-1">
+                                <span>🔀 Feed Order System</span>
+                            </p>
+                            <span id="p8-order-active-pill" class="text-[9px] font-extrabold bg-white text-buna border border-purple-200 px-2 py-0.5 rounded-full">
+                                ✨ Default Smart
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1.5 text-[10px] font-extrabold mb-1.5">
+                            <button id="p8-ord-default" onclick="selectDiscoverOrderPreset('default')" class="py-1.5 px-1 rounded-xl bg-gradient-to-r from-botOrange to-habeshaCoral text-white shadow-sm transition">✨ Default</button>
+                            <button id="p8-ord-online" onclick="selectDiscoverOrderPreset('online')" class="py-1.5 px-1 rounded-xl bg-white text-gray-600 border border-gray-200 transition">🟢 Online</button>
+                            <button id="p8-ord-newest" onclick="selectDiscoverOrderPreset('newest')" class="py-1.5 px-1 rounded-xl bg-white text-gray-600 border border-gray-200 transition">🆕 Newest</button>
+                            <button id="p8-ord-popular" onclick="selectDiscoverOrderPreset('popular')" class="py-1.5 px-1 rounded-xl bg-white text-gray-600 border border-gray-200 transition">🔥 Popular</button>
+                            <button id="p8-ord-nearby" onclick="selectDiscoverOrderPreset('nearby')" class="py-1.5 px-1 rounded-xl bg-white text-gray-600 border border-gray-200 transition">📍 My City</button>
+                            <button id="p8-ord-custom" onclick="toggleCustomOrderBuilder()" class="py-1.5 px-1 rounded-xl bg-purple-100 text-premium border border-purple-200 transition">🎛️ Custom</button>
+                        </div>
+
+                        <!-- Expandable 3-Priority Custom Order Builder -->
+                        <div id="p8-custom-order-builder" class="hidden mt-2 pt-2 border-t border-purple-200/70 space-y-2">
+                            <p class="text-[10px] text-gray-600 font-semibold leading-snug">
+                                Build your own custom card order (runs alongside the Default system):
+                            </p>
+                            <div class="space-y-1.5 text-[11px]">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-14 font-extrabold text-premium shrink-0">#1 First:</span>
+                                    <select id="p8-co-p1" class="flex-1 p-1.5 rounded-xl border border-purple-200 bg-white font-bold text-buna text-[11px]">
+                                        <option value="online">🟢 Online Now First</option>
+                                        <option value="same_city">📍 Same City / Sub-City</option>
+                                        <option value="verified">🛡️ Verified & High Trust</option>
+                                        <option value="voice">🎙️ Has Voice Bio First</option>
+                                        <option value="match_pct">🔥 Highest Match %</option>
+                                        <option value="newest">🆕 Newest Joined</option>
+                                        <option value="popular">❤️ Most Liked</option>
+                                        <option value="age_asc">🎂 Youngest First</option>
+                                        <option value="age_desc">🎂 Mature First</option>
+                                        <option value="random">🎲 Random Shuffle</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-14 font-extrabold text-botOrange shrink-0">#2 Next:</span>
+                                    <select id="p8-co-p2" class="flex-1 p-1.5 rounded-xl border border-purple-200 bg-white font-bold text-buna text-[11px]">
+                                        <option value="same_city">📍 Same City / Sub-City</option>
+                                        <option value="online">🟢 Online Now First</option>
+                                        <option value="verified">🛡️ Verified & High Trust</option>
+                                        <option value="voice">🎙️ Has Voice Bio First</option>
+                                        <option value="match_pct">🔥 Highest Match %</option>
+                                        <option value="newest">🆕 Newest Joined</option>
+                                        <option value="popular">❤️ Most Liked</option>
+                                        <option value="age_asc">🎂 Youngest First</option>
+                                        <option value="age_desc">🎂 Mature First</option>
+                                        <option value="none">— None —</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-14 font-extrabold text-gray-500 shrink-0">#3 Then:</span>
+                                    <select id="p8-co-p3" class="flex-1 p-1.5 rounded-xl border border-purple-200 bg-white font-bold text-buna text-[11px]">
+                                        <option value="verified">🛡️ Verified & High Trust</option>
+                                        <option value="match_pct">🔥 Highest Match %</option>
+                                        <option value="online">🟢 Online Now First</option>
+                                        <option value="same_city">📍 Same City / Sub-City</option>
+                                        <option value="voice">🎙️ Has Voice Bio First</option>
+                                        <option value="newest">🆕 Newest Joined</option>
+                                        <option value="popular">❤️ Most Liked</option>
+                                        <option value="age_asc">🎂 Youngest First</option>
+                                        <option value="age_desc">🎂 Mature First</option>
+                                        <option value="none">— None —</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex gap-1.5 pt-0.5">
+                                <button type="button" onclick="selectDiscoverOrderPreset('default')" class="w-1/3 py-2 rounded-xl bg-gray-100 text-gray-600 font-extrabold text-[10px] active:scale-95">
+                                    Reset Default
+                                </button>
+                                <button type="button" onclick="saveAndApplyCustomOrder()" class="btn-shimmer w-2/3 py-2 rounded-xl bg-gradient-to-r from-premium to-habeshaCoral text-white font-extrabold text-[11px] shadow-sm active:scale-95">
+                                    ✅ Apply Custom Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-2 text-left mb-3">
                         <button onclick="closeLoungeAndRun(openDailyCuratedModal)" class="p-3 rounded-2xl bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-200 flex items-center gap-2.5 active:scale-95">
                             <span class="text-2xl">💌</span>
@@ -584,12 +666,203 @@
     window.openHabeshaLoungeModal = function () {
         if (typeof triggerHaptic === "function") triggerHaptic("light");
         syncDataSaverButtonUI();
+        syncDiscoverOrderUI();
         document.getElementById("p8-lounge-modal")?.classList.remove("hidden");
     };
 
     window.closeLoungeAndRun = function (fn) {
         document.getElementById("p8-lounge-modal")?.classList.add("hidden");
         if (typeof fn === "function") fn();
+    };
+
+    // --- DUAL ORDERING SYSTEM: DEFAULT (SMART) + CUSTOM PRIORITY ORDER ---
+    const ORDER_STORAGE_KEY = "habesha_custom_order_v1";
+
+    function getCustomOrderConfig() {
+        try {
+            const raw = localStorage.getItem(ORDER_STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed && parsed.mode) return parsed;
+            }
+        } catch (e) {}
+        return { mode: "default", p1: "online", p2: "same_city", p3: "verified" };
+    }
+
+    function saveCustomOrderConfig(cfg) {
+        try {
+            localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(cfg));
+        } catch (e) {}
+    }
+
+    window.getActiveOrderParam = function () {
+        const cfg = getCustomOrderConfig();
+        if (["online", "newest", "popular"].includes(cfg.mode)) return cfg.mode;
+        if (cfg.mode === "custom" && ["online", "newest", "popular", "age_asc", "age_desc"].includes(cfg.p1)) {
+            return cfg.p1;
+        }
+        return "default";
+    };
+
+    function getOrderRuleValue(profile, ruleKey, myProfile) {
+        if (!profile || !ruleKey || ruleKey === "none") return 0;
+        const tid = String(profile.telegram_id || "");
+        const snap = P7_CACHE[tid] || {};
+        const myLoc = String((myProfile && myProfile.location) || "").trim().toLowerCase();
+        const mySub = String((myProfile && myProfile.subcity_campus) || "").trim().toLowerCase();
+        const uLoc = String(profile.location || "").trim().toLowerCase();
+        const uSub = String(profile.subcity_campus || "").trim().toLowerCase();
+
+        switch (ruleKey) {
+            case "online":
+                return (profile.is_online ? 10000000000000 : 0) + (profile.last_active ? Date.parse(profile.last_active) || 0 : 0);
+            case "same_city": {
+                let s = 0;
+                if (mySub && uSub && mySub === uSub) s += 300;
+                if (myLoc && uLoc && (uLoc === myLoc || uLoc.includes(myLoc) || myLoc.includes(uLoc))) s += 150;
+                if (snap.distance_label) {
+                    const m = snap.distance_label.match(/(\d+)/);
+                    if (m) s += Math.max(0, 120 - parseInt(m[1], 10));
+                }
+                return s;
+            }
+            case "verified":
+                return (snap.is_diamond_verified ? 300 : 0) + (profile.is_gold_trusted ? 200 : 0) + (profile.is_verified ? 100 : 0) + (Number(profile.trust_score) || 0);
+            case "voice":
+                return profile.voice_bio_url && String(profile.voice_bio_url).trim() !== "" ? 1 : 0;
+            case "match_pct":
+                return Number(profile.match_percent) || 0;
+            case "newest":
+                return profile.created_at ? Date.parse(profile.created_at) || 0 : 0;
+            case "popular":
+                return (Number(profile.total_likes) || 0) * 10 + (profile.is_boosted ? 50 : 0) + (profile.is_verified ? 15 : 0);
+            case "age_asc":
+                return -(Number(profile.age) || 99);
+            case "age_desc":
+                return Number(profile.age) || 0;
+            case "random":
+                return Math.random();
+            default:
+                return 0;
+        }
+    }
+
+    window.applyCustomProfileOrdering = function (list) {
+        if (!Array.isArray(list) || list.length <= 1) return list;
+        const cfg = getCustomOrderConfig();
+        if (!cfg || cfg.mode === "default") return list;
+
+        const myProfile = window.myProfileData || {};
+        const presetToRules = {
+            online: ["online", "match_pct", "verified"],
+            newest: ["newest", "online", "match_pct"],
+            popular: ["popular", "verified", "match_pct"],
+            nearby: ["same_city", "online", "match_pct"],
+            custom: [cfg.p1 || "online", cfg.p2 || "none", cfg.p3 || "none"]
+        };
+        const rules = presetToRules[cfg.mode] || [];
+        if (!rules.length) return list;
+
+        // Precompute random keys once per sort pass so comparator stays deterministic
+        const randMap = new Map();
+        if (rules.includes("random")) {
+            list.forEach((p) => randMap.set(p, Math.random()));
+        }
+
+        const copy = list.slice();
+        copy.sort((a, b) => {
+            // Always keep a shared Crush Link profile pinned at #1
+            if (Boolean(a.is_crush_target) !== Boolean(b.is_crush_target)) {
+                return a.is_crush_target ? -1 : 1;
+            }
+            for (let i = 0; i < rules.length; i++) {
+                const r = rules[i];
+                if (!r || r === "none") continue;
+                const va = r === "random" ? randMap.get(a) : getOrderRuleValue(a, r, myProfile);
+                const vb = r === "random" ? randMap.get(b) : getOrderRuleValue(b, r, myProfile);
+                if (vb !== va) return vb - va;
+            }
+            return 0;
+        });
+        return copy;
+    };
+
+    function syncDiscoverOrderUI() {
+        const cfg = getCustomOrderConfig();
+        const modeLabels = {
+            default: "✨ Default Smart",
+            online: "🟢 Online First",
+            newest: "🆕 Newest First",
+            popular: "🔥 Most Popular",
+            nearby: "📍 My City First",
+            custom: "🎛️ Custom Order"
+        };
+
+        const activePill = document.getElementById("p8-order-active-pill");
+        if (activePill) activePill.innerText = modeLabels[cfg.mode] || "✨ Default Smart";
+
+        const presetIds = ["default", "online", "newest", "popular", "nearby", "custom"];
+        presetIds.forEach((id) => {
+            const btn = document.getElementById(`p8-ord-${id}`);
+            if (!btn) return;
+            const isSelected = cfg.mode === id;
+            if (isSelected) {
+                btn.className = "py-1.5 px-1 rounded-xl bg-gradient-to-r from-botOrange to-habeshaCoral text-white shadow-sm transition";
+            } else if (id === "custom") {
+                btn.className = "py-1.5 px-1 rounded-xl bg-purple-100 text-premium border border-purple-200 transition";
+            } else {
+                btn.className = "py-1.5 px-1 rounded-xl bg-white text-gray-600 border border-gray-200 transition";
+            }
+        });
+
+        const s1 = document.getElementById("p8-co-p1");
+        const s2 = document.getElementById("p8-co-p2");
+        const s3 = document.getElementById("p8-co-p3");
+        if (s1 && cfg.p1) s1.value = cfg.p1;
+        if (s2 && cfg.p2) s2.value = cfg.p2;
+        if (s3 && cfg.p3) s3.value = cfg.p3;
+
+        const builder = document.getElementById("p8-custom-order-builder");
+        if (builder && cfg.mode !== "custom") {
+            builder.classList.add("hidden");
+        }
+    }
+
+    window.toggleCustomOrderBuilder = function () {
+        if (typeof triggerHaptic === "function") triggerHaptic("selection");
+        const builder = document.getElementById("p8-custom-order-builder");
+        if (builder) builder.classList.toggle("hidden");
+    };
+
+    window.selectDiscoverOrderPreset = async function (preset) {
+        if (typeof triggerHaptic === "function") triggerHaptic("medium");
+        const cfg = getCustomOrderConfig();
+        cfg.mode = preset || "default";
+        saveCustomOrderConfig(cfg);
+        syncDiscoverOrderUI();
+
+        document.getElementById("p8-lounge-modal")?.classList.add("hidden");
+        if (typeof loadDiscoverProfiles === "function") {
+            await loadDiscoverProfiles();
+        } else if (typeof applyAllFilters === "function") {
+            applyAllFilters();
+        }
+    };
+
+    window.saveAndApplyCustomOrder = async function () {
+        if (typeof triggerHaptic === "function") triggerHaptic("success");
+        const p1 = document.getElementById("p8-co-p1")?.value || "online";
+        const p2 = document.getElementById("p8-co-p2")?.value || "same_city";
+        const p3 = document.getElementById("p8-co-p3")?.value || "verified";
+        saveCustomOrderConfig({ mode: "custom", p1, p2, p3 });
+        syncDiscoverOrderUI();
+
+        document.getElementById("p8-lounge-modal")?.classList.add("hidden");
+        if (typeof loadDiscoverProfiles === "function") {
+            await loadDiscoverProfiles();
+        } else if (typeof applyAllFilters === "function") {
+            applyAllFilters();
+        }
     };
 
     window.toggleDataSaverMode = function () {
@@ -1427,6 +1700,7 @@
     function bootPhase7And8() {
         setupProgressiveWebApp();
         injectModalsAndUnifiedBar();
+        syncDiscoverOrderUI();
         hookExistingFunctions();
         setTimeout(enrichDiscoverFeedPhase7, 1200);
         setTimeout(checkMutualOnlineSpark, 5000);
