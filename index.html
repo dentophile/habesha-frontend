@@ -2866,6 +2866,10 @@
                 if (activeFilters.verifiedOnly) params.set("verified_only", "true");
                 if (activeFilters.voiceOnly) params.set("voice_only", "true");
                 if (activeFilters.newOnly) params.set("new_only", "true");
+                if (typeof window.getActiveOrderParam === "function") {
+                    const orderParam = window.getActiveOrderParam();
+                    if (orderParam && orderParam !== "default") params.set("sort_by", orderParam);
+                }
 
                 let res = await fetch(`${BACKEND_URL}/api/get-potential-matches/${encodeURIComponent(targetUid)}?${params.toString()}`);
                 if (!res.ok && targetUid === "guest") {
@@ -3162,6 +3166,10 @@
                 }
                 return true;
             });
+
+            if (typeof window.applyCustomProfileOrdering === "function") {
+                profiles = window.applyCustomProfileOrdering(profiles);
+            }
 
             currentCardIndex = isGuestMode ? Math.min(guestSwipesUsed, profiles.length) : 0;
             currentPhotoSlideIndex = 0;
@@ -5515,9 +5523,9 @@
 
         initApp();
     </script>
-    <script src="phase6_features.js?v=19"></script>
-    <script src="phase7_features.js?v=19"></script>
-    <script src="phase9_features.js?v=19"></script>
-    <script src="phase10_features.js?v=19"></script>
+    <script src="phase6_features.js?v=20"></script>
+    <script src="phase7_features.js?v=20"></script>
+    <script src="phase9_features.js?v=20"></script>
+    <script src="phase10_features.js?v=20"></script>
 </body>
 </html>
