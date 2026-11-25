@@ -3989,6 +3989,34 @@
                 </div>
             ` : "";
 
+            const trustShieldBox = `
+                <div class="mb-4 p-3 rounded-2xl bg-gradient-to-r from-sky-50 via-blue-50 to-emerald-50 border border-blue-200/80 flex items-center justify-between gap-2">
+                    <div class="text-left">
+                        <p class="text-[10px] font-extrabold text-verify uppercase tracking-wider flex items-center gap-1">
+                            <i class="ph-fill ph-shield-check"></i> Habesha TrustShield™ Authenticity
+                        </p>
+                        <p class="text-[11px] font-bold text-buna mt-0.5">
+                            ${profile.is_verified ? "☑️ Biometric Face Matched" : "⏳ Verification Pending"} • ${profile.voice_bio_url ? "🎙️ Voice Verified" : "No Voice Bio"}
+                        </p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full bg-white border border-blue-200 text-xs font-extrabold text-verify shrink-0 shadow-sm">${trustScore}%</span>
+                </div>
+            `;
+
+            let extraLocalBadges = "";
+            if (profile.subcity_campus) {
+                extraLocalBadges += `<span class="text-xs font-bold bg-orange-50 text-botOrange border border-orange-200 px-2.5 py-1 rounded-md">📍 ${profile.subcity_campus}</span>`;
+            }
+            if (profile.languages_spoken) {
+                extraLocalBadges += `<span class="text-xs font-bold bg-purple-50 text-premium border border-purple-200 px-2.5 py-1 rounded-md">🗣️ ${profile.languages_spoken}</span>`;
+            }
+
+            const voiceButtonHtml = profile.voice_bio_url ? `
+                <button type="button" onclick="playProfileVoiceBio('${profile.voice_bio_url}', event)" class="w-full mb-4 py-3 bg-gradient-to-r from-botOrange to-habeshaCoral text-white rounded-2xl font-extrabold text-xs shadow-md flex items-center justify-center gap-2 active:scale-95 transition">
+                    <i class="ph-fill ph-waveform text-base"></i> <span>Listen to 15s Voice Intro</span>
+                </button>
+            ` : "";
+
             const safeName = (profile.name || "User").replace(/'/g, "\\'");
 
             document.getElementById("profile-details-content").innerHTML = `
@@ -4162,6 +4190,18 @@
                             ? "🔒 Modest Mode: Strict"
                             : "Modest Photo Blur: OFF";
                     }
+
+                    const profileName = document.getElementById("my-profile-name");
+                    if (profileName) profileName.innerText = `${mp.name || "Habesha"}, ${formatAgeGender(mp.age, mp.gender)}`;
+
+                    const compPct = parseInt(mp.profile_completion || 50, 10);
+                    const compCard = document.getElementById("profile-completion-card");
+                    if (compCard) {
+                        compCard.classList.toggle("hidden", compPct >= 100);
+                        const pctEl = document.getElementById("profile-completion-pct");
+                        const barEl = document.getElementById("profile-completion-bar");
+                        if (pctEl) pctEl.innerText = `${compPct}%`;
+                        if (barEl) barEl.style.width = `${compPct}%`;
                     }
 
                     const refCount = parseInt(mp.referral_count || 0);
