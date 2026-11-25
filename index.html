@@ -3402,6 +3402,17 @@
             if (profile.travel_banner) {
                 topOverlayBadges += `<div class="bg-sky-500/90 backdrop-blur-sm text-white px-2.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1 shadow-lg border border-white/30">${profile.travel_banner}</div>`;
             }
+            const isPhotoBlurred = profile.effective_photo_blurred !== undefined
+                ? Boolean(profile.effective_photo_blurred)
+                : Boolean(profile.blur_photos_until_match);
+            if (!isPhotoBlurred && profile.modest_unlock_reason) {
+                const unlockTxt = profile.modest_unlock_reason === "verified_vip"
+                    ? "🛡️ Clear for Verified VIP"
+                    : profile.modest_unlock_reason === "merit_alignment"
+                    ? "🎙️ Unblurred (90%+ Alignment)"
+                    : "🔓 Revealed Exclusively For You";
+                topOverlayBadges += `<div class="bg-emerald-600/90 backdrop-blur-sm text-white px-2.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1 shadow-lg border border-white/30">${unlockTxt}</div>`;
+            }
             const topLeftStackHtml = topOverlayBadges ? `<div class="absolute top-5 left-3 z-20 flex flex-col gap-1 items-start">${topOverlayBadges}</div>` : "";
 
             const matchPercent = profile.match_percent || 85;
@@ -3433,6 +3444,21 @@
 
             const promptDisplay = profile.icebreaker || "💬 Tap to reply or send a Golden Rose 🌹";
 
+            const modestBlurOverlayHtml = isPhotoBlurred ? `
+                <div class="absolute inset-x-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
+                    <span class="glass-pill-dark text-white text-[11px] font-extrabold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl text-center">
+                        <i class="ph-fill ph-lock-key text-amber-300"></i>
+                        ${profile.modest_blur_level === "trusted" ? "Modest Mode • Clear for ☑️ Verified VIPs" : "Strict Modest Mode • Unblurs on Match"}
+                    </span>
+                    ${profile.reveal_request_status === "pending"
+                        ? `<span class="px-3.5 py-1.5 rounded-full bg-amber-500/90 text-white text-[10px] font-extrabold shadow-lg border border-white/30">⏳ Photo Reveal Requested</span>`
+                        : `<button type="button" onclick="event.stopPropagation(); if(typeof openPhotoRevealRequestModal==='function') openPhotoRevealRequestModal(event);" class="btn-shimmer px-4 py-2 rounded-full bg-gradient-to-r from-premium via-fuchsia-600 to-habeshaCoral text-white text-[11px] font-extrabold shadow-xl border border-white/30 active:scale-95 transition flex items-center gap-1.5">
+                            <i class="ph-fill ph-lock-key-open text-amber-200"></i> <span>🔓 Request Photo Reveal (👑/🌹)</span>
+                           </button>`
+                    }
+                </div>
+            ` : "";
+
             container.innerHTML = `
                 <div id="active-swipe-card" class="swipe-card-surface w-full h-full flex flex-col overflow-hidden relative bg-white animate-card-in ${profile.is_crush_target ? 'ring-2 ring-habeshaCoral' : ''}">
                     <div class="tibeb-ribbon h-1 w-full shrink-0"></div>
@@ -3440,16 +3466,10 @@
                     <div id="stamp-like" class="swipe-stamp absolute top-14 left-5 z-30 border-4 border-emerald-400 bg-emerald-500/20 backdrop-blur-sm text-emerald-300 font-extrabold text-xl px-3.5 py-1 rounded-xl -rotate-12 tracking-widest">LIKE 💚</div>
                     <div id="stamp-nope" class="swipe-stamp absolute top-14 right-5 z-30 border-4 border-rose-400 bg-rose-500/20 backdrop-blur-sm text-rose-300 font-extrabold text-xl px-3.5 py-1 rounded-xl rotate-12 tracking-widest">PASS ✕</div>
 
-                    <div onclick="${profile.blur_photos_until_match ? "showAlert('🔒 Modest Mode Active: Match with ' + (profiles[currentCardIndex]?.name || 'them') + ' to unlock clear photos!')" : `openImageLightbox('${photoToUse}')`}" class="w-full flex-1 min-h-[175px] bg-[#18110E] relative cursor-pointer overflow-hidden">
-                        <div class="absolute inset-0 bg-cover bg-[center_20%] bg-no-repeat transition-all duration-500 ${profile.blur_photos_until_match ? 'blur-modest' : ''}" style="background-image: url('${photoToUse}')"></div>
+                    <div onclick="${isPhotoBlurred ? "if(typeof openPhotoRevealRequestModal==='function') openPhotoRevealRequestModal(event);" : `openImageLightbox('${photoToUse}')`}" class="w-full flex-1 min-h-[175px] bg-[#18110E] relative cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-[center_20%] bg-no-repeat transition-all duration-500 ${isPhotoBlurred ? 'blur-modest' : ''}" style="background-image: url('${photoToUse}')"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/20 pointer-events-none"></div>
-                        ${profile.blur_photos_until_match ? `
-                            <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center pointer-events-none z-20">
-                                <span class="glass-pill-dark text-white text-[11px] font-extrabold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl">
-                                    <i class="ph-fill ph-lock-key text-amber-300"></i> Modest Mode • Unblurs on Match
-                                </span>
-                            </div>
-                        ` : ""}
+                        ${modestBlurOverlayHtml}
                         ${dotsHtml}
                         ${topLeftStackHtml}
                         ${voicePillHtml}
@@ -3944,45 +3964,21 @@
             const verifyBadge = profile.is_verified ? `<i class="ph-fill ph-seal-check text-verify ml-1 text-2xl"></i>` : "";
             const ageGenderLabel = formatAgeGender(profile.age, profile.gender);
             const photos = getProfilePhotoArray(profile);
-            const isBlurred = Boolean(profile.blur_photos_until_match);
+            const isBlurred = profile.effective_photo_blurred !== undefined
+                ? Boolean(profile.effective_photo_blurred)
+                : Boolean(profile.blur_photos_until_match);
             const trustScore = profile.trust_score || (profile.is_verified ? 85 : 45);
 
             const galleryHtml = photos.length > 1 ? `
                 <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-4">
-                    ${photos.map(u => `<div class="w-40 h-52 rounded-2xl overflow-hidden shrink-0 border border-gray-200 shadow-sm relative"><img onclick="${isBlurred ? "" : `openImageLightbox('${u}')`}" src="${u}" class="w-full h-full object-cover ${isBlurred ? "blur-modest" : "cursor-pointer"}"></div>`).join("")}
+                    ${photos.map(u => `<div class="w-40 h-52 rounded-2xl overflow-hidden shrink-0 border border-gray-200 shadow-sm relative"><img onclick="${isBlurred ? "if(typeof openPhotoRevealRequestModal==='function') openPhotoRevealRequestModal(event);" : `openImageLightbox('${u}')`}" src="${u}" class="w-full h-full object-cover ${isBlurred ? "blur-modest cursor-pointer" : "cursor-pointer"}"></div>`).join("")}
                 </div>
             ` : "";
 
-            const trustShieldBox = `
-                <div class="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-sky-50 via-blue-50 to-emerald-50 border border-blue-200/80">
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-xs font-extrabold text-buna flex items-center gap-1.5">
-                            <i class="ph-fill ph-shield-check text-verify text-base"></i>
-                            <span>Habesha TrustShield™ Score</span>
-                        </span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${profile.is_gold_trusted ? 'bg-amber-400 text-buna' : 'bg-white text-verify border border-blue-200'}">
-                            ${profile.is_gold_trusted ? '🛡️ Gold Trusted • ' : ''}${trustScore}%
-                        </span>
-                    </div>
-                    <div class="w-full bg-white h-2 rounded-full overflow-hidden mb-2 border border-blue-100">
-                        <div class="bg-gradient-to-r from-verify to-emerald-500 h-full" style="width:${trustScore}%"></div>
-                    </div>
-                    <div class="flex flex-wrap gap-1.5 text-[10px] font-bold">
-                        <span class="px-2 py-0.5 rounded-lg ${profile.is_verified ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-500'}">${profile.is_verified ? '✓ Biometric Face Verified' : '○ Face Unverified'}</span>
-                        <span class="px-2 py-0.5 rounded-lg ${profile.voice_bio_url ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-500'}">${profile.voice_bio_url ? '✓ 15s Voice Verified' : '○ No Voice Bio'}</span>
-                    </div>
-                </div>
-            `;
-
-            const extraLocalBadges = `
-                ${profile.travel_banner ? `<span class="text-xs font-extrabold bg-sky-50 text-sky-700 border border-sky-200 px-2.5 py-1 rounded-md">${profile.travel_banner}</span>` : ""}
-                ${profile.subcity_campus ? `<span class="text-xs font-extrabold bg-orange-50 text-botOrange border border-orange-200 px-2.5 py-1 rounded-md">📍 ${profile.subcity_campus}</span>` : ""}
-                ${profile.languages_spoken ? `<span class="text-xs font-extrabold bg-purple-50 text-premium border border-purple-200 px-2.5 py-1 rounded-md">🗣️ ${profile.languages_spoken}</span>` : ""}
-            `;
-
-            const voiceButtonHtml = profile.voice_bio_url ? `
-                <button onclick="playProfileVoiceBio('${profile.voice_bio_url}', event)" class="mb-4 px-4 py-2.5 bg-orange-50 text-botOrange border border-orange-200 rounded-xl font-bold text-xs flex items-center gap-2">
-                    <i class="ph-fill ph-speaker-high text-base"></i> Listen to ${profile.name}'s Voice Intro
+            const modestDetailBtn = isBlurred ? `
+                <button type="button" onclick="closeProfileDetails(); if(typeof openPhotoRevealRequestModal==='function') openPhotoRevealRequestModal(event);" class="btn-shimmer w-full mb-4 py-3 bg-gradient-to-r from-premium to-habeshaCoral text-white rounded-2xl font-extrabold text-xs shadow-md flex items-center justify-center gap-1.5 active:scale-95 transition">
+                    <i class="ph-fill ph-lock-key-open text-amber-200"></i>
+                    <span>${profile.reveal_request_status === "pending" ? "⏳ Photo Reveal Request Pending" : "🔓 Request Photo Reveal (VIP / 🌹 Rose)"}</span>
                 </button>
             ` : "";
 
@@ -3997,6 +3993,7 @@
 
             document.getElementById("profile-details-content").innerHTML = `
                 ${galleryHtml}
+                ${modestDetailBtn}
                 <h3 class="text-3xl font-bold text-buna mb-2 flex items-center">${profile.name}, ${ageGenderLabel} ${verifyBadge}</h3>
                 ${trustShieldBox}
                 <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -4149,23 +4146,22 @@
                     const matchesViewsPill = document.getElementById("matches-views-count-pill");
                     if (matchesViewsPill) matchesViewsPill.innerText = `👀 ${mp.views_count || 0}`;
 
+                    const revealPill = document.getElementById("matches-reveal-count-pill");
+                    if (revealPill) {
+                        const rCnt = parseInt(mp.pending_reveal_requests_count || 0, 10);
+                        revealPill.innerText = `🔓 ${rCnt}`;
+                        revealPill.classList.toggle("animate-pulse", rCnt > 0);
+                    }
+
                     const modestLabel = document.getElementById("modest-blur-btn-label");
-                    if (modestLabel) modestLabel.innerText = mp.blur_photos_until_match ? "🔒 Modest Photo Blur: ON" : "Modest Photo Blur: OFF";
-
-                    const profileName = document.getElementById("my-profile-name");
-                    const crownHtml = mp.is_premium ? `<i class="ph-fill ph-crown text-premium ml-1"></i>` : "";
-                    if (profileName) profileName.innerHTML = `${mp.name || "User"}, ${formatAgeGender(mp.age, mp.gender)} ${crownHtml}`;
-
-                    const completionPct = parseInt(mp.profile_completion || 50);
-                    const compCard = document.getElementById("profile-completion-card");
-                    if (compCard) {
-                        if (completionPct < 85 || !mp.is_verified) {
-                            compCard.classList.remove("hidden");
-                            document.getElementById("profile-completion-pct").innerText = `${completionPct}%`;
-                            document.getElementById("profile-completion-bar").style.width = `${completionPct}%`;
-                        } else {
-                            compCard.classList.add("hidden");
-                        }
+                    if (modestLabel) {
+                        const mLevel = mp.modest_blur_level || (mp.blur_photos_until_match ? "strict" : "off");
+                        modestLabel.innerText = mLevel === "trusted"
+                            ? "🛡️ Modest Mode: Trusted VIPs"
+                            : mLevel === "strict"
+                            ? "🔒 Modest Mode: Strict"
+                            : "Modest Photo Blur: OFF";
+                    }
                     }
 
                     const refCount = parseInt(mp.referral_count || 0);
@@ -5719,9 +5715,9 @@
 
         initApp();
     </script>
-    <script src="phase6_features.js?v=21"></script>
-    <script src="phase7_features.js?v=21"></script>
-    <script src="phase9_features.js?v=21"></script>
-    <script src="phase10_features.js?v=21"></script>
+    <script src="phase6_features.js?v=22"></script>
+    <script src="phase7_features.js?v=22"></script>
+    <script src="phase9_features.js?v=22"></script>
+    <script src="phase10_features.js?v=22"></script>
 </body>
 </html>
