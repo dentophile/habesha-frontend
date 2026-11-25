@@ -155,20 +155,36 @@
                 }
                 break;
 
+            case "photo_reveal_requested":
+                triggerHaptic("light");
+                if (window.myProfileData) {
+                    window.myProfileData.pending_reveal_requests_count = (parseInt(window.myProfileData.pending_reveal_requests_count || 0, 10) + 1);
+                    syncRevealRequestsBadgeUI();
+                }
+                break;
+
+            case "photo_reveal_responded":
+                if (pkt.approved) {
+                    triggerHaptic("success");
+                    if (typeof loadDiscoverProfiles === "function") loadDiscoverProfiles();
+                    showAlert("🔓 Great news! Your Photo Reveal request was approved—their clear photo is now unlocked for you!");
+                }
+                break;
+
             case "webrtc_signal":
                 handleIncomingWebRTCSignal(pkt);
                 break;
 
-            case "mixer_paired":
             case "mixer_message":
+            case "mixer_paired":
             case "mixer_matched":
-                if (mixerOpen) pollBunaMixerState();
+                if (mixerOpen) pollBunaMixerState("join");
                 break;
 
             case "mixer_ended":
                 if (mixerOpen) {
-                    showAlert("☕ Your speed-date partner left the lounge. Tap Mixer again to meet someone new!");
                     closeBunaMixerUIOnly();
+                    showAlert("☕ Your Buna Speed-Date ended! Tap Speed Mixer anytime to meet someone new.");
                 }
                 break;
         }
@@ -176,58 +192,216 @@
 
     window.toggleSpokenLangPill = function (btnEl) {
         if (!btnEl) return;
-        triggerHaptic("selection");
-        const isSelected = btnEl.getAttribute("data-selected") === "true";
-        if (isSelected) {
-            btnEl.setAttribute("data-selected", "false");
-            btnEl.className = "px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-gray-600 border border-gray-200 transition";
-        } else {
-            btnEl.setAttribute("data-selected", "true");
-            btnEl.className = "px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-botOrange to-habeshaCoral text-white border border-transparent shadow-sm transition";
-        }
-        syncHiddenSpokenLanguages();
+        const active = btnEl.classList.toggle("bg-botOrange");
+        btnEl.classList.toggle("text-white", active);
+        btnEl.classList.toggle("border-botOrange", active);
+        btnEl.classList.toggle("bg-white", !active);
+        btnEl.classList.toggle("text-gray-600", !active);
+        btnEl.classList.toggle("border-gray-200", !active);
+
+        const selected = Array.from(document.querySelectorAll("#reg-languages-pills button.bg-botOrange"))
+            .map((b) => b.getAttribute("data-lang"))
+            .filter(Boolean);
+        const hiddenInput = document.getElementById("reg-languages-spoken");
+        if (hiddenInput) hiddenInput.value = selected.join(", ");
     };
 
-    function syncHiddenSpokenLanguages() {
-        const container = document.getElementById("reg-languages-pills");
-        const hiddenInput = document.getElementById("reg-languages-spoken");
-        if (!container || !hiddenInput) return;
-        const chosen = [];
-        container.querySelectorAll("button[data-lang]").forEach((b) => {
-            if (b.getAttribute("data-selected") === "true") {
-                chosen.push(b.getAttribute("data-lang"));
-            }
-        });
-        hiddenInput.value = chosen.join(", ");
-    }
-
     window.setSpokenLangPillsFromCSV = function (csvStr) {
-        const container = document.getElementById("reg-languages-pills");
-        const hiddenInput = document.getElementById("reg-languages-spoken");
-        if (!container || !hiddenInput) return;
-        const activeSet = new Set(
+        const chosen = new Set(
             String(csvStr || "")
                 .split(",")
                 .map((s) => s.trim().toLowerCase())
                 .filter(Boolean)
         );
-        container.querySelectorAll("button[data-lang]").forEach((b) => {
-            const lang = (b.getAttribute("data-lang") || "").toLowerCase();
-            if (activeSet.has(lang)) {
-                b.setAttribute("data-selected", "true");
-                b.className = "px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-botOrange to-habeshaCoral text-white border border-transparent shadow-sm transition";
-            } else {
-                b.setAttribute("data-selected", "false");
-                b.className = "px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-gray-600 border border-gray-200 transition";
-            }
+        document.querySelectorAll("#reg-languages-pills button").forEach((btn) => {
+            const val = String(btn.getAttribute("data-lang") || "").trim().toLowerCase();
+            const isSel = chosen.has(val);
+            btn.classList.toggle("bg-botOrange", isSel);
+            btn.classList.toggle("text-white", isSel);
+            btn.classList.toggle("border-botOrange", isSel);
+            btn.classList.toggle("bg-white", !isSel);
+            btn.classList.toggle("text-gray-600", !isSel);
+            btn.classList.toggle("border-gray-200", !isSel);
         });
-        syncHiddenSpokenLanguages();
+        const hiddenInput = document.getElementById("reg-languages-spoken");
+        if (hiddenInput) hiddenInput.value = String(csvStr || "").trim();
     };
 
-    window.toggleMyModestBlur = async function () {
+    function ensureTieredModestModalsDOM() {
+        if (!document.getElementById("p6-modest-tier-modal")) {
+            const m = document.createElement("div");
+            m.id = "p6-modest-tier-modal";
+            m.className = "hidden fixed inset-0 z-[218] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4";
+            m.innerHTML = `
+                <div class="bg-white rounded-[2rem] p-5 w-full max-w-sm shadow-2xl relative overflow-hidden border border-purple-200 modal-pop max-h-[88vh] touch-scroll no-scrollbar">
+                    <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
+                    <button type="button" onclick="document.getElementById('p6-modest-tier-modal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                    <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-premium text-[10px] font-extrabold uppercase mb-1.5">
+                        🔒 Tiered Modest Privacy
+                    </div>
+                    <h3 class="text-lg font-extrabold text-buna mb-1">Choose Who Sees Your Clear Photos</h3>
+                    <p class="text-[11px] text-gray-500 mb-3.5 leading-relaxed">Stay 100% in control—nobody can ever bypass your blur without your chosen rule or approval.</p>
+
+                    <div class="space-y-2 text-left mb-3.5">
+                        <label class="flex items-start gap-2.5 p-3 rounded-2xl border-2 border-gray-200 bg-gray-50/70 cursor-pointer">
+                            <input type="radio" name="p6-modest-level" value="off" class="mt-0.5 w-4 h-4 accent-botOrange shrink-0">
+                            <div>
+                                <p class="text-xs font-extrabold text-buna">✨ Public (Blur OFF)</p>
+                                <p class="text-[10px] text-gray-500">Everyone on Discover can see your clear photos immediately.</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-2.5 p-3 rounded-2xl border-2 border-purple-300 bg-purple-50/60 cursor-pointer">
+                            <input type="radio" name="p6-modest-level" value="trusted" class="mt-0.5 w-4 h-4 accent-premium shrink-0">
+                            <div>
+                                <p class="text-xs font-extrabold text-premium">🛡️ Trusted Members Only (Recommended)</p>
+                                <p class="text-[10px] text-gray-600">Blurred for anonymous/unverified strangers, but <b>automatically clear for ☑️ Biometric Verified + 👑 VIP</b> members!</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-2.5 p-3 rounded-2xl border-2 border-amber-200 bg-amber-50/60 cursor-pointer">
+                            <input type="radio" name="p6-modest-level" value="strict" class="mt-0.5 w-4 h-4 accent-amber-600 shrink-0">
+                            <div>
+                                <p class="text-xs font-extrabold text-buna">🔒 Strict Blur (Match or Approval Only)</p>
+                                <p class="text-[10px] text-gray-600">Blurred for everyone until mutual match—or until you personally tap <b>🔓 Approve</b> on a VIP/Rose reveal request.</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <label class="flex items-center justify-between p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 cursor-pointer mb-4 text-left">
+                        <div class="pr-2">
+                            <p class="text-xs font-extrabold text-emerald-900">🎙️ Merit Auto-Unlock (Optional)</p>
+                            <p class="text-[10px] text-emerald-800">Also auto-unblur for members who have a <b>15s Voice Bio</b> &amp; <b>90%+ Compatibility Alignment</b>.</p>
+                        </div>
+                        <input id="p6-modest-merit-chk" type="checkbox" class="w-4 h-4 accent-emerald-600 rounded shrink-0">
+                    </label>
+
+                    <button type="button" onclick="saveModestPrivacySettings()" class="btn-shimmer w-full py-3.5 bg-gradient-to-r from-premium via-fuchsia-600 to-habeshaCoral text-white rounded-2xl font-extrabold text-xs shadow-lg active:scale-95 transition">
+                        Save Privacy Preference
+                    </button>
+                </div>
+            `;
+            m.addEventListener("click", (e) => { if (e.target === m) m.classList.add("hidden"); });
+            document.body.appendChild(m);
+        }
+
+        if (!document.getElementById("p6-reveal-request-modal")) {
+            const rm = document.createElement("div");
+            rm.id = "p6-reveal-request-modal";
+            rm.className = "hidden fixed inset-0 z-[218] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4";
+            rm.innerHTML = `
+                <div class="bg-white rounded-[2rem] p-5 w-full max-w-sm shadow-2xl relative overflow-hidden border border-purple-200 modal-pop">
+                    <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
+                    <button type="button" onclick="document.getElementById('p6-reveal-request-modal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                    <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-premium text-[10px] font-extrabold uppercase mb-1.5">
+                        🔓 Respectful Photo Reveal
+                    </div>
+                    <h3 id="p6-req-reveal-title" class="text-lg font-extrabold text-buna mb-1">Request Photo Reveal</h3>
+                    <p id="p6-req-reveal-desc" class="text-xs text-gray-600 mb-3 leading-relaxed"></p>
+
+                    <div id="p6-trusted-fasttrack-box" class="hidden mb-3 p-3 rounded-2xl bg-sky-50 border border-blue-200 text-left space-y-2">
+                        <p class="text-[11px] font-extrabold text-buna">🛡️ Instant Auto-Unblur Available!</p>
+                        <p class="text-[10px] text-gray-600">This member allows <b>☑️ Biometric Verified + 👑 VIP</b> members to view clear photos automatically.</p>
+                        <div class="flex gap-1.5">
+                            <button type="button" onclick="document.getElementById('p6-reveal-request-modal').classList.add('hidden'); openVerifyModal();" class="flex-1 py-2 bg-verify text-white rounded-xl text-[10px] font-extrabold">☑️ Verify Face (3s)</button>
+                            <button type="button" onclick="document.getElementById('p6-reveal-request-modal').classList.add('hidden'); openPremiumModal('stars');" class="flex-1 py-2 bg-premium text-white rounded-xl text-[10px] font-extrabold">👑 Get VIP</button>
+                        </div>
+                    </div>
+
+                    <textarea id="p6-req-reveal-note" maxlength="120" placeholder="Add a respectful 1-line intro (e.g. Loved your Tidar goals & bio! ☕)..." class="w-full p-3 border border-gray-200 rounded-2xl bg-gray-50 text-xs h-16 resize-none mb-3 focus:bg-white focus:outline-none focus:border-premium"></textarea>
+
+                    <div class="space-y-2">
+                        <button type="button" id="p6-btn-req-vip" onclick="submitPhotoRevealRequest(false)" class="btn-shimmer w-full py-3.5 bg-gradient-to-r from-premium to-pink-600 text-white rounded-2xl font-extrabold text-xs shadow-lg active:scale-95 transition">
+                            👑 Send VIP Photo Reveal Request (Free for VIP)
+                        </button>
+                        <button type="button" id="p6-btn-req-rose" onclick="submitPhotoRevealRequest(true)" class="w-full py-3 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition">
+                            🌹 Request Reveal Using 1 Golden Rose
+                        </button>
+                    </div>
+                </div>
+            `;
+            rm.addEventListener("click", (e) => { if (e.target === rm) rm.classList.add("hidden"); });
+            document.body.appendChild(rm);
+        }
+
+        if (!document.getElementById("p6-incoming-reveals-modal")) {
+            const im = document.createElement("div");
+            im.id = "p6-incoming-reveals-modal";
+            im.className = "hidden fixed inset-0 z-[218] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4";
+            im.innerHTML = `
+                <div class="bg-white rounded-[2rem] p-5 w-full max-w-sm shadow-2xl relative overflow-hidden border border-purple-200 modal-pop max-h-[86vh] flex flex-col">
+                    <div class="tibeb-ribbon h-1.5 w-full absolute top-0 left-0"></div>
+                    <button type="button" onclick="document.getElementById('p6-incoming-reveals-modal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                    <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-premium text-[10px] font-extrabold uppercase mb-1.5 w-fit">
+                        🔓 Photo Reveal Requests
+                    </div>
+                    <h3 class="text-lg font-extrabold text-buna mb-0.5">Choose Who Can See You</h3>
+                    <p class="text-[11px] text-gray-500 mb-3">Approve to unblur your photos for that specific person only, or keep blurred.</p>
+                    <div id="p6-incoming-reveals-list" class="flex-1 min-h-0 touch-scroll space-y-2.5 pr-0.5"></div>
+                </div>
+            `;
+            im.addEventListener("click", (e) => { if (e.target === im) im.classList.add("hidden"); });
+            document.body.appendChild(im);
+        }
+
+        // Inject Photo Reveal Requests bar right below the Views Vault bar in Matches tab
+        const viewsBar = document.getElementById("matches-views-vault-bar");
+        if (viewsBar && !document.getElementById("matches-reveal-requests-bar")) {
+            viewsBar.insertAdjacentHTML(
+                "afterend",
+                `
+                <div id="matches-reveal-requests-bar" onclick="openIncomingRevealRequestsModal()" class="bg-gradient-to-r from-amber-50 via-white to-purple-50 p-3.5 rounded-3xl shadow-sm border border-amber-200/80 flex items-center justify-between cursor-pointer active:scale-[0.98] transition">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                            <i class="ph-fill ph-lock-key-open text-xl"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h3 class="text-xs font-extrabold text-buna truncate">Photo Reveal Requests (Modest Mode)</h3>
+                            <p class="text-[11px] text-gray-500 truncate">Approve or keep blurred in 1 tap</p>
+                        </div>
+                    </div>
+                    <span id="matches-reveal-count-pill" class="bg-amber-500 text-white text-xs font-extrabold px-2.5 py-1 rounded-full shrink-0 shadow-sm">🔓 0</span>
+                </div>
+                `
+            );
+        }
+    }
+
+    function syncRevealRequestsBadgeUI() {
+        const cnt = parseInt((window.myProfileData && window.myProfileData.pending_reveal_requests_count) || 0, 10);
+        const pill = document.getElementById("matches-reveal-count-pill");
+        if (pill) {
+            pill.innerText = `🔓 ${cnt}`;
+            pill.classList.toggle("animate-pulse", cnt > 0);
+        }
+    }
+
+    window.toggleMyModestBlur = function () {
         if (isGuestMode) return openGuestSignupModal();
-        const curState = Boolean(window.myProfileData && window.myProfileData.blur_photos_until_match);
-        const nextState = !curState;
+        ensureTieredModestModalsDOM();
+        triggerHaptic("light");
+
+        const mp = window.myProfileData || {};
+        const curLevel = mp.modest_blur_level || (mp.blur_photos_until_match ? "strict" : "off");
+        document.querySelectorAll("input[name='p6-modest-level']").forEach((r) => {
+            r.checked = r.value === curLevel;
+        });
+        const meritChk = document.getElementById("p6-modest-merit-chk");
+        if (meritChk) meritChk.checked = Boolean(mp.modest_merit_unlock);
+
+        document.getElementById("p6-modest-tier-modal")?.classList.remove("hidden");
+    };
+
+    window.saveModestPrivacySettings = async function () {
+        const checked = document.querySelector("input[name='p6-modest-level']:checked");
+        const level = checked ? checked.value : "off";
+        const merit = Boolean(document.getElementById("p6-modest-merit-chk")?.checked);
         triggerHaptic("medium");
         try {
             const res = await fetch(`${BACKEND_URL}/api/toggle-blur-photos`, {
@@ -235,22 +409,191 @@
                 headers: getAuthHeaders(true),
                 body: JSON.stringify({
                     telegram_id: cleanTelegramId,
-                    blur_photos_until_match: nextState
+                    blur_photos_until_match: level !== "off",
+                    modest_blur_level: level,
+                    modest_merit_unlock: merit
                 })
             });
-            if (!res.ok) throw new Error("Could not update Modest Mode.");
-            if (window.myProfileData) window.myProfileData.blur_photos_until_match = nextState;
-
+            if (!res.ok) throw new Error("Could not save privacy setting.");
+            if (window.myProfileData) {
+                window.myProfileData.modest_blur_level = level;
+                window.myProfileData.blur_photos_until_match = level !== "off";
+                window.myProfileData.modest_merit_unlock = merit;
+            }
             const lbl = document.getElementById("modest-blur-btn-label");
-            if (lbl) lbl.innerText = nextState ? "🔒 Modest Photo Blur: ON" : "Modest Photo Blur: OFF";
-
-            showAlert(
-                nextState
-                    ? "🔒 Modest Mode ON! Your photos are now frosted on Discover and automatically unblur only for people you mutually match with."
-                    : "✨ Modest Mode OFF! Your clear photos are visible on Discover again."
-            );
+            if (lbl) {
+                lbl.innerText = level === "trusted"
+                    ? "🛡️ Modest Mode: Trusted VIPs"
+                    : level === "strict"
+                    ? "🔒 Modest Mode: Strict"
+                    : "Modest Photo Blur: OFF";
+            }
+            document.getElementById("p6-modest-tier-modal")?.classList.add("hidden");
+            const desc = level === "trusted"
+                ? "🛡️ Trusted Modest Mode ON! Blurred for strangers, automatically clear for ☑️ Verified VIPs."
+                : level === "strict"
+                ? "🔒 Strict Modest Mode ON! Blurred until mutual match or your personal 1-tap approval."
+                : "✨ Modest Photo Blur OFF! Your clear photos are public on Discover.";
+            showAlert(desc);
         } catch (err) {
-            showAlert(err.message || "Could not toggle Modest Mode.");
+            showAlert(err.message || "Could not update Modest Mode.");
+        }
+    };
+
+    window.openPhotoRevealRequestModal = function (event) {
+        if (event) event.stopPropagation();
+        const profile = (typeof profiles !== "undefined" && profiles[currentCardIndex]) ? profiles[currentCardIndex] : null;
+        if (!profile) return;
+        if (isGuestMode) return openGuestSignupModal(profile.name);
+        ensureTieredModestModalsDOM();
+        triggerHaptic("light");
+
+        const isTrusted = profile.modest_blur_level === "trusted";
+        document.getElementById("p6-req-reveal-title").innerText = `Ask ${profile.name} to Unblur Photos`;
+        document.getElementById("p6-req-reveal-desc").innerHTML = isTrusted
+            ? `<b>${profile.name}</b> uses <b>Trusted Modest Mode</b>. Become ☑️ Biometric Verified + 👑 VIP to unblur automatically, OR send a respectful 1-tap reveal request below:`
+            : `<b>${profile.name}</b> uses <b>Strict Modest Mode</b>. Send a respectful Photo Reveal request—they'll see your badges &amp; bio and can unblur for you in 1 tap!`;
+
+        const fastBox = document.getElementById("p6-trusted-fasttrack-box");
+        if (fastBox) fastBox.classList.toggle("hidden", !isTrusted);
+
+        const isPrem = Boolean(window.myProfileData && window.myProfileData.is_premium);
+        const roses = (window.myProfileData && window.myProfileData.golden_roses !== undefined) ? window.myProfileData.golden_roses : 1;
+        const vipBtn = document.getElementById("p6-btn-req-vip");
+        const roseBtn = document.getElementById("p6-btn-req-rose");
+        if (vipBtn) {
+            vipBtn.innerText = isPrem
+                ? "👑 Send Respectful Photo Reveal Request (VIP Free)"
+                : "👑 Unlock Free VIP Photo Reveal Requests";
+        }
+        if (roseBtn) {
+            roseBtn.innerText = `🌹 Send Priority Reveal Request (1 Rose • You have ${roses})`;
+        }
+
+        const noteEl = document.getElementById("p6-req-reveal-note");
+        if (noteEl) noteEl.value = "";
+        document.getElementById("p6-reveal-request-modal")?.classList.remove("hidden");
+    };
+
+    window.submitPhotoRevealRequest = async function (useRose = false) {
+        const profile = (typeof profiles !== "undefined" && profiles[currentCardIndex]) ? profiles[currentCardIndex] : null;
+        if (!profile) return;
+        const isPrem = Boolean(window.myProfileData && window.myProfileData.is_premium);
+        if (!useRose && !isPrem) {
+            document.getElementById("p6-reveal-request-modal")?.classList.add("hidden");
+            return openPremiumModal("stars");
+        }
+
+        const note = document.getElementById("p6-req-reveal-note")?.value.trim() || "";
+        triggerHaptic("medium");
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/photo-reveal/request`, {
+                method: "POST",
+                headers: getAuthHeaders(true),
+                body: JSON.stringify({
+                    requester_id: cleanTelegramId,
+                    owner_id: String(profile.telegram_id),
+                    use_rose: Boolean(useRose),
+                    note: note
+                })
+            });
+            const data = await res.json();
+            document.getElementById("p6-reveal-request-modal")?.classList.add("hidden");
+            if (data.upgrade_required) {
+                openPremiumModal("stars");
+                return showAlert(data.message);
+            }
+            if (!res.ok) throw new Error(data.detail || "Could not send request.");
+
+            if (window.myProfileData && data.golden_roses !== undefined) {
+                window.myProfileData.golden_roses = data.golden_roses;
+                if (typeof updateSwipesRemainingUI === "function") updateSwipesRemainingUI();
+            }
+            profile.reveal_request_status = data.status || "pending";
+            if (typeof renderCards === "function") renderCards();
+            triggerHaptic("success");
+            showAlert(data.message || "🔓 Photo Reveal request sent!");
+        } catch (err) {
+            showAlert(err.message || "Could not send Photo Reveal request.");
+        }
+    };
+
+    window.openIncomingRevealRequestsModal = async function () {
+        if (isGuestMode) return openGuestSignupModal();
+        ensureTieredModestModalsDOM();
+        triggerHaptic("light");
+        const modal = document.getElementById("p6-incoming-reveals-modal");
+        const listEl = document.getElementById("p6-incoming-reveals-list");
+        if (!modal || !listEl) return;
+
+        modal.classList.remove("hidden");
+        listEl.innerHTML = `<div class="flex justify-center py-8"><i class="ph ph-spinner animate-spin text-2xl text-premium"></i></div>`;
+
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/photo-reveal/incoming/${encodeURIComponent(cleanTelegramId)}`);
+            const data = await res.json();
+            const reqs = data.requests || [];
+            if (window.myProfileData) {
+                window.myProfileData.pending_reveal_requests_count = reqs.length;
+                syncRevealRequestsBadgeUI();
+            }
+
+            if (reqs.length === 0) {
+                listEl.innerHTML = `
+                    <div class="text-center py-6 px-3">
+                        <div class="w-12 h-12 mx-auto mb-2 rounded-2xl bg-purple-50 text-premium flex items-center justify-center">
+                            <i class="ph-duotone ph-lock-key-open text-2xl"></i>
+                        </div>
+                        <p class="text-xs font-extrabold text-buna">No Pending Photo Reveal Requests</p>
+                        <p class="text-[11px] text-gray-500 mt-1">When VIP or Rose admirers request to see your blurred photos, they'll appear here for your 1-tap approval.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = reqs.map((r) => {
+                const ageGen = formatAgeGender(r.age, r.gender);
+                const badges = `${r.is_verified ? "☑️ Verified" : ""} ${r.is_premium ? "👑 VIP" : ""} ${r.method === "rose" ? "🌹 Rose" : ""}`.trim();
+                return `
+                    <div class="p-3 bg-purple-50/50 border border-purple-100 rounded-2xl space-y-2 text-left">
+                        <div class="flex items-center gap-2.5">
+                            <div onclick="document.getElementById('p6-incoming-reveals-modal').classList.add('hidden'); jumpFromViewsVault('${r.requester_id}');" class="w-12 h-12 rounded-2xl bg-cover bg-center border-2 border-premium shrink-0 cursor-pointer" style="background-image:url('${r.photo_url || DEFAULT_AVATAR}')"></div>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-xs font-extrabold text-buna truncate">${r.name}, ${ageGen}</p>
+                                <p class="text-[10px] font-bold text-premium truncate">${badges || "Habesha Member"} • 📍 ${r.location}</p>
+                                ${r.note ? `<p class="text-[11px] text-gray-600 italic mt-0.5 line-clamp-2">"${r.note}"</p>` : ""}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button type="button" onclick="respondPhotoRevealRequest('${r.requester_id}', true)" class="py-2 bg-emerald-600 text-white rounded-xl text-[11px] font-extrabold shadow-sm active:scale-95">🔓 Reveal My Photo</button>
+                            <button type="button" onclick="respondPhotoRevealRequest('${r.requester_id}', false)" class="py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-[11px] font-extrabold active:scale-95">❌ Keep Blurred</button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        } catch (err) {
+            listEl.innerHTML = `<p class="text-xs text-red-500 text-center py-4">Could not load requests right now.</p>`;
+        }
+    };
+
+    window.respondPhotoRevealRequest = async function (requesterId, approve) {
+        triggerHaptic(approve ? "success" : "light");
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/photo-reveal/respond`, {
+                method: "POST",
+                headers: getAuthHeaders(true),
+                body: JSON.stringify({
+                    owner_id: cleanTelegramId,
+                    requester_id: String(requesterId),
+                    approve: Boolean(approve)
+                })
+            });
+            if (res.ok) {
+                showAlert(approve ? "🔓 Photo unlocked for this member!" : "🔒 Kept blurred—your privacy is protected.");
+                await window.openIncomingRevealRequestsModal();
+            }
+        } catch (err) {
+            showAlert("Could not update request.");
         }
     };
 
@@ -1175,10 +1518,12 @@
 
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
+            ensureTieredModestModalsDOM();
             checkAppBuildVersionAndBunaHour();
             setTimeout(connectRealtimeWebSocket, 1200);
         });
     } else {
+        ensureTieredModestModalsDOM();
         checkAppBuildVersionAndBunaHour();
         setTimeout(connectRealtimeWebSocket, 1200);
     }
