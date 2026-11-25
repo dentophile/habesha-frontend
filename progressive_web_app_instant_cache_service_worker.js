@@ -7,15 +7,15 @@
  * - Bypass for live API & WebSocket calls
  */
 
-const CACHE_NAME = "habesha-date-pwa-v21";
+const CACHE_NAME = "habesha-date-pwa-v22";
 
 const STATIC_ASSETS = [
     "./",
     "./index.html",
-    "./phase6_features.js?v=21",
-    "./phase7_features.js?v=21",
-    "./phase9_features.js?v=21",
-    "./phase10_features.js?v=21",
+    "./phase6_features.js?v=22",
+    "./phase7_features.js?v=22",
+    "./phase9_features.js?v=22",
+    "./phase10_features.js?v=22",
     "https://unpkg.com/@phosphor-icons/web"
 ];
 
